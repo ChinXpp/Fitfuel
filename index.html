@@ -37,28 +37,9 @@
   .form-group label {display:block;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
   .form-group input, .form-group select {width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);padding:13px 16px;border-radius:var(--radius-sm);font-size:15px;box-sizing:border-box;max-width:100%}
   
-  /* ─── DATE INPUT FIX ─── */
-  .form-group input[type=date] {
-    font-family:'JetBrains Mono',monospace;
-    text-align:left;
-    padding:12px 12px;
-    font-size:14px;
-    min-height:46px;
-    width:100%;
-    appearance:none;
-    -webkit-appearance:none;
-    position:relative;
-  }
-  .form-group input[type=date]::-webkit-calendar-picker-indicator {
-    filter:invert(1) opacity(.6);
-    cursor:pointer;
-    padding:4px;
-    margin-left:0;
-    flex-shrink:0;
-  }
-  @media(max-width:380px){
-    .form-group input[type=date]{font-size:13px;padding:12px 8px}
-  }
+  .form-group input[type=date] {font-family:'JetBrains Mono',monospace;text-align:left;padding:12px 12px;font-size:14px;min-height:46px;width:100%;appearance:none;-webkit-appearance:none;position:relative;}
+  .form-group input[type=date]::-webkit-calendar-picker-indicator {filter:invert(1) opacity(.6);cursor:pointer;padding:4px;margin-left:0;flex-shrink:0;}
+  @media(max-width:380px){.form-group input[type=date]{font-size:13px;padding:12px 8px}}
   
   .form-group input:focus, .form-group select:focus {outline:none;border-color:var(--lime)}
   .form-row {display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -416,7 +397,7 @@
     </div>
     <div class="form-group"><label>เป้าหมายหลัก *</label><select id="ob-goal"><option value="">เลือก</option><option>ลดน้ำหนัก</option><option>เพิ่มกล้ามเนื้อ</option><option>รักษาน้ำหนัก</option><option>ปรับปรุงสุขภาพโดยรวม</option></select></div>
     <div class="form-row">
-      <div class="form-group"><label>เป้าการนอน (ชม.) *</label><input type="number" id="ob-sleep" placeholder="7.5" step="0.5" value="7.5"></div>
+      <div class="form-group"><label>เป้าหมายการนอน (ชม.) *</label><input type="number" id="ob-sleep" placeholder="7.5" step="0.5" value="7.5"></div>
       <div class="form-group"><label>เป้าออกกำลัง (นาที/สัปดาห์) *</label><input type="number" id="ob-ex" placeholder="150" step="10" value="150"></div>
     </div>
     <p class="error-msg" id="ob-error"></p>
@@ -723,7 +704,6 @@ function calcHealthScore(log, user) {
   return Math.max(0, s);
 }
 
-// ─── ENERGY HELPER ───
 function energyInfo(level) {
   if(level <= 3) return {label:'พลังงานต่ำ', emoji:'😴', color:'#FF4757', advice:'ควรพักผ่อน เพิ่มการนอน หรือทบทวนความเครียด'};
   if(level <= 6) return {label:'พลังงานปานกลาง', emoji:'😐', color:'#FF8C42', advice:'พลังงานปกติ ลองเพิ่มกิจกรรมเบาๆ'};
@@ -748,7 +728,6 @@ function generateRecommendations(log, user, history=[]) {
   if(log.exercise < targetExDaily/2) recs.push({severity:'high', icon:'⚠', title:'ออกกำลังกายน้อยไป', msg:'วันนี้ออกกำลังกาย '+log.exercise+' นาที (เป้าเฉลี่ย: '+targetExDaily+' นาที/วัน)', action:'เริ่มเดินเร็ว 20 นาที หรือ HIIT 10 นาที'});
   else if(log.exercise < targetExDaily) recs.push({severity:'medium', icon:'💡', title:'ออกกำลังกายยังไม่ถึงเป้า', msg:'ออกกำลังกาย '+log.exercise+' นาที', action:'เพิ่มความเข้มข้นอีกนิด'});
   
-  // ─── ENERGY-BASED RECOMMENDATIONS ───
   if(log.energyLevel) {
     if(log.energyLevel <= 3) {
       if(log.exercise >= 60) {
@@ -760,13 +739,6 @@ function generateRecommendations(log, user, history=[]) {
       }
     } else if(log.energyLevel >= 8 && log.exercise < targetExDaily/2) {
       recs.push({severity:'low', icon:'🔥', title:'พลังงานดีเยี่ยม!', msg:'พลังงาน '+log.energyLevel+'/10 แต่ออกกำลังกายแค่ '+log.exercise+' นาที', action:'เป็นโอกาสดี! เพิ่มความเข้มข้นการออกกำลังกายได้เลย'});
-    }
-    
-    if(history.length >= 3) {
-      const recent3Energy = history.slice(0,3).map(l=>l.energyLevel).filter(e=>e!=null);
-      if(recent3Energy.length === 3 && recent3Energy.every((e,i,arr)=>i===0||e<arr[i-1]) && recent3Energy[0] < recent3Energy[recent3Energy.length-1]-2) {
-        recs.push({severity:'medium', icon:'📉', title:'พลังงานลดลงต่อเนื่อง', msg:'พลังงาน 3 วันล่าสุดลดลงเรื่อยๆ', action:'ทบทวนการนอน อาหาร และความเครียด — อาจต้อง deload week'});
-      }
     }
   }
 
@@ -996,7 +968,6 @@ function renderUserHome() {
 }
 
 function renderUserLog() {
-  const hasEmail = !!currentUser.email;
   const today = new Date().toISOString().split('T')[0];
   return `
     <div class="section-title">บันทึกข้อมูลวันนี้</div>
@@ -1213,32 +1184,34 @@ document.getElementById('photo-input').addEventListener('change', function(e) {
 });
 
 // ════════════════════════════════════════════════════════════
-//  IMAGE CROPPER (Discord-style)
+//  IMAGE CROPPER (FIXED SCALING MATH)
 // ════════════════════════════════════════════════════════════
 let cropImg = null;
 let cropX = 0, cropY = 0, cropScale = 1;
 let cropDragging = false, cropDragStart = {x:0, y:0};
 let cropBaseScale = 1;
+let cropStageSize = 280; // ตัวแปรล็อกขนาดที่แท้จริง
 
 function openCropper(dataUrl) {
   const overlay = document.getElementById('cropper-overlay');
   overlay.classList.add('show'); 
   
-  // ใช้ setTimeout หน่วงเวลา เพื่อให้เบราว์เซอร์โชว์ Modal ขึ้นมาก่อน แล้วค่อยวัดขนาดกว้างยาว
   setTimeout(() => {
+    const stage = document.getElementById('cropper-stage');
+    // ล็อกขนาดจริงๆ ของกล่องสี่เหลี่ยมไว้ใช้ตลอดเวลา ไม่พึ่ง clientWidth ที่เปลี่ยนแปลงได้
+    const rect = stage.getBoundingClientRect();
+    cropStageSize = rect.width || stage.clientWidth || 280;
+    
     const img = document.getElementById('cropper-img');
     cropImg = new Image();
     cropImg.onload = () => {
-      img.src = dataUrl;
-      const stage = document.getElementById('cropper-stage');
-      const stageW = stage.clientWidth || 280; 
-      cropBaseScale = Math.max(stageW / cropImg.naturalWidth, stageW / cropImg.naturalHeight);
+      cropBaseScale = Math.max(cropStageSize / cropImg.naturalWidth, cropStageSize / cropImg.naturalHeight);
       cropX = 0; cropY = 0; cropScale = 1;
       document.getElementById('cropper-zoom').value = 1;
       applyCropTransform();
     };
     cropImg.src = dataUrl;
-  }, 50);
+  }, 50); // รอให้ Modal เด้งเสร็จและเบราว์เซอร์จัด Layout เรียบร้อยก่อนวัด
 }
 
 function applyCropTransform() {
@@ -1253,13 +1226,14 @@ function applyCropTransform() {
 }
 
 function constrainCrop() {
-  const stage = document.getElementById('cropper-stage');
-  const stageW = stage.clientWidth || 280;
   const totalScale = cropBaseScale * cropScale;
   const w = cropImg.naturalWidth * totalScale;
   const h = cropImg.naturalHeight * totalScale;
-  const maxX = (w - stageW) / 2;
-  const maxY = (h - stageW) / 2;
+  
+  // ใช้ค่า cropStageSize ที่ล็อกไว้มาคำนวณ เพื่อกันไม่ให้ขนาดกล่องเพี้ยนตอนลาก
+  const maxX = (w - cropStageSize) / 2;
+  const maxY = (h - cropStageSize) / 2;
+  
   cropX = Math.max(-maxX, Math.min(maxX, cropX));
   cropY = Math.max(-maxY, Math.min(maxY, cropY));
 }
@@ -1312,29 +1286,29 @@ async function applyCropper() {
   btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
   
   try {
-    const stage = document.getElementById('cropper-stage');
-    const stageW = stage.clientWidth || 280;
     const OUTPUT_SIZE = 400;
-    
     const canvas = document.createElement('canvas');
     canvas.width = OUTPUT_SIZE;
     canvas.height = OUTPUT_SIZE;
     const ctx = canvas.getContext('2d');
     
-    // เติมสีขาวที่พื้นหลัง เพื่อไม่ให้พิกเซลที่โปร่งใสในภาพ PNG กลายเป็นสีดำ
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
     
+    // คำนวณแบบแม่นยำ 100% ด้วยคณิตศาสตร์ โดยใช้ตำแหน่งศูนย์กลาง (Center)
     const totalScale = cropBaseScale * cropScale;
-    const displayW = cropImg.naturalWidth * totalScale;
-    const displayH = cropImg.naturalHeight * totalScale;
-    const imgLeft = stageW/2 - displayW/2 + cropX;
-    const imgTop = stageW/2 - displayH/2 + cropY;
     
-    const sx = -imgLeft / totalScale;
-    const sy = -imgTop / totalScale;
-    const sw = stageW / totalScale;
-    const sh = stageW / totalScale;
+    // แปลงจุดศูนย์กลางที่ต้องการตัด กลับไปเป็นค่า pixel ของภาพต้นฉบับ
+    const sourceCropCenterX = (cropImg.naturalWidth / 2) - (cropX / totalScale);
+    const sourceCropCenterY = (cropImg.naturalHeight / 2) - (cropY / totalScale);
+    
+    // คำนวณความกว้างยาวของกรอบในสเกลต้นฉบับ
+    const sw = cropStageSize / totalScale;
+    const sh = cropStageSize / totalScale;
+    
+    // หาจุดมุมซ้ายบนของกรอบ
+    const sx = sourceCropCenterX - (sw / 2);
+    const sy = sourceCropCenterY - (sh / 2);
     
     ctx.save();
     ctx.beginPath();
@@ -1386,7 +1360,7 @@ function renderSettingsInfo() {
         <div style="flex:1">
           <button class="btn-sm" onclick="document.getElementById('photo-input').click()">📷 เลือกรูปใหม่</button>
           ${currentUser.photo ? '<button class="btn-danger" style="margin-left:6px" onclick="removePhoto()">🗑 ลบ</button>' : ''}
-          <p class="field-hint" style="margin-top:8px">เลือกรูป → ปรับตำแหน่ง+ขนาดได้</p>
+          <p class="field-hint" style="margin-top:8px">JPG, PNG, GIF · ไม่เกิน 5MB</p>
         </div>
       </div>
     </div>
@@ -1591,7 +1565,7 @@ function renderActivityItem(a) {
   return `<div class="activity-item">
     <div class="activity-icon">${icons[a.type] || '📌'}</div>
     <div style="flex:1;min-width:0">
-      <div style="font-size:13px;line-height:1.5;word-break:break-word">${a.msg}</div>
+      <div style="font-size:13px;line-height:1.5;word-break:break-word">${a.msg} ${targetUser ? `<b>(@${targetUser.name})</b>` : ''}</div>
       <div class="activity-time">${time} · by ${a.actorName || 'system'}</div>
     </div>
   </div>`;
@@ -1614,7 +1588,7 @@ function renderAdminAlerts() {
     const u = USERS.find(x => x.id === l.userId); if(!u || u.role !== 'user') return null;
     const score = calcHealthScore(l, u);
     const userLogs = LOGS.filter(x => x.userId === u.id).sort((a,b) => b.date.localeCompare(a.date));
-    const recs = getRecommendations(l, u, userLogs).filter(r => r.severity === 'high');
+    const recs = generateRecommendations(l, u, userLogs).filter(r => r.severity === 'high');
     return {l, u, score, recs};
   }).filter(x => x && x.score < 70).sort((a,b) => a.score - b.score);
   if(!alerts.length) return `${adminBackBtn()}<div class="section-title">🚨 Alerts</div><div class="empty-state"><span class="empty-icon">✅</span><p>ไม่มีการแจ้งเตือน</p></div>`;

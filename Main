@@ -6,251 +6,238 @@
 <title>FitFuel – Health Tracking</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root{--lime:#C8F000;--lime-dark:#a8cc00;--gold:#FFD700;--black:#0A0A0A;--dark:#111214;--card:#1A1C1F;--card2:#222428;--border:#2A2D32;--muted:#555A62;--text:#E8EBF0;--text2:#9BA3AF;--red:#FF4757;--orange:#FF8C42;--teal:#2DD4BF;--blue:#3B82F6;--purple:#A78BFA;--radius:16px;--radius-sm:10px}
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{max-width:100%;overflow-x:hidden}
-  body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--text);min-height:100vh}
-  .screen{display:none;min-height:100vh;flex-direction:column;animation:fadeIn .3s ease}
-  .screen.active{display:flex}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  :root {--lime:#C8F000;--lime-dark:#a8cc00;--gold:#FFD700;--black:#0A0A0A;--dark:#111214;--card:#1A1C1F;--card2:#222428;--border:#2A2D32;--muted:#555A62;--text:#E8EBF0;--text2:#9BA3AF;--red:#FF4757;--orange:#FF8C42;--teal:#2DD4BF;--blue:#3B82F6;--purple:#A78BFA;--radius:16px;--radius-sm:10px}
+  * {margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body {max-width:100%;overflow-x:hidden}
+  body {font-family:'DM Sans',sans-serif;background:var(--black);color:var(--text);min-height:100vh}
+  .screen {display:none;min-height:100vh;flex-direction:column;animation:fadeIn .3s ease}
+  .screen.active {display:flex}
+  @keyframes fadeIn {from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)}}
 
-/* SPLASH */
-#screen-splash{align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 30%,#1a2a00 0%,var(--black) 70%);padding:24px}
-.splash-logo{text-align:center}
-.splash-logo .icon{font-size:72px;margin-bottom:12px;display:block}
-.splash-logo h1{font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:4px;color:var(--lime);line-height:1}
-.splash-logo p{color:var(--text2);font-size:14px;letter-spacing:3px;text-transform:uppercase;margin-top:6px}
-.splash-btns{margin-top:60px;display:flex;flex-direction:column;gap:12px;width:290px}
+  /* SPLASH */
+  #screen-splash {align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 30%,#1a2a00 0%,var(--black) 70%);padding:24px}
+  .splash-logo {text-align:center}
+  .splash-logo .icon {font-size:72px;margin-bottom:12px;display:block}
+  .splash-logo h1 {font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:4px;color:var(--lime);line-height:1}
+  .splash-logo p {color:var(--text2);font-size:14px;letter-spacing:3px;text-transform:uppercase;margin-top:6px}
+  .splash-btns {margin-top:60px;display:flex;flex-direction:column;gap:12px;width:290px}
 
-/* BUTTONS */
-.btn{border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:var(--radius-sm);transition:all .18s ease;letter-spacing:.3px}
-.btn-primary{background:var(--lime);color:var(--black);padding:16px 24px;font-size:15px;width:100%}
-.btn-primary:hover{background:var(--lime-dark);transform:translateY(-1px)}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.btn-secondary{background:var(--card);color:var(--text);padding:16px 24px;font-size:15px;width:100%;border:1px solid var(--border)}
-.btn-secondary:hover{background:var(--card2)}
-.btn-ghost{background:transparent;color:var(--text2);padding:14px 24px;font-size:14px;width:100%;text-decoration:underline;text-underline-offset:3px;cursor:pointer;border:none}
-.btn-ghost:hover{color:var(--text)}
-.btn-sm{background:var(--lime);color:var(--black);padding:9px 16px;font-size:12px;border-radius:8px;cursor:pointer;border:none;font-weight:600;font-family:'DM Sans',sans-serif}
-.btn-danger{background:rgba(255,71,87,.15);color:var(--red);border:1px solid rgba(255,71,87,.3);padding:10px 20px;font-size:13px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
-.btn-export{background:rgba(45,212,191,.15);color:var(--teal);border:1px solid rgba(45,212,191,.3);padding:10px 16px;font-size:12px;border-radius:8px;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:6px}
-.btn-export:hover{background:rgba(45,212,191,.25)}
+  /* BUTTONS */
+  .btn {border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:var(--radius-sm);transition:all .18s ease;letter-spacing:.3px}
+  .btn-primary {background:var(--lime);color:var(--black);padding:16px 24px;font-size:15px;width:100%}
+  .btn-primary:hover {background:var(--lime-dark);transform:translateY(-1px)}
+  .btn-primary:disabled {opacity:.5;cursor:not-allowed;transform:none}
+  .btn-secondary {background:var(--card);color:var(--text);padding:16px 24px;font-size:15px;width:100%;border:1px solid var(--border)}
+  .btn-secondary:hover {background:var(--card2)}
+  .btn-ghost {background:transparent;color:var(--text2);padding:14px 24px;font-size:14px;width:100%;text-decoration:underline;text-underline-offset:3px;cursor:pointer;border:none}
+  .btn-ghost:hover {color:var(--text)}
+  .btn-sm {background:var(--lime);color:var(--black);padding:9px 16px;font-size:12px;border-radius:8px;cursor:pointer;border:none;font-weight:600;font-family:'DM Sans',sans-serif}
+  .btn-danger {background:rgba(255,71,87,.15);color:var(--red);border:1px solid rgba(255,71,87,.3);padding:10px 20px;font-size:13px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
+  .btn-export {background:rgba(45,212,191,.15);color:var(--teal);border:1px solid rgba(45,212,191,.3);padding:10px 16px;font-size:12px;border-radius:8px;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:6px}
+  .btn-export:hover {background:rgba(45,212,191,.25)}
 
-/* AUTH */
-#screen-login,#screen-register,#screen-forgot{background:radial-gradient(ellipse at 20% 80%,#0d1f00 0%,var(--black) 60%);overflow-y:auto}
-.auth-wrap{max-width:420px;width:100%;margin:0 auto;padding:40px 24px 60px}
-.auth-header{margin-bottom:28px}
-.auth-header .back{background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;margin-bottom:20px;display:block;padding:0}
-.auth-header h2{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;color:var(--lime)}
-.auth-header p{color:var(--text2);font-size:14px;margin-top:4px}
+  /* AUTH */
+  #screen-login,#screen-register,#screen-forgot {background:radial-gradient(ellipse at 20% 80%,#0d1f00 0%,var(--black) 60%);overflow-y:auto}
+  .auth-wrap {max-width:420px;width:100%;margin:0 auto;padding:40px 24px 60px}
+  .auth-header {margin-bottom:28px}
+  .auth-header .back {background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;margin-bottom:20px;display:block;padding:0}
+  .auth-header h2 {font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;color:var(--lime)}
+  .auth-header p {color:var(--text2);font-size:14px;margin-top:4px}
 
-/* FORMS */
-.form-group{margin-bottom:14px; max-width: 100%;}
-.form-group label{display:block;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
-.form-group input,.form-group select{width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);padding:13px 16px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;transition:border-color .2s;box-sizing:border-box;}
-.form-group input[type=date]{font-family:'JetBrains Mono',monospace;font-size:14px;text-align:center;-webkit-appearance:none;appearance:none;min-height:46px;padding:13px 8px; width: 100%; box-sizing: border-box;}
-.form-group input::-webkit-calendar-picker-indicator{filter:invert(1) opacity(.6);cursor:pointer}
-.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--lime)}
-.form-group select option{background:var(--dark)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.error-msg{color:var(--red);font-size:13px;margin-top:8px;text-align:center;min-height:18px}
-.field-hint{font-size:11px;color:var(--text2);margin-top:5px;padding-left:2px}
+  /* FORMS */
+  .form-group {margin-bottom:14px; width:100%}
+  .form-group label {display:block;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+  .form-group input, .form-group select {width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);padding:13px 16px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;transition:border-color .2s;box-sizing:border-box}
+  .form-group input[type=date] {font-family:'JetBrains Mono',monospace;font-size:14px;text-align:center;-webkit-appearance:none;appearance:none;min-height:46px;padding:13px 8px;width:100%}
+  .form-group input::-webkit-calendar-picker-indicator {filter:invert(1) opacity(.6);cursor:pointer}
+  .form-group input:focus, .form-group select:focus {outline:none;border-color:var(--lime)}
+  .form-group select option {background:var(--dark)}
+  .form-row {display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .error-msg {color:var(--red);font-size:13px;margin-top:8px;text-align:center;min-height:18px}
+  .field-hint {font-size:11px;color:var(--text2);margin-top:5px;padding-left:2px}
 
-/* PIN INPUT */
-.pin-wrap{display:flex;gap:8px;justify-content:center;margin:8px 0;max-width:100%}
-.pin-box{width:44px;height:54px;text-align:center;font-size:22px;font-weight:600;background:var(--card);border:2px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'JetBrains Mono',monospace;transition:all .15s}
-.pin-box:focus{outline:none;border-color:var(--lime);transform:scale(1.05)}
-.pin-box.filled{border-color:var(--lime)}
+  /* PIN INPUT */
+  .pin-wrap {display:flex;gap:8px;justify-content:center;margin:8px 0;max-width:100%}
+  .pin-box {width:44px;height:54px;text-align:center;font-size:22px;font-weight:600;background:var(--card);border:2px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'JetBrains Mono',monospace;transition:all .15s}
+  .pin-box:focus {outline:none;border-color:var(--lime);transform:scale(1.05)}
+  .pin-box.filled {border-color:var(--lime)}
 
-/* STEP TABS */
-.step-tabs{display:flex;background:var(--card2);border-radius:var(--radius-sm);padding:3px;margin-bottom:22px;gap:3px}
-.step-tab{flex:1;padding:10px 6px;border:none;background:transparent;color:var(--text2);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
-.step-tab.active{background:var(--card);color:var(--lime)}
-.step-tab:disabled{opacity:.4;cursor:not-allowed}
+  /* STEP TABS */
+  .step-tabs {display:flex;background:var(--card2);border-radius:var(--radius-sm);padding:3px;margin-bottom:22px;gap:3px}
+  .step-tab {flex:1;padding:10px 6px;border:none;background:transparent;color:var(--text2);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
+  .step-tab.active {background:var(--card);color:var(--lime)}
+  .step-tab:disabled {opacity:.4;cursor:not-allowed}
 
-/* TOPBAR */
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--dark);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
-.topbar-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--lime)}
-.topbar-right{display:flex;align-items:center;gap:8px}
-.avatar{width:36px;height:36px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--black);cursor:pointer;flex-shrink:0;background-size:cover;background-position:center;overflow:hidden}
-.avatar.admin{background:var(--blue);color:white}
-.avatar.master{background:var(--gold);color:var(--black)}
-.role-badge{font-size:9px;padding:3px 8px;border-radius:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
-.role-user{background:rgba(200,240,0,.15);color:var(--lime);border:1px solid rgba(200,240,0,.3)}
-.role-admin{background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3)}
-.role-master{background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.3)}
+  /* TOPBAR */
+  .topbar {display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--dark);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+  .topbar-logo {font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--lime)}
+  .topbar-right {display:flex;align-items:center;gap:8px}
+  .avatar {width:36px;height:36px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--black);cursor:pointer;flex-shrink:0;background-size:cover;background-position:center;overflow:hidden}
+  .avatar.admin {background:var(--blue);color:white}
+  .avatar.master {background:var(--gold);color:var(--black)}
+  .role-badge {font-size:9px;padding:3px 8px;border-radius:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+  .role-user {background:rgba(200,240,0,.15);color:var(--lime);border:1px solid rgba(200,240,0,.3)}
+  .role-admin {background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3)}
+  .role-master {background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.3)}
 
-/* MODE SWITCH */
-.mode-switch{background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(255,215,0,.04));border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.mode-switch-info{flex:1;min-width:0}
-.mode-switch-info .ms-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
-.mode-switch-info .ms-title{font-size:13px;font-weight:600;margin-top:2px}
-.mode-btn{padding:8px 14px;font-size:12px;border-radius:8px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;white-space:nowrap}
-.mode-btn-admin{background:var(--blue);color:white}
-.mode-btn-master{background:var(--gold);color:var(--black)}
+  /* MODE SWITCH */
+  .mode-switch {background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(255,215,0,.04));border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .mode-switch-info {flex:1;min-width:0}
+  .mode-switch-info .ms-label {font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
+  .mode-switch-info .ms-title {font-size:13px;font-weight:600;margin-top:2px}
+  .mode-btn {padding:8px 14px;font-size:12px;border-radius:8px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;white-space:nowrap}
+  .mode-btn-admin {background:var(--blue);color:white}
+  .mode-btn-master {background:var(--gold);color:var(--black)}
 
-/* CONTENT & NAV */
-.content{flex:1;overflow-y:auto;padding:20px;padding-bottom:100px}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--dark);border-top:1px solid var(--border);display:flex;padding:8px 0 20px;z-index:100}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px;transition:color .2s;color:var(--muted);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;background:none;border:none}
-.nav-item.active{color:var(--lime)}
-.nav-item .nav-icon{font-size:22px}
+  /* CONTENT & NAV */
+  .content {flex:1;overflow-y:auto;padding:20px;padding-bottom:100px}
+  .bottom-nav {position:fixed;bottom:0;left:0;right:0;background:var(--dark);border-top:1px solid var(--border);display:flex;padding:8px 0 20px;z-index:100}
+  .nav-item {flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px;transition:color .2s;color:var(--muted);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;background:none;border:none}
+  .nav-item.active {color:var(--lime)}
+  .nav-item .nav-icon {font-size:22px}
 
-/* CARDS */
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
-.card-sm{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px}
+  /* CARDS */
+  .card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+  .card-sm {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px}
 
-/* SETTINGS LIST */
-.settings-list{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
-.setting-item{padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s}
-.setting-item:hover{background:var(--card2)}
-.setting-item:last-child{border-bottom:none}
-.setting-icon{width:36px;height:36px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.setting-content{flex:1;min-width:0}
-.setting-title{font-size:14px;font-weight:600;margin-bottom:2px}
-.setting-desc{font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.setting-arrow{color:var(--muted);font-size:18px;flex-shrink:0}
+  /* SETTINGS LIST */
+  .settings-list {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+  .setting-item {padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s}
+  .setting-item:hover {background:var(--card2)}
+  .setting-item:last-child {border-bottom:none}
+  .setting-icon {width:36px;height:36px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .setting-content {flex:1;min-width:0}
+  .setting-title {font-size:14px;font-weight:600;margin-bottom:2px}
+  .setting-desc {font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .setting-arrow {color:var(--muted);font-size:18px;flex-shrink:0}
 
-/* METRICS */
-.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.metric-chip{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden}
-.metric-chip::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.07}
-.metric-chip.lime::before{background:var(--lime)}.metric-chip.teal::before{background:var(--teal)}
-.metric-chip.orange::before{background:var(--orange)}.metric-chip.blue::before{background:var(--blue)}
-.metric-chip .chip-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-.metric-chip .chip-value{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;line-height:1}
-.metric-chip .chip-unit{font-size:12px;color:var(--text2);margin-top:2px}
-.metric-chip.lime .chip-value{color:var(--lime)}.metric-chip.teal .chip-value{color:var(--teal)}
-.metric-chip.orange .chip-value{color:var(--orange)}.metric-chip.blue .chip-value{color:var(--blue)}
+  /* METRICS */
+  .metrics-grid {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .metric-chip {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden}
+  .metric-chip::before {content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.07}
+  .metric-chip.lime::before {background:var(--lime)} .metric-chip.teal::before {background:var(--teal)}
+  .metric-chip.orange::before {background:var(--orange)} .metric-chip.blue::before {background:var(--blue)}
+  .metric-chip .chip-label {font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+  .metric-chip .chip-value {font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;line-height:1}
+  .metric-chip .chip-unit {font-size:12px;color:var(--text2);margin-top:2px}
+  .metric-chip.lime .chip-value {color:var(--lime)} .metric-chip.teal .chip-value {color:var(--teal)}
+  .metric-chip.orange .chip-value {color:var(--orange)} .metric-chip.blue .chip-value {color:var(--blue)}
 
-/* BMI */
-.bmi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
-.bmi-card h3{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px}
-.bmi-display{text-align:center;margin-bottom:20px}
-.bmi-number{font-family:'Bebas Neue',sans-serif;font-size:80px;line-height:1}
-.bmi-label{font-size:14px;font-weight:500;margin-top:4px}
-.bmi-bar{background:var(--border);border-radius:6px;height:10px;position:relative;overflow:visible;margin:16px 0 8px}
-.bmi-bar-fill{height:100%;border-radius:6px}
-.bmi-indicator{position:absolute;top:-4px;width:18px;height:18px;border-radius:50%;background:white;border:3px solid var(--black);transform:translateX(-50%);transition:left .5s ease;box-shadow:0 0 0 2px white}
-.bmi-legend{display:flex;justify-content:space-between;font-size:10px;color:var(--text2)}
+  /* BMI */
+  .bmi-card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
+  .bmi-card h3 {font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px}
+  .bmi-display {text-align:center;margin-bottom:20px}
+  .bmi-number {font-family:'Bebas Neue',sans-serif;font-size:80px;line-height:1}
+  .bmi-label {font-size:14px;font-weight:500;margin-top:4px}
+  .bmi-bar {background:var(--border);border-radius:6px;height:10px;position:relative;overflow:visible;margin:16px 0 8px}
+  .bmi-bar-fill {height:100%;border-radius:6px}
+  .bmi-indicator {position:absolute;top:-4px;width:18px;height:18px;border-radius:50%;background:white;border:3px solid var(--black);transform:translateX(-50%);transition:left .5s ease;box-shadow:0 0 0 2px white}
+  .bmi-legend {display:flex;justify-content:space-between;font-size:10px;color:var(--text2)}
 
-/* PROGRESS */
-.progress-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
-.progress-bar{background:var(--border);height:8px;border-radius:4px;overflow:hidden;margin:8px 0}
-.progress-bar-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
-.progress-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
-.progress-row .label{color:var(--text2)}
-.progress-row .value{font-weight:600}
-.streak-box{background:linear-gradient(135deg,rgba(255,140,66,.12),rgba(255,71,87,.06));border:1px solid rgba(255,140,66,.3);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:14px}
-.streak-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--orange);line-height:1}
+  /* PROGRESS */
+  .progress-card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+  .progress-bar {background:var(--border);height:8px;border-radius:4px;overflow:hidden;margin:8px 0}
+  .progress-bar-fill {height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+  .progress-row {display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+  .progress-row .label {color:var(--text2)}
+  .progress-row .value {font-weight:600}
+  .streak-box {background:linear-gradient(135deg,rgba(255,140,66,.12),rgba(255,71,87,.06));border:1px solid rgba(255,140,66,.3);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:14px}
+  .streak-num {font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--orange);line-height:1}
 
-/* RISK */
-.risk-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600}
-.risk-low{background:rgba(200,240,0,.15);color:var(--lime);border:1px solid rgba(200,240,0,.3)}
-.risk-medium{background:rgba(255,140,66,.15);color:var(--orange);border:1px solid rgba(255,140,66,.3)}
-.risk-high{background:rgba(255,71,87,.15);color:var(--red);border:1px solid rgba(255,71,87,.3)}
+  /* RISK & RECS */
+  .risk-badge {display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600}
+  .risk-low {background:rgba(200,240,0,.15);color:var(--lime);border:1px solid rgba(200,240,0,.3)}
+  .risk-medium {background:rgba(255,140,66,.15);color:var(--orange);border:1px solid rgba(255,140,66,.3)}
+  .risk-high {background:rgba(255,71,87,.15);color:var(--red);border:1px solid rgba(255,71,87,.3)}
 
-/* LOGS */
-.log-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px}
-.log-item-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
-.log-stats{display:flex;gap:12px;flex-wrap:wrap}
-.log-stat{font-size:12px;color:var(--text2)}
-.log-stat span{color:var(--text);font-weight:600}
+  .rec-box {border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;border-left:3px solid}
+  .rec-box.low {background:rgba(200,240,0,.08);border-color:var(--lime)}
+  .rec-box.medium {background:rgba(255,140,66,.08);border-color:var(--orange)}
+  .rec-box.high {background:rgba(255,71,87,.08);border-color:var(--red)}
+  .rec-box p {font-size:13px;line-height:1.6}
+  .rec-box .rec-label {font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600}
+  .rec-box.low .rec-label {color:var(--lime)}
+  .rec-box.medium .rec-label {color:var(--orange)}
+  .rec-box.high .rec-label {color:var(--red)}
+  .rec-action {font-size:12px;color:var(--text2);margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-style:italic}
 
-/* SECTION */
-.section-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--lime);margin-bottom:16px}
-.section-sub{font-size:12px;color:var(--text2);margin-bottom:14px;text-transform:uppercase;letter-spacing:1px}
-.section-flex{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px}
-.section-flex .section-title{margin-bottom:0}
+  /* LOGS & ACTIVITY */
+  .log-item {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px}
+  .log-item-top {display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
+  .log-stats {display:flex;gap:12px;flex-wrap:wrap}
+  .log-stat {font-size:12px;color:var(--text2)}
+  .log-stat span {color:var(--text);font-weight:600}
 
-/* RECS */
-.rec-box{border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;border-left:3px solid}
-.rec-box.low{background:rgba(200,240,0,.08);border-color:var(--lime)}
-.rec-box.medium{background:rgba(255,140,66,.08);border-color:var(--orange)}
-.rec-box.high{background:rgba(255,71,87,.08);border-color:var(--red)}
-.rec-box p{font-size:13px;line-height:1.6}
-.rec-box .rec-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600}
-.rec-box.low .rec-label{color:var(--lime)}
-.rec-box.medium .rec-label{color:var(--orange)}
-.rec-box.high .rec-label{color:var(--red)}
-.rec-action{font-size:12px;color:var(--text2);margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-style:italic}
+  .activity-item {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
+  .activity-icon {width:32px;height:32px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+  .activity-content {flex:1;min-width:0}
+  .activity-text {font-size:13px;line-height:1.5;word-break:break-word}
+  .activity-text b {color:var(--text)}
+  .activity-time {font-size:11px;color:var(--text2);margin-top:3px;font-family:'JetBrains Mono',monospace}
 
-/* ADMIN STATS */
-.admin-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
-.stat-card .s-num{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--lime);line-height:1}
-.stat-card .s-label{font-size:12px;color:var(--text2);margin-top:4px}
+  /* SECTIONS */
+  .section-title {font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--lime);margin-bottom:16px}
+  .section-sub {font-size:12px;color:var(--text2);margin-bottom:14px;text-transform:uppercase;letter-spacing:1px}
+  .section-flex {display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px}
+  .section-flex .section-title {margin-bottom:0}
 
-/* ACTIVITY */
-.activity-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
-.activity-icon{width:32px;height:32px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
-.activity-content{flex:1;min-width:0}
-.activity-text{font-size:13px;line-height:1.5;word-break:break-word}
-.activity-text b{color:var(--text)}
-.activity-time{font-size:11px;color:var(--text2);margin-top:3px;font-family:'JetBrains Mono',monospace}
+  /* CHART & ADMIN */
+  .mini-chart {display:flex;align-items:flex-end;gap:4px;height:50px;margin-top:12px}
+  .bar-col {flex:1;background:var(--lime);border-radius:3px 3px 0 0;opacity:.7;transition:opacity .2s;min-width:8px}
+  .bar-col:hover {opacity:1}
+  .admin-stats {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .stat-card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+  .stat-card .s-num {font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--lime);line-height:1}
+  .stat-card .s-label {font-size:12px;color:var(--text2);margin-top:4px}
 
-/* CHART */
-.mini-chart{display:flex;align-items:flex-end;gap:4px;height:50px;margin-top:12px}
-.bar-col{flex:1;background:var(--lime);border-radius:3px 3px 0 0;opacity:.7;transition:opacity .2s;min-width:8px}
-.bar-col:hover{opacity:1}
+  /* TOGGLES & TOAST */
+  .email-toggle-box {background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius-sm);padding:14px 16px;margin:12px 0}
+  .email-toggle-box label {display:flex;align-items:flex-start;gap:12px;cursor:pointer}
+  .email-toggle-box input[type=checkbox] {width:18px;height:18px;accent-color:var(--lime);margin-top:1px;flex-shrink:0}
+  .email-toggle-box .etb-title {font-size:14px;font-weight:600;margin-bottom:2px}
+  .email-toggle-box .etb-sub {font-size:12px;color:var(--text2);word-break:break-word}
 
-/* EMAIL TOGGLE */
-.email-toggle-box{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius-sm);padding:14px 16px;margin:12px 0}
-.email-toggle-box label{display:flex;align-items:flex-start;gap:12px;cursor:pointer}
-.email-toggle-box input[type=checkbox]{width:18px;height:18px;accent-color:var(--lime);margin-top:1px;flex-shrink:0}
-.email-toggle-box .etb-title{font-size:14px;font-weight:600;margin-bottom:2px}
-.email-toggle-box .etb-sub{font-size:12px;color:var(--text2);word-break:break-word}
+  .spinner {display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+  @keyframes spin {to {transform:rotate(360deg)}}
 
-/* SPINNER */
-.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
-@keyframes spin{to{transform:rotate(360deg)}}
+  .toast {position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--lime);color:var(--black);padding:12px 24px;border-radius:30px;font-weight:600;font-size:14px;opacity:0;transition:all .3s ease;z-index:999;white-space:nowrap;max-width:88vw;text-align:center;pointer-events:none}
+  .toast.show {opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* TOAST */
-.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--lime);color:var(--black);padding:12px 24px;border-radius:30px;font-weight:600;font-size:14px;opacity:0;transition:all .3s ease;z-index:999;white-space:nowrap;max-width:88vw;text-align:center}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  /* PROFILE SETTINGS */
+  .profile-header {display:flex;align-items:center;gap:16px;margin-bottom:24px}
+  .profile-avatar-lg {width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:var(--black);flex-shrink:0;background-size:cover;background-position:center;position:relative;overflow:hidden;cursor:pointer;border:3px solid var(--border)}
+  .profile-avatar-lg.admin {background:linear-gradient(135deg,var(--blue),var(--purple));color:white}
+  .profile-avatar-lg.master {background:linear-gradient(135deg,var(--gold),var(--orange));color:var(--black)}
+  .profile-avatar-lg .photo-edit-overlay {position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:18px;color:white}
+  .profile-avatar-lg:hover .photo-edit-overlay {opacity:1}
+  .photo-input {display:none}
+  .role-pill {display:inline-flex;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  .subpage-header {display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+  .subpage-back {background:var(--card);border:1px solid var(--border);color:var(--text);width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .subpage-back:hover {background:var(--card2)}
+  .subpage-title {font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:var(--lime)}
+  .form-group input.input-lg {padding:14px 16px;font-size:15px}
 
-/* PROFILE */
-.profile-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
-.profile-avatar-lg{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:var(--black);flex-shrink:0;background-size:cover;background-position:center;position:relative;overflow:hidden;cursor:pointer;border:3px solid var(--border)}
-.profile-avatar-lg.admin{background:linear-gradient(135deg,var(--blue),var(--purple));color:white}
-.profile-avatar-lg.master{background:linear-gradient(135deg,var(--gold),var(--orange));color:var(--black)}
-.profile-avatar-lg .photo-edit-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:18px;color:white}
-.profile-avatar-lg:hover .photo-edit-overlay{opacity:1}
-.photo-input{display:none}
+  /* UTIL */
+  .flex-between {display:flex;justify-content:space-between;align-items:center}
+  .text-muted {color:var(--text2);font-size:13px}
+  .text-lime {color:var(--lime)}
+  .fw-600 {font-weight:600}
+  .mono {font-family:'JetBrains Mono',monospace}
+  .empty-state {text-align:center;padding:40px 20px;color:var(--text2)}
+  .empty-state .empty-icon {font-size:48px;margin-bottom:12px;display:block}
+  .empty-state p {font-size:14px}
 
-/* ROLE PILL */
-.role-pill{display:inline-flex;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-
-/* SUB-PAGE HEADER */
-.subpage-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.subpage-back{background:var(--card);border:1px solid var(--border);color:var(--text);width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.subpage-back:hover{background:var(--card2)}
-.subpage-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:var(--lime)}
-
-/* INPUT LARGE (in settings) */
-.form-group input.input-lg{padding:14px 16px;font-size:15px}
-
-/* UTIL */
-.flex-between{display:flex;justify-content:space-between;align-items:center}
-.text-muted{color:var(--text2);font-size:13px}
-.text-lime{color:var(--lime)}
-.fw-600{font-weight:600}
-.mono{font-family:'JetBrains Mono',monospace}
-.empty-state{text-align:center;padding:40px 20px;color:var(--text2)}
-.empty-state .empty-icon{font-size:48px;margin-bottom:12px;display:block}
-.empty-state p{font-size:14px}
-
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-@media(max-width:400px){
-.metrics-grid,.admin-stats,.form-row{grid-template-columns:1fr}
-.pin-box{width:40px;height:50px;font-size:18px}
-.pin-wrap{gap:6px}
-.content{padding:16px;padding-bottom:100px}
-}
+  ::-webkit-scrollbar {width:4px;height:4px}
+  ::-webkit-scrollbar-track {background:transparent}
+  ::-webkit-scrollbar-thumb {background:var(--border);border-radius:2px}
+  @media(max-width:400px){
+    .metrics-grid,.admin-stats,.form-row {grid-template-columns:1fr}
+    .pin-box {width:40px;height:50px;font-size:18px}
+    .pin-wrap {gap:6px}
+    .content {padding:16px;padding-bottom:100px}
+  }
 </style>
-
 </head>
 <body>
 
@@ -397,16 +384,16 @@
 
 <script>
 // ════════════════════════════════════════════════════════════
-//  STORAGE (No default users)
+//  STORAGE (Clean start - no dummy data)
 // ════════════════════════════════════════════════════════════
-const STORAGE_KEY = 'fitfuel_data_v6';
+const STORAGE_KEY = 'fitfuel_data_v7';
 
-function loadData(){
-  try{const s=localStorage.getItem(STORAGE_KEY);if(s)return JSON.parse(s)}catch(e){}
+function loadData() {
+  try { const s=localStorage.getItem(STORAGE_KEY); if(s) return JSON.parse(s); } catch(e){}
   return null;
 }
-function saveData(){
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({USERS,LOGS,ACTIVITIES}))}catch(e){console.error(e)}
+function saveData() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({USERS, LOGS, ACTIVITIES})); } catch(e) { console.error(e); }
 }
 
 const DEFAULT_USERS = [];
@@ -418,8 +405,7 @@ let USERS = _saved?.USERS || JSON.parse(JSON.stringify(DEFAULT_USERS));
 let LOGS = _saved?.LOGS || JSON.parse(JSON.stringify(DEFAULT_LOGS));
 let ACTIVITIES = _saved?.ACTIVITIES || JSON.parse(JSON.stringify(DEFAULT_ACTIVITIES));
 
-// Ensure properties exist
-USERS.forEach(u=>{if(u.photo===undefined)u.photo=null});
+USERS.forEach(u => { if(u.photo === undefined) u.photo = null; });
 saveData();
 
 let currentUser = null;
@@ -429,92 +415,96 @@ let currentPage = 'home';
 // ════════════════════════════════════════════════════════════
 //  PIN BEHAVIOR
 // ════════════════════════════════════════════════════════════
-function setupPinInputs(containerId){
+function setupPinInputs(containerId) {
   const container = document.getElementById(containerId);
   if(!container) return;
-  const inputs = container.querySelectorAll(`.pin-box`);
-  inputs.forEach((inp,i)=>{
-    inp.oninput = e=>{
-      const v = e.target.value.replace(/\D/g,'');
+  const inputs = container.querySelectorAll('.pin-box');
+  inputs.forEach((inp,i) => {
+    inp.oninput = e => {
+      const v = e.target.value.replace(/[^0-9]/g,'');
       e.target.value = v;
       if(v) e.target.classList.add('filled'); else e.target.classList.remove('filled');
       if(v && i < inputs.length-1) inputs[i+1].focus();
     };
-    inp.onkeydown = e=>{
-      if(e.key==='Backspace' && !e.target.value && i>0){
+    inp.onkeydown = e => {
+      if(e.key === 'Backspace' && !e.target.value && i > 0) {
         inputs[i-1].focus();
-        inputs[i-1].value='';
+        inputs[i-1].value = '';
         inputs[i-1].classList.remove('filled');
       }
     };
-    inp.onpaste = e=>{
+    inp.onpaste = e => {
       e.preventDefault();
-      const txt = (e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
-      txt.split('').forEach((c,j)=>{if(inputs[j]){inputs[j].value=c;inputs[j].classList.add('filled')}});
-      if(inputs[Math.min(txt.length,inputs.length-1)]) inputs[Math.min(txt.length,inputs.length-1)].focus();
+      const txt = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g,'').slice(0,6);
+      txt.split('').forEach((c,j) => { if(inputs[j]) { inputs[j].value = c; inputs[j].classList.add('filled'); }});
+      if(inputs[Math.min(txt.length, inputs.length-1)]) inputs[Math.min(txt.length, inputs.length-1)].focus();
     };
   });
 }
-function getPinValue(containerId){
-  return Array.from(document.querySelectorAll(`#${containerId} .pin-box`)).map(i=>i.value).join('');
+function getPinValue(containerId) {
+  const container = document.getElementById(containerId);
+  if(!container) return '';
+  return Array.from(container.querySelectorAll('.pin-box')).map(i=>i.value).join('');
 }
-function clearPinInputs(containerId){
-  document.querySelectorAll(`#${containerId} .pin-box`).forEach(i=>{i.value='';i.classList.remove('filled')});
+function clearPinInputs(containerId) {
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  container.querySelectorAll('.pin-box').forEach(i => { i.value=''; i.classList.remove('filled'); });
 }
 
-['login-pin','reg-pin-1','reg-pin-2','forgot-pin-1','forgot-pin-2'].forEach(id=>setupPinInputs(id));
+['login-pin','reg-pin-1','reg-pin-2','forgot-pin-1','forgot-pin-2'].forEach(id => setupPinInputs(id));
 
 // ════════════════════════════════════════════════════════════
 //  ACTIVITY
 // ════════════════════════════════════════════════════════════
-function logActivity(type, msg, userId=null, target='log'){
+function logActivity(type, msg, userId=null, target='log') {
   ACTIVITIES.unshift({
-    id:'a'+Date.now()+Math.random().toString(36).slice(2,5),
-    type,target,userId,
-    actorId:currentUser?.id||'system',
-    actorName:currentUser?.name||'System',
-    msg,timestamp:new Date().toISOString()
+    id: 'a' + Date.now() + Math.random().toString(36).slice(2,5),
+    type, target, userId,
+    actorId: currentUser?.id || 'system',
+    actorName: currentUser?.name || 'System',
+    msg, timestamp: new Date().toISOString()
   });
-  if(ACTIVITIES.length>200)ACTIVITIES.length=200;
+  if(ACTIVITIES.length > 200) ACTIVITIES.length = 200;
   saveData();
 }
 
 // ════════════════════════════════════════════════════════════
 //  NAV / LOGIN (Case Insensitive)
 // ════════════════════════════════════════════════════════════
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-'+id).classList.add('active');
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
 }
-function logout(){currentUser=null;currentView='user';showScreen('splash')}
+function logout() { currentUser = null; currentView = 'user'; showScreen('splash'); }
 
-function doLogin(){
-  const u=document.getElementById('login-user').value.trim().toLowerCase();
-  const pin=getPinValue('login-pin');
-  document.getElementById('login-error').textContent='';
-  if(!u||pin.length!==6){document.getElementById('login-error').textContent='กรอก Username และ PIN ครบ 6 หลัก';return}
-  const usr=USERS.find(x=>x.username.toLowerCase()===u && x.pin===pin);
-  if(!usr){document.getElementById('login-error').textContent='Username หรือ PIN ไม่ถูกต้อง';return}
-  currentUser=usr;
-  currentView='user';
+function doLogin() {
+  const u = document.getElementById('login-user').value.trim().toLowerCase();
+  const pin = getPinValue('login-pin');
+  document.getElementById('login-error').textContent = '';
+  if(!u || pin.length !== 6) { document.getElementById('login-error').textContent = 'กรอก Username และ PIN ครบ 6 หลัก'; return; }
+  const usr = USERS.find(x => x.username.toLowerCase() === u && x.pin === pin);
+  if(!usr) { document.getElementById('login-error').textContent = 'Username หรือ PIN ไม่ถูกต้อง'; return; }
+  currentUser = usr;
+  currentView = 'user';
   enterApp();
-  document.getElementById('login-user').value='';
+  document.getElementById('login-user').value = '';
   clearPinInputs('login-pin');
 }
 
-function enterApp(){
+function enterApp() {
   updateAvatar();
-  const role=currentUser.role;
-  document.getElementById('topbar-role').className='role-badge role-'+role;
-  document.getElementById('topbar-role').textContent=role.toUpperCase();
+  const role = currentUser.role;
+  document.getElementById('topbar-role').className = 'role-badge role-' + role;
+  document.getElementById('topbar-role').textContent = role.toUpperCase();
   renderApp('home');
   showScreen('main');
 }
 
-function updateAvatar(){
+function updateAvatar() {
   const av = document.getElementById('user-avatar');
-  av.className='avatar '+(currentUser.role==='master'?'master':currentUser.role==='admin'?'admin':'');
-  if(currentUser.photo){
+  av.className = 'avatar ' + (currentUser.role === 'master' ? 'master' : currentUser.role === 'admin' ? 'admin' : '');
+  if(currentUser.photo) {
     av.style.backgroundImage = `url("${currentUser.photo}")`;
     av.textContent = '';
   } else {
@@ -526,262 +516,280 @@ function updateAvatar(){
 // ════════════════════════════════════════════════════════════
 //  FORGOT (Case Insensitive)
 // ════════════════════════════════════════════════════════════
-let _forgotUser=null;
-function forgotVerify(){
-  const u=document.getElementById('forgot-user').value.trim().toLowerCase();
-  const e=document.getElementById('forgot-email').value.trim().toLowerCase();
-  const err=document.getElementById('forgot-err-1');
-  err.textContent='';
-  if(!u||!e){err.textContent='กรุณากรอกให้ครบ';return}
-  const usr=USERS.find(x=>x.username.toLowerCase()===u && (x.email||'').toLowerCase()===e);
-  if(!usr){err.textContent='ไม่พบบัญชีที่ตรงกัน';return}
-  _forgotUser=usr;
-  document.getElementById('forgot-step-1').style.display='none';
-  document.getElementById('forgot-step-2').style.display='block';
-  setTimeout(()=>document.querySelector('#forgot-pin-1 .pin-box').focus(),100);
+let _forgotUser = null;
+function forgotVerify() {
+  const u = document.getElementById('forgot-user').value.trim().toLowerCase();
+  const e = document.getElementById('forgot-email').value.trim().toLowerCase();
+  const err = document.getElementById('forgot-err-1');
+  err.textContent = '';
+  if(!u || !e) { err.textContent = 'กรุณากรอกให้ครบ'; return; }
+  const usr = USERS.find(x => x.username.toLowerCase() === u && (x.email||'').toLowerCase() === e);
+  if(!usr) { err.textContent = 'ไม่พบบัญชีที่ตรงกัน'; return; }
+  _forgotUser = usr;
+  document.getElementById('forgot-step-1').style.display = 'none';
+  document.getElementById('forgot-step-2').style.display = 'block';
+  setTimeout(() => document.querySelector('#forgot-pin-1 .pin-box').focus(), 100);
 }
-function forgotReset(){
-  const p1=getPinValue('forgot-pin-1');
-  const p2=getPinValue('forgot-pin-2');
-  const err=document.getElementById('forgot-err-2');
-  err.textContent='';
-  if(p1.length!==6||p2.length!==6){err.textContent='กรอก PIN ครบ 6 หลัก';return}
-  if(p1!==p2){err.textContent='PIN ไม่ตรงกัน';return}
-  _forgotUser.pin=p1;
+function forgotReset() {
+  const p1 = getPinValue('forgot-pin-1');
+  const p2 = getPinValue('forgot-pin-2');
+  const err = document.getElementById('forgot-err-2');
+  err.textContent = '';
+  if(p1.length !== 6 || p2.length !== 6) { err.textContent = 'กรอก PIN ครบ 6 หลัก'; return; }
+  if(p1 !== p2) { err.textContent = 'PIN ไม่ตรงกัน'; return; }
+  _forgotUser.pin = p1;
   saveData();
-  ACTIVITIES.unshift({id:'a'+Date.now(),type:'update',target:'user',userId:_forgotUser.id,actorId:_forgotUser.id,actorName:_forgotUser.name,msg:'รีเซ็ต PIN ผ่านระบบลืมรหัส',timestamp:new Date().toISOString()});
-  saveData();
+  logActivity('update', 'รีเซ็ต PIN ผ่านระบบลืมรหัส', _forgotUser.id, 'user');
   showToast('🔓 รีเซ็ต PIN สำเร็จ!');
-  clearPinInputs('forgot-pin-1');clearPinInputs('forgot-pin-2');
-  document.getElementById('forgot-user').value='';document.getElementById('forgot-email').value='';
-  document.getElementById('forgot-step-1').style.display='block';
-  document.getElementById('forgot-step-2').style.display='none';
-  setTimeout(()=>showScreen('login'),800);
-  _forgotUser=null;
+  clearPinInputs('forgot-pin-1'); clearPinInputs('forgot-pin-2');
+  document.getElementById('forgot-user').value = ''; document.getElementById('forgot-email').value = '';
+  document.getElementById('forgot-step-1').style.display = 'block';
+  document.getElementById('forgot-step-2').style.display = 'none';
+  setTimeout(() => showScreen('login'), 800);
+  _forgotUser = null;
 }
 
 // ════════════════════════════════════════════════════════════
-//  REGISTER (Case Insensitive Username Check)
+//  REGISTER (Case Insensitive)
 // ════════════════════════════════════════════════════════════
-let _regData={};
-function regStep(n){
-  [1,2,3].forEach(i=>{
-    document.getElementById('reg-step-'+i).style.display=i===n?'block':'none';
-    document.getElementById('reg-tab-'+i).classList.toggle('active',i===n);
+let _regData = {};
+function regStep(n) {
+  [1, 2, 3].forEach(i => {
+    document.getElementById('reg-step-' + i).style.display = (i === n) ? 'block' : 'none';
+    document.getElementById('reg-tab-' + i).classList.toggle('active', i === n);
   });
 }
-function regNext1(){
-  const name=document.getElementById('reg-name').value.trim();
-  const email=document.getElementById('reg-email').value.trim();
-  const username=document.getElementById('reg-username').value.trim();
-  const err=document.getElementById('reg-err-1');
-  if(!name||!email||!username){err.textContent='กรุณากรอกให้ครบ';return}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='รูปแบบ Email ไม่ถูกต้อง';return}
-  if(/\s/.test(username)||username.length<3){err.textContent='Username อย่างน้อย 3 ตัว ไม่มีช่องว่าง';return}
-  if(USERS.find(u=>u.username.toLowerCase()===username.toLowerCase())){err.textContent='Username นี้ถูกใช้แล้ว';return}
-  err.textContent='';
-  _regData={name,email,username};
-  document.getElementById('reg-tab-2').disabled=false;
+function regNext1() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const username = document.getElementById('reg-username').value.trim();
+  const err = document.getElementById('reg-err-1');
+  if(!name || !email || !username) { err.textContent = 'กรุณากรอกให้ครบ'; return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'รูปแบบ Email ไม่ถูกต้อง'; return; }
+  if(/\s/.test(username) || username.length < 3) { err.textContent = 'Username อย่างน้อย 3 ตัว ไม่มีช่องว่าง'; return; }
+  if(USERS.find(u => u.username.toLowerCase() === username.toLowerCase())) { err.textContent = 'Username ถูกใช้แล้ว'; return; }
+  err.textContent = '';
+  _regData = { name, email, username };
+  document.getElementById('reg-tab-2').disabled = false;
   regStep(2);
-  setTimeout(()=>document.querySelector('#reg-pin-1 .pin-box').focus(),100);
+  setTimeout(() => document.querySelector('#reg-pin-1 .pin-box').focus(), 100);
 }
-function regNext2(){
-  const p1=getPinValue('reg-pin-1');
-  const p2=getPinValue('reg-pin-2');
-  const err=document.getElementById('reg-err-2');
-  if(p1.length!==6||p2.length!==6){err.textContent='กรอก PIN ครบ 6 หลัก';return}
-  if(p1!==p2){err.textContent='PIN ไม่ตรงกัน';return}
-  err.textContent='';
-  _regData.pin=p1;
-  document.getElementById('reg-tab-3').disabled=false;
+function regNext2() {
+  const p1 = getPinValue('reg-pin-1');
+  const p2 = getPinValue('reg-pin-2');
+  const err = document.getElementById('reg-err-2');
+  if(p1.length !== 6 || p2.length !== 6) { err.textContent = 'กรอก PIN ครบ 6 หลัก'; return; }
+  if(p1 !== p2) { err.textContent = 'PIN ไม่ตรงกัน'; return; }
+  err.textContent = '';
+  _regData.pin = p1;
+  document.getElementById('reg-tab-3').disabled = false;
   regStep(3);
 }
-function regSubmit(){
-  const age=parseInt(document.getElementById('reg-age').value);
-  const gender=document.getElementById('reg-gender').value;
-  const height=parseInt(document.getElementById('reg-height').value);
-  const target=parseFloat(document.getElementById('reg-target').value);
-  const goal=document.getElementById('reg-goal').value;
-  const err=document.getElementById('reg-err-3');
-  if(!age||!gender||!height||!target||!goal){err.textContent='กรุณากรอกให้ครบ';return}
-  if(age<10||age>100){err.textContent='อายุไม่ถูกต้อง';return}
-  if(height<100||height>250){err.textContent='ส่วนสูงไม่ถูกต้อง';return}
-  if(target<20||target>300){err.textContent='น้ำหนักเป้าหมายไม่ถูกต้อง';return}
-  err.textContent='';
+function regSubmit() {
+  const age = parseInt(document.getElementById('reg-age').value);
+  const gender = document.getElementById('reg-gender').value;
+  const height = parseInt(document.getElementById('reg-height').value);
+  const target = parseFloat(document.getElementById('reg-target').value);
+  const goal = document.getElementById('reg-goal').value;
+  const err = document.getElementById('reg-err-3');
+  
+  if(!age || !gender || !height || !target || !goal) { err.textContent = 'กรุณากรอกให้ครบ'; return; }
+  if(age < 10 || age > 100) { err.textContent = 'อายุไม่ถูกต้อง'; return; }
+  if(height < 100 || height > 250) { err.textContent = 'ส่วนสูงไม่ถูกต้อง'; return; }
+  if(target < 20 || target > 300) { err.textContent = 'น้ำหนักเป้าหมายไม่ถูกต้อง'; return; }
+  err.textContent = '';
 
-  // ให้สิทธิ์ master สำหรับคนแรกของระบบ
-  const assignRole = USERS.length === 0 ? 'master' : 'user';
+  const isFirstUser = USERS.length === 0;
+  const assignRole = isFirstUser ? 'master' : 'user';
 
-  const newUser={id:'u'+Date.now(),username:_regData.username,pin:_regData.pin,name:_regData.name,email:_regData.email,age,gender,height,targetWeight:target,goalType:goal,role:assignRole,photo:null,createdAt:new Date().toISOString()};
+  const newUser = {
+    id: 'u' + Date.now(),
+    username: _regData.username,
+    pin: _regData.pin,
+    name: _regData.name,
+    email: _regData.email,
+    age, gender, height, targetWeight: target, goalType: goal,
+    role: assignRole, photo: null,
+    createdAt: new Date().toISOString()
+  };
+
   USERS.push(newUser);
   saveData();
-  currentUser=newUser;
-  currentView='user';
-  logActivity('create',`สร้างบัญชีใหม่: ${newUser.name} (${assignRole})`,newUser.id,'user');
-  showToast('🎉 ยินดีต้อนรับ '+newUser.name.split(' ')[0]+'!');
+  currentUser = newUser;
+  currentView = 'user';
+  logActivity('create', `สร้างบัญชีใหม่: ${newUser.name} (${assignRole})`, newUser.id, 'user');
+  showToast('🎉 ยินดีต้อนรับ ' + newUser.name.split(' ')[0] + '!');
   enterApp();
-  ['reg-name','reg-email','reg-username','reg-age','reg-height','reg-target'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
-  document.getElementById('reg-gender').value='';document.getElementById('reg-goal').value='';
-  clearPinInputs('reg-pin-1');clearPinInputs('reg-pin-2');
-  document.getElementById('reg-tab-2').disabled=true;document.getElementById('reg-tab-3').disabled=true;
+  
+  ['reg-name','reg-email','reg-username','reg-age','reg-height','reg-target'].forEach(id => { const e = document.getElementById(id); if(e) e.value=''; });
+  document.getElementById('reg-gender').value = ''; document.getElementById('reg-goal').value = '';
+  clearPinInputs('reg-pin-1'); clearPinInputs('reg-pin-2');
+  document.getElementById('reg-tab-2').disabled = true; document.getElementById('reg-tab-3').disabled = true;
   regStep(1);
 }
 
 // ════════════════════════════════════════════════════════════
 //  CALCULATIONS
 // ════════════════════════════════════════════════════════════
-function calcBMI(w,h){return w/Math.pow(h/100,2)}
-function bmiCategory(bmi){
-  if(bmi<18.5)return{label:'น้ำหนักน้อย',color:'#3B82F6',risk:'low'};
-  if(bmi<25)return{label:'น้ำหนักปกติ',color:'#C8F000',risk:'low'};
-  if(bmi<30)return{label:'น้ำหนักเกิน',color:'#FF8C42',risk:'medium'};
-  return{label:'โรคอ้วน',color:'#FF4757',risk:'high'};
+function calcBMI(w, h) { return w / Math.pow(h/100, 2); }
+function bmiCategory(bmi) {
+  if(bmi < 18.5) return {label:'น้ำหนักน้อย', color:'#3B82F6', risk:'low'};
+  if(bmi < 25) return {label:'น้ำหนักปกติ', color:'#C8F000', risk:'low'};
+  if(bmi < 30) return {label:'น้ำหนักเกิน', color:'#FF8C42', risk:'medium'};
+  return {label:'โรคอ้วน', color:'#FF4757', risk:'high'};
 }
-function calcHealthScore(log,user){
-  let s=100;
-  const bmi=calcBMI(log.weight,user.height);
-  if(bmi<18.5||bmi>=30)s-=25;else if(bmi>=25)s-=15;
-  if(log.sleep<6)s-=20;else if(log.sleep<7)s-=10;
-  if(log.water<1.5)s-=20;else if(log.water<2)s-=10;
-  if(log.exercise<15)s-=20;else if(log.exercise<30)s-=10;
-  return Math.max(0,s);
+function calcHealthScore(log, user) {
+  let s = 100;
+  const bmi = calcBMI(log.weight, user.height);
+  if(bmi < 18.5 || bmi >= 30) s -= 25; else if(bmi >= 25) s -= 15;
+  if(log.sleep < 6) s -= 20; else if(log.sleep < 7) s -= 10;
+  if(log.water < 1.5) s -= 20; else if(log.water < 2) s -= 10;
+  if(log.exercise < 15) s -= 20; else if(log.exercise < 30) s -= 10;
+  return Math.max(0, s);
 }
-function getRecommendations(log,user,history=[]){
-  const recs=[];
-  const bmi=calcBMI(log.weight,user.height);
-  const cat=bmiCategory(bmi);
-  if(cat.risk==='high')recs.push({severity:'high',icon:'⚠',title:'BMI โรคอ้วน',msg:'BMI '+bmi.toFixed(1)+' อยู่ในระดับโรคอ้วน',action:'ลดน้ำหนัก 0.5–1 kg/สัปดาห์ ลดแคลอรี่ 500 kcal/วัน + ออกกำลังกาย 150 นาที/สัปดาห์'});
-  else if(cat.risk==='medium')recs.push({severity:'medium',icon:'💡',title:'น้ำหนักเกิน',msg:'BMI '+bmi.toFixed(1)+' เกินมาตรฐาน',action:'ลดของหวาน เครื่องดื่มน้ำตาลสูง เดิน 30 นาทีหลังอาหาร'});
-  else if(bmi<18.5)recs.push({severity:'medium',icon:'💡',title:'น้ำหนักน้อย',msg:'BMI '+bmi.toFixed(1)+' ต่ำกว่ามาตรฐาน',action:'เพิ่มแคลอรี่จากโปรตีน 1.6–2 g/kg + ฝึกเวท'});
-  if(log.sleep<6)recs.push({severity:'high',icon:'⚠',title:'นอนน้อยเกินไป',msg:'นอนเพียง '+log.sleep+' ชม.',action:'ปิดมือถือก่อนนอน 1 ชม. นอนตื่นเวลาเดียวกันทุกวัน'});
-  else if(log.sleep<7)recs.push({severity:'medium',icon:'💡',title:'การนอนยังไม่พอ',msg:'นอน '+log.sleep+' ชม.',action:'เลื่อนเวลานอนเร็วขึ้น 15 นาที/สัปดาห์'});
-  if(log.water<1.5)recs.push({severity:'high',icon:'⚠',title:'ดื่มน้ำน้อยมาก',msg:'ดื่ม '+log.water+' L',action:'พกขวด 1L ติดตัว ดื่มทุก 2 ชม.'});
-  else if(log.water<2)recs.push({severity:'medium',icon:'💡',title:'ควรดื่มน้ำเพิ่ม',msg:'ดื่ม '+log.water+' L',action:'ตั้งเตือนทุก 2 ชม.'});
-  if(log.exercise<15)recs.push({severity:'high',icon:'⚠',title:'ออกกำลังกายน้อยมาก',msg:'ออกกำลังกาย '+log.exercise+' นาที',action:'เริ่มเดินเร็ว 20 นาที/วัน หรือ HIIT 10 นาที'});
-  else if(log.exercise<30)recs.push({severity:'medium',icon:'💡',title:'ออกกำลังกายยังไม่พอ',msg:'ออกกำลังกาย '+log.exercise+' นาที',action:'เพิ่มทีละ 5 นาที/สัปดาห์'});
-  if(history.length>=3){
-    const r3=history.slice(0,3);
-    const trend=r3[0].weight-r3[r3.length-1].weight;
-    if(user.goalType==='ลดน้ำหนัก'&&trend>0)recs.push({severity:'medium',icon:'📉',title:'น้ำหนักขึ้น',msg:'3 วันล่าสุดน้ำหนักเพิ่ม '+trend.toFixed(1)+' kg',action:'ทบทวนอาหาร ลดของแปรรูปและน้ำตาล'});
-    else if(user.goalType==='ลดน้ำหนัก'&&trend<-0.5)recs.push({severity:'low',icon:'🎉',title:'ความคืบหน้าดี!',msg:'น้ำหนักลด '+Math.abs(trend).toFixed(1)+' kg',action:'ระวังอย่าลดเร็วเกิน (ไม่ควรเกิน 1 kg/สัปดาห์)'});
+function getRecommendations(log, user, history=[]) {
+  const recs = [];
+  const bmi = calcBMI(log.weight, user.height);
+  const cat = bmiCategory(bmi);
+  if(cat.risk === 'high') recs.push({severity:'high', icon:'⚠', title:'BMI โรคอ้วน', msg:'BMI '+bmi.toFixed(1)+' อยู่ในระดับโรคอ้วน', action:'ลดน้ำหนัก 0.5–1 kg/สัปดาห์ ลดแคลอรี่ 500 kcal/วัน + ออกกำลังกาย 150 นาที/สัปดาห์'});
+  else if(cat.risk === 'medium') recs.push({severity:'medium', icon:'💡', title:'น้ำหนักเกิน', msg:'BMI '+bmi.toFixed(1)+' เกินมาตรฐาน', action:'ลดของหวาน เครื่องดื่มน้ำตาลสูง เดิน 30 นาทีหลังอาหาร'});
+  else if(bmi < 18.5) recs.push({severity:'medium', icon:'💡', title:'น้ำหนักน้อย', msg:'BMI '+bmi.toFixed(1)+' ต่ำกว่ามาตรฐาน', action:'เพิ่มแคลอรี่จากโปรตีน 1.6–2 g/kg + ฝึกเวท'});
+  
+  if(log.sleep < 6) recs.push({severity:'high', icon:'⚠', title:'นอนน้อยเกินไป', msg:'นอนเพียง '+log.sleep+' ชม.', action:'ปิดมือถือก่อนนอน 1 ชม. นอนตื่นเวลาเดียวกันทุกวัน'});
+  else if(log.sleep < 7) recs.push({severity:'medium', icon:'💡', title:'การนอนยังไม่พอ', msg:'นอน '+log.sleep+' ชม.', action:'เลื่อนเวลานอนเร็วขึ้น 15 นาที/สัปดาห์'});
+  
+  if(log.water < 1.5) recs.push({severity:'high', icon:'⚠', title:'ดื่มน้ำน้อยมาก', msg:'ดื่ม '+log.water+' L', action:'พกขวด 1L ติดตัว ดื่มทุก 2 ชม.'});
+  else if(log.water < 2) recs.push({severity:'medium', icon:'💡', title:'ควรดื่มน้ำเพิ่ม', msg:'ดื่ม '+log.water+' L', action:'ตั้งเตือนทุก 2 ชม.'});
+  
+  if(log.exercise < 15) recs.push({severity:'high', icon:'⚠', title:'ออกกำลังกายน้อยมาก', msg:'ออกกำลังกาย '+log.exercise+' นาที', action:'เริ่มเดินเร็ว 20 นาที/วัน หรือ HIIT 10 นาที'});
+  else if(log.exercise < 30) recs.push({severity:'medium', icon:'💡', title:'ออกกำลังกายยังไม่พอ', msg:'ออกกำลังกาย '+log.exercise+' นาที', action:'เพิ่มทีละ 5 นาที/สัปดาห์'});
+  
+  if(history.length >= 3) {
+    const r3 = history.slice(0,3);
+    const trend = r3[0].weight - r3[r3.length-1].weight;
+    if(user.goalType === 'ลดน้ำหนัก' && trend > 0) recs.push({severity:'medium', icon:'📉', title:'น้ำหนักขึ้น', msg:'3 วันล่าสุดน้ำหนักเพิ่ม '+trend.toFixed(1)+' kg', action:'ทบทวนอาหาร ลดของแปรรูปและน้ำตาล'});
+    else if(user.goalType === 'ลดน้ำหนัก' && trend < -0.5) recs.push({severity:'low', icon:'🎉', title:'ความคืบหน้าดี!', msg:'น้ำหนักลด '+Math.abs(trend).toFixed(1)+' kg', action:'ระวังอย่าลดเร็วเกิน (ไม่ควรเกิน 1 kg/สัปดาห์)'});
   }
-  if(recs.length===0)recs.push({severity:'low',icon:'🎉',title:'ทำได้ดีมาก!',msg:'สุขภาพอยู่ในเกณฑ์ดีเยี่ยม',action:'ความสม่ำเสมอคือกุญแจสำคัญ'});
+  if(recs.length === 0) recs.push({severity:'low', icon:'🎉', title:'ทำได้ดีมาก!', msg:'สุขภาพอยู่ในเกณฑ์ดีเยี่ยม', action:'ความสม่ำเสมอคือกุญแจสำคัญ'});
   return recs;
 }
-function calcProgress(user){
-  const logs=LOGS.filter(l=>l.userId===user.id).sort((a,b)=>a.date.localeCompare(b.date));
-  if(!logs.length)return null;
-  const first=logs[0],latest=logs[logs.length-1];
-  const startW=first.weight,curW=latest.weight,targetW=user.targetWeight||curW;
-  let weightPct=0;
-  const td=Math.abs(targetW-startW),cd=Math.abs(targetW-curW);
-  weightPct=td>0?Math.min(100,Math.max(0,((td-cd)/td)*100)):100;
-  let streak=1;
-  const dates=logs.map(l=>l.date).reverse();
-  let lastD=new Date(dates[0]);
-  for(let i=1;i<dates.length;i++){const d=new Date(dates[i]);if(Math.round((lastD-d)/(1000*60*60*24))===1){streak++;lastD=d}else break}
-  const recent=logs.slice(-7);
-  return{
-    startWeight:startW,currentWeight:curW,targetWeight:targetW,
-    weightPct:weightPct.toFixed(0),
-    weightDelta:(curW-startW).toFixed(1),
-    daysTracked:logs.length,streak,
-    avgScore:(recent.reduce((s,l)=>s+calcHealthScore(l,user),0)/recent.length).toFixed(0),
-    avgSleep:(recent.reduce((s,l)=>s+l.sleep,0)/recent.length).toFixed(1),
-    avgWater:(recent.reduce((s,l)=>s+l.water,0)/recent.length).toFixed(1),
-    avgExercise:(recent.reduce((s,l)=>s+l.exercise,0)/recent.length).toFixed(0),
-    sleepGoal:Math.min(100,(recent.reduce((s,l)=>s+l.sleep,0)/recent.length/7.5)*100).toFixed(0),
-    waterGoal:Math.min(100,(recent.reduce((s,l)=>s+l.water,0)/recent.length/2.5)*100).toFixed(0),
-    exerciseGoal:Math.min(100,(recent.reduce((s,l)=>s+l.exercise,0)/recent.length/30)*100).toFixed(0),
+function calcProgress(user) {
+  const logs = LOGS.filter(l => l.userId === user.id).sort((a,b) => a.date.localeCompare(b.date));
+  if(!logs.length) return null;
+  const first = logs[0], latest = logs[logs.length-1];
+  const startW = first.weight, curW = latest.weight, targetW = user.targetWeight || curW;
+  let weightPct = 0;
+  const td = Math.abs(targetW - startW), cd = Math.abs(targetW - curW);
+  weightPct = td > 0 ? Math.min(100, Math.max(0, ((td - cd) / td) * 100)) : 100;
+  let streak = 1;
+  const dates = logs.map(l => l.date).reverse();
+  let lastD = new Date(dates[0]);
+  for(let i=1; i<dates.length; i++) {
+    const d = new Date(dates[i]);
+    if(Math.round((lastD - d)/(1000*60*60*24)) === 1) { streak++; lastD = d; } else break;
+  }
+  const recent = logs.slice(-7);
+  return {
+    startWeight: startW, currentWeight: curW, targetWeight: targetW,
+    weightPct: weightPct.toFixed(0),
+    weightDelta: (curW - startW).toFixed(1),
+    daysTracked: logs.length, streak,
+    avgScore: (recent.reduce((s,l)=>s+calcHealthScore(l,user),0)/recent.length).toFixed(0),
+    avgSleep: (recent.reduce((s,l)=>s+l.sleep,0)/recent.length).toFixed(1),
+    avgWater: (recent.reduce((s,l)=>s+l.water,0)/recent.length).toFixed(1),
+    avgExercise: (recent.reduce((s,l)=>s+l.exercise,0)/recent.length).toFixed(0),
+    sleepGoal: Math.min(100, (recent.reduce((s,l)=>s+l.sleep,0)/recent.length/7.5)*100).toFixed(0),
+    waterGoal: Math.min(100, (recent.reduce((s,l)=>s+l.water,0)/recent.length/2.5)*100).toFixed(0),
+    exerciseGoal: Math.min(100, (recent.reduce((s,l)=>s+l.exercise,0)/recent.length/30)*100).toFixed(0),
   };
 }
 
 // ════════════════════════════════════════════════════════════
 //  RENDER
 // ════════════════════════════════════════════════════════════
-function renderApp(page){
+function renderApp(page) {
   currentPage = page;
   renderNav();
-  const el=document.getElementById('main-content');
-  if(currentView==='user'){
-    if(page==='home')el.innerHTML=renderUserHome();
-    else if(page==='log')el.innerHTML=renderUserLog();
-    else if(page==='progress')el.innerHTML=renderUserProgress();
-    else if(page==='history')el.innerHTML=renderUserHistory();
-    else if(page==='profile')el.innerHTML=renderUserProfile();
-    else if(page==='settings')el.innerHTML=renderSettings();
-    else if(page==='settings-email')el.innerHTML=renderSettingsEmail();
-    else if(page==='settings-pin')el.innerHTML=renderSettingsPin();
-    else if(page==='settings-info')el.innerHTML=renderSettingsInfo();
-  } else if(currentView==='admin'){
-    if(page==='dashboard')el.innerHTML=renderAdminDashboard();
-    else if(page==='users')el.innerHTML=renderAdminUsers();
-    else if(page==='logs')el.innerHTML=renderAdminLogs();
-    else if(page==='activity')el.innerHTML=renderAdminActivity();
-    else if(page==='alerts')el.innerHTML=renderAdminAlerts();
-  } else if(currentView==='master'){
-    if(page==='control')el.innerHTML=renderMasterControl();
-    else if(page==='roles')el.innerHTML=renderMasterRoles();
-    else if(page==='activity')el.innerHTML=renderAdminActivity();
-    else if(page==='backup')el.innerHTML=renderMasterBackup();
+  const el = document.getElementById('main-content');
+  if(currentView === 'user') {
+    if(page === 'home') el.innerHTML = renderUserHome();
+    else if(page === 'log') el.innerHTML = renderUserLog();
+    else if(page === 'progress') el.innerHTML = renderUserProgress();
+    else if(page === 'history') el.innerHTML = renderUserHistory();
+    else if(page === 'profile') el.innerHTML = renderUserProfile();
+    else if(page === 'settings') el.innerHTML = renderSettings();
+    else if(page === 'settings-email') el.innerHTML = renderSettingsEmail();
+    else if(page === 'settings-pin') el.innerHTML = renderSettingsPin();
+    else if(page === 'settings-info') el.innerHTML = renderSettingsInfo();
+  } else if(currentView === 'admin') {
+    if(page === 'dashboard') el.innerHTML = renderAdminDashboard();
+    else if(page === 'users') el.innerHTML = renderAdminUsers();
+    else if(page === 'logs') el.innerHTML = renderAdminLogs();
+    else if(page === 'activity') el.innerHTML = renderAdminActivity();
+    else if(page === 'alerts') el.innerHTML = renderAdminAlerts();
+  } else if(currentView === 'master') {
+    if(page === 'control') el.innerHTML = renderMasterControl();
+    else if(page === 'roles') el.innerHTML = renderMasterRoles();
+    else if(page === 'activity') el.innerHTML = renderAdminActivity();
+    else if(page === 'backup') el.innerHTML = renderMasterBackup();
   }
-  // Setup pin inputs in any rendered settings page
-  ['change-pin-old','change-pin-new','change-pin-new2'].forEach(id=>{
-    if(document.getElementById(id))setupPinInputs(id);
+  
+  ['change-pin-old', 'change-pin-new', 'change-pin-new2'].forEach(id => {
+    if(document.getElementById(id)) setupPinInputs(id);
   });
 }
 
-function renderNav(){
-  const nav=document.getElementById('main-nav');
+function renderNav() {
+  const nav = document.getElementById('main-nav');
   let items;
-  if(currentView==='user'){
-    items=[
-      {p:'home',i:'🏠',l:'Home'},
-      {p:'log',i:'📝',l:'Log'},
-      {p:'progress',i:'🎯',l:'Progress'},
-      {p:'history',i:'📊',l:'History'},
-      {p:'profile',i:'👤',l:'Profile'}
+  if(currentView === 'user') {
+    items = [
+      {p:'home', i:'🏠', l:'Home'},
+      {p:'log', i:'📝', l:'Log'},
+      {p:'progress', i:'🎯', l:'Progress'},
+      {p:'history', i:'📊', l:'History'},
+      {p:'profile', i:'👤', l:'Profile'}
     ];
-  } else if(currentView==='admin'){
-    items=[
-      {p:'dashboard',i:'📊',l:'Dashboard'},
-      {p:'users',i:'👥',l:'Users'},
-      {p:'logs',i:'📋',l:'Logs'},
-      {p:'activity',i:'⚡',l:'Activity'},
-      {p:'alerts',i:'🚨',l:'Alerts'}
+  } else if(currentView === 'admin') {
+    items = [
+      {p:'dashboard', i:'📊', l:'Dashboard'},
+      {p:'users', i:'👥', l:'Users'},
+      {p:'logs', i:'📋', l:'Logs'},
+      {p:'activity', i:'⚡', l:'Activity'},
+      {p:'alerts', i:'🚨', l:'Alerts'}
     ];
   } else {
-    items=[
-      {p:'control',i:'⚙',l:'Control'},
-      {p:'roles',i:'🛡',l:'Roles'},
-      {p:'activity',i:'⚡',l:'Activity'},
-      {p:'backup',i:'💾',l:'Backup'}
+    items = [
+      {p:'control', i:'⚙', l:'Control'},
+      {p:'roles', i:'🛡', l:'Roles'},
+      {p:'activity', i:'⚡', l:'Activity'},
+      {p:'backup', i:'💾', l:'Backup'}
     ];
   }
-  let activeIdx = items.findIndex(it=>it.p===currentPage);
-  if(activeIdx===-1 && currentPage.startsWith('settings')) activeIdx = items.findIndex(it=>it.p==='profile');
-  if(activeIdx===-1) activeIdx = 0;
-  nav.innerHTML = items.map((it,i)=>`<button class="nav-item${i===activeIdx?' active':''}" onclick="navTo('${it.p}',this)"><span class="nav-icon">${it.i}</span>${it.l}</button>`).join('');
+  let activeIdx = items.findIndex(it => it.p === currentPage);
+  if(activeIdx === -1 && currentPage.startsWith('settings')) activeIdx = items.findIndex(it => it.p === 'profile');
+  if(activeIdx === -1) activeIdx = 0;
+  nav.innerHTML = items.map((it, i) => `<button class="nav-item${i === activeIdx ? ' active' : ''}" onclick="navTo('${it.p}', this)"><span class="nav-icon">${it.i}</span>${it.l}</button>`).join('');
 }
-function navTo(page,el){
-  document.querySelectorAll('#main-nav .nav-item').forEach(n=>n.classList.remove('active'));
-  if(el)el.classList.add('active');
+function navTo(page, el) {
+  document.querySelectorAll('#main-nav .nav-item').forEach(n => n.classList.remove('active'));
+  if(el) el.classList.add('active');
   renderApp(page);
 }
-function switchView(v){
-  currentView=v;
-  const def={user:'home',admin:'dashboard',master:'control'}[v];
+function switchView(v) {
+  currentView = v;
+  const def = {user:'home', admin:'dashboard', master:'control'}[v];
   renderApp(def);
 }
 
-function modeSwitchHTML(){
-  if(currentView!=='user')return '';
-  if(currentUser.role==='admin'){
+function modeSwitchHTML() {
+  if(currentView !== 'user') return '';
+  if(currentUser.role === 'admin') {
     return `<div class="mode-switch">
       <div class="mode-switch-info"><div class="ms-label">โหมดปัจจุบัน</div><div class="ms-title">👤 User Mode</div></div>
       <button class="mode-btn mode-btn-admin" onclick="switchView('admin')">🛡 Admin Panel →</button>
     </div>`;
-  } else if(currentUser.role==='master'){
+  } else if(currentUser.role === 'master') {
     return `<div class="mode-switch">
       <div class="mode-switch-info"><div class="ms-label">โหมดปัจจุบัน</div><div class="ms-title">👤 User Mode</div></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
@@ -796,23 +804,28 @@ function modeSwitchHTML(){
 // ════════════════════════════════════════════════════════════
 //  USER PAGES
 // ════════════════════════════════════════════════════════════
-function renderUserHome(){
-  const logs=LOGS.filter(l=>l.userId===currentUser.id).sort((a,b)=>b.date.localeCompare(a.date));
-  const latest=logs[0];
-  const switcher=modeSwitchHTML();
-  if(!latest)return`${switcher}<div class="section-title">สวัสดี, ${currentUser.name.split(' ')[0]} 👋</div><div class="empty-state"><span class="empty-icon">📊</span><p>ยังไม่มีข้อมูล<br>กดแท็บ <b>Log</b> เพื่อเริ่ม!</p></div>`;
-  const bmi=calcBMI(latest.weight,currentUser.height);
-  const cat=bmiCategory(bmi);
-  const score=calcHealthScore(latest,currentUser);
-  const recs=getRecommendations(latest,currentUser,logs);
-  const bmiPct=Math.min(100,Math.max(0,((bmi-15)/(40-15))*100));
-  const scoreColor=score>=80?'#C8F000':score>=50?'#FF8C42':'#FF4757';
-  const riskClass=cat.risk==='low'?'risk-low':cat.risk==='medium'?'risk-medium':'risk-high';
-  const weights=logs.slice(0,7).reverse().map(l=>l.weight);
-  const maxW=Math.max(...weights),minW=Math.min(...weights);
-  const bars=weights.map(w=>{const h=maxW===minW?50:Math.round(20+((w-minW)/(maxW-minW))*80);return`<div class="bar-col" style="height:${h}%"></div>`}).join('');
-  const prog=calcProgress(currentUser);
-  return`${switcher}
+function renderUserHome() {
+  const logs = LOGS.filter(l => l.userId === currentUser.id).sort((a,b) => b.date.localeCompare(a.date));
+  const latest = logs[0];
+  const switcher = modeSwitchHTML();
+  if(!latest) return `${switcher}<div class="section-title">สวัสดี, ${currentUser.name.split(' ')[0]} 👋</div><div class="empty-state"><span class="empty-icon">📊</span><p>ยังไม่มีข้อมูล<br>กดแท็บ <b>Log</b> เพื่อเริ่ม!</p></div>`;
+  
+  const bmi = calcBMI(latest.weight, currentUser.height);
+  const cat = bmiCategory(bmi);
+  const score = calcHealthScore(latest, currentUser);
+  const recs = getRecommendations(latest, currentUser, logs);
+  const bmiPct = Math.min(100, Math.max(0, ((bmi - 15) / (40 - 15)) * 100));
+  const scoreColor = score >= 80 ? '#C8F000' : score >= 50 ? '#FF8C42' : '#FF4757';
+  const riskClass = cat.risk === 'low' ? 'risk-low' : cat.risk === 'medium' ? 'risk-medium' : 'risk-high';
+  const weights = logs.slice(0, 7).reverse().map(l => l.weight);
+  const maxW = Math.max(...weights), minW = Math.min(...weights);
+  const bars = weights.map(w => {
+    const h = maxW === minW ? 50 : Math.round(20 + ((w - minW) / (maxW - minW)) * 80);
+    return `<div class="bar-col" style="height:${h}%"></div>`;
+  }).join('');
+  const prog = calcProgress(currentUser);
+  
+  return `${switcher}
     <div class="section-title">สวัสดี, ${currentUser.name.split(' ')[0]} 👋</div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">ข้อมูลล่าสุด: ${latest.date}</p>
     <div class="card" style="background:linear-gradient(135deg,#1a2800,#111214);border-color:#2d4000">
@@ -829,7 +842,7 @@ function renderUserHome(){
         </div>
       </div>
     </div>
-    ${prog&&prog.streak>1?`<div class="streak-box"><div class="streak-num">${prog.streak}</div><div><div class="fw-600" style="font-size:14px">🔥 Streak ${prog.streak} วันต่อเนื่อง!</div><div class="text-muted" style="font-size:12px">รักษาวินัยให้ต่อเนื่อง</div></div></div>`:''}
+    ${prog && prog.streak > 1 ? `<div class="streak-box"><div class="streak-num">${prog.streak}</div><div><div class="fw-600" style="font-size:14px">🔥 Streak ${prog.streak} วันต่อเนื่อง!</div><div class="text-muted" style="font-size:12px">รักษาวินัยให้ต่อเนื่อง</div></div></div>` : ''}
     <div class="metrics-grid">
       <div class="metric-chip lime"><div class="chip-label">น้ำหนัก</div><div class="chip-value">${latest.weight}</div><div class="chip-unit">กิโลกรัม</div></div>
       <div class="metric-chip teal"><div class="chip-label">BMI</div><div class="chip-value">${bmi.toFixed(1)}</div><div class="chip-unit">${cat.label}</div></div>
@@ -850,14 +863,14 @@ function renderUserHome(){
       <div class="mini-chart">${bars}</div>
     </div>
     <div class="section-title" style="margin-top:8px">คำแนะนำ</div>
-    ${recs.map(r=>`<div class="rec-box ${r.severity}"><div class="rec-label">${r.icon} ${r.title}</div><p>${r.msg}</p>${r.action?`<div class="rec-action">📋 ${r.action}</div>`:''}</div>`).join('')}
+    ${recs.map(r => `<div class="rec-box ${r.severity}"><div class="rec-label">${r.icon} ${r.title}</div><p>${r.msg}</p>${r.action ? `<div class="rec-action">📋 ${r.action}</div>` : ''}</div>`).join('')}
   `;
 }
 
-function renderUserLog(){
-  const hasEmail=!!currentUser.email;
-  const today=new Date().toISOString().split('T')[0];
-  return`
+function renderUserLog() {
+  const hasEmail = !!currentUser.email;
+  const today = new Date().toISOString().split('T')[0];
+  return `
     <div class="section-title">บันทึกข้อมูลวันนี้</div>
     <div class="card">
       <div class="form-group"><label>วันที่</label><input type="date" id="log-date" value="${today}" max="${today}"></div>
@@ -871,10 +884,10 @@ function renderUserLog(){
       </div>
       <div class="email-toggle-box">
         <label>
-          <input type="checkbox" id="send-email-chk" ${hasEmail?'checked':''} ${hasEmail?'':'disabled'}>
+          <input type="checkbox" id="send-email-chk" ${hasEmail ? 'checked' : ''} ${hasEmail ? '' : 'disabled'}>
           <div>
             <div class="etb-title">📧 ส่งรายงาน AI ไปยัง Email</div>
-            <div class="etb-sub">${hasEmail?currentUser.email:'ยังไม่มี Email — ตั้งใน Settings'}</div>
+            <div class="etb-sub">${hasEmail ? currentUser.email : 'ยังไม่มี Email — ตั้งใน Settings'}</div>
           </div>
         </label>
       </div>
@@ -882,69 +895,74 @@ function renderUserLog(){
       <button class="btn btn-primary" id="log-btn" onclick="submitLog()">💾 บันทึกข้อมูล</button>
     </div>
     <div class="section-sub">เป้าหมายที่แนะนำ</div>
-    ${[['BMI เป้าหมาย','18.5–24.9'],['นอนหลับ','7–9 ชั่วโมง'],['ดื่มน้ำ','2–3 ลิตร'],['ออกกำลังกาย','30+ นาที/วัน']].map(([k,v])=>
+    ${[['BMI เป้าหมาย','18.5–24.9'],['นอนหลับ','7–9 ชั่วโมง'],['ดื่มน้ำ','2–3 ลิตร'],['ออกกำลังกาย','30+ นาที/วัน']].map(([k,v]) =>
     `<div class="card-sm" style="margin-bottom:10px"><div class="flex-between"><span class="text-muted">${k}</span><span class="text-lime fw-600">${v}</span></div></div>`).join('')}
   `;
 }
 
-async function submitLog(){
-  const date=document.getElementById('log-date').value;
-  const weight=parseFloat(document.getElementById('log-weight').value);
-  const sleep=parseFloat(document.getElementById('log-sleep').value);
-  const water=parseFloat(document.getElementById('log-water').value);
-  const exercise=parseInt(document.getElementById('log-exercise').value);
-  const sendEmail=document.getElementById('send-email-chk')?.checked;
-  const err=document.getElementById('log-error');
-  const btn=document.getElementById('log-btn');
-  if(!date||isNaN(weight)||isNaN(sleep)||isNaN(water)||isNaN(exercise)){err.textContent='กรุณากรอกข้อมูลให้ครบ';return}
-  if(weight<20||weight>300){err.textContent='น้ำหนักไม่ถูกต้อง';return}
-  if(sleep<0||sleep>24){err.textContent='ชั่วโมงนอนไม่ถูกต้อง';return}
-  if(water<0||water>20){err.textContent='ปริมาณน้ำไม่ถูกต้อง';return}
-  err.textContent='';
-  const newLog={id:'l'+Date.now(),userId:currentUser.id,date,weight,sleep,water,exercise,createdAt:new Date().toISOString()};
+async function submitLog() {
+  const date = document.getElementById('log-date').value;
+  const weight = parseFloat(document.getElementById('log-weight').value);
+  const sleep = parseFloat(document.getElementById('log-sleep').value);
+  const water = parseFloat(document.getElementById('log-water').value);
+  const exercise = parseInt(document.getElementById('log-exercise').value);
+  const sendEmail = document.getElementById('send-email-chk')?.checked;
+  const err = document.getElementById('log-error');
+  const btn = document.getElementById('log-btn');
+  
+  if(!date || isNaN(weight) || isNaN(sleep) || isNaN(water) || isNaN(exercise)) { err.textContent = 'กรุณากรอกข้อมูลให้ครบ'; return; }
+  if(weight < 20 || weight > 300) { err.textContent = 'น้ำหนักไม่ถูกต้อง'; return; }
+  if(sleep < 0 || sleep > 24) { err.textContent = 'ชั่วโมงนอนไม่ถูกต้อง'; return; }
+  if(water < 0 || water > 20) { err.textContent = 'ปริมาณน้ำไม่ถูกต้อง'; return; }
+  err.textContent = '';
+
+  const newLog = {id: 'l' + Date.now(), userId: currentUser.id, date, weight, sleep, water, exercise, createdAt: new Date().toISOString()};
   LOGS.push(newLog);
   saveData();
-  logActivity('create',`บันทึก Log: ${date} (${weight}kg, ${sleep}h sleep)`,currentUser.id,'log');
-  if(sendEmail&&currentUser.email){
-    btn.disabled=true;btn.innerHTML='<span class="spinner"></span>กำลังสร้างรายงาน...';
-    await generateAndOpenEmail(newLog,currentUser);
-    btn.disabled=false;btn.innerHTML='💾 บันทึกข้อมูล';
+  logActivity('create', `บันทึก Log: ${date} (${weight}kg, ${sleep}h sleep)`, currentUser.id, 'log');
+
+  if(sendEmail && currentUser.email) {
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>กำลังสร้างรายงาน...';
+    await generateAndOpenEmail(newLog, currentUser);
+    btn.disabled = false; btn.innerHTML = '💾 บันทึกข้อมูล';
   } else {
     showToast('✅ บันทึกข้อมูลสำเร็จ!');
-    setTimeout(()=>navTo('home',document.querySelectorAll('#main-nav .nav-item')[0]),600);
+    setTimeout(() => navTo('home', document.querySelectorAll('#main-nav .nav-item')[0]), 600);
   }
 }
 
-async function generateAndOpenEmail(log,user){
-  const bmi=calcBMI(log.weight,user.height).toFixed(1);
-  const cat=bmiCategory(parseFloat(bmi));
-  const score=calcHealthScore(log,user);
-  const userLogs=LOGS.filter(l=>l.userId===user.id).sort((a,b)=>b.date.localeCompare(a.date));
-  const recs=getRecommendations(log,user,userLogs);
-  let aiBody='';
-  try{
-    const prompt=`คุณคือ AI โค้ชสุขภาพของ FitFuel
+async function generateAndOpenEmail(log, user) {
+  const bmi = calcBMI(log.weight, user.height).toFixed(1);
+  const cat = bmiCategory(parseFloat(bmi));
+  const score = calcHealthScore(log, user);
+  const userLogs = LOGS.filter(l => l.userId === user.id).sort((a,b) => b.date.localeCompare(a.date));
+  const recs = getRecommendations(log, user, userLogs);
+  let aiBody = '';
+  try {
+    const prompt = `คุณคือ AI โค้ชสุขภาพของ FitFuel
 ข้อมูล ${user.name} วันที่ ${log.date}: น้ำหนัก ${log.weight} kg, BMI ${bmi} (${cat.label}), Health Score ${score}/100, นอนหลับ ${log.sleep} ชม., ดื่มน้ำ ${log.water} L, ออกกำลังกาย ${log.exercise} นาที, เป้าหมาย: ${user.goalType}
 เขียนรายงานภาษาไทย 180-220 คำ มี 3 ส่วน: ✅ภาพรวม ⭐สิ่งที่ทำได้ดี 💡คำแนะนำ`;
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
-    const data=await resp.json();
-    aiBody=data.content?.[0]?.text||'';
-  }catch(e){aiBody=recs.map(r=>r.title+': '+r.msg).join('\n\n')}
-  const subject=encodeURIComponent(`🔥 [FitFuel] รายงาน ${log.date} | Score: ${score}/100`);
-  const body=`สวัสดีคุณ ${user.name} 👋\n\nรายงานสุขภาพประจำวันจาก FitFuel\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📅 วันที่: ${log.date}\n⚖️ น้ำหนัก: ${log.weight} kg\n📊 BMI: ${bmi} — ${cat.label}\n💯 Health Score: ${score}/100\n🌙 นอนหลับ: ${log.sleep} ชม.\n💧 ดื่มน้ำ: ${log.water} L\n🏃 ออกกำลังกาย: ${log.exercise} นาที\n🎯 เป้าหมาย: ${user.goalType}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 รายงานจาก AI Coach\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${aiBody}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\nFitFuel Health Tracking`;
-  window.location.href=`mailto:${user.email}?subject=${subject}&body=${encodeURIComponent(body)}`;
+    const resp = await fetch('https://api.anthropic.com/v1/messages', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]}) });
+    const data = await resp.json();
+    aiBody = data.content?.[0]?.text || '';
+  } catch(e) { aiBody = recs.map(r => r.title + ': ' + r.msg).join('\n\n'); }
+  
+  const subject = encodeURIComponent(`🔥 [FitFuel] รายงาน ${log.date} | Score: ${score}/100`);
+  const body = `สวัสดีคุณ ${user.name} 👋\n\nรายงานสุขภาพประจำวันจาก FitFuel\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📅 วันที่: ${log.date}\n⚖️ น้ำหนัก: ${log.weight} kg\n📊 BMI: ${bmi} — ${cat.label}\n💯 Health Score: ${score}/100\n🌙 นอนหลับ: ${log.sleep} ชม.\n💧 ดื่มน้ำ: ${log.water} L\n🏃 ออกกำลังกาย: ${log.exercise} นาที\n🎯 เป้าหมาย: ${user.goalType}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 รายงานจาก AI Coach\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${aiBody}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\nFitFuel Health Tracking`;
+  window.location.href = `mailto:${user.email}?subject=${subject}&body=${encodeURIComponent(body)}`;
   showToast('📧 เปิด Email Client แล้ว!');
-  setTimeout(()=>navTo('home',document.querySelectorAll('#main-nav .nav-item')[0]),1200);
+  setTimeout(() => navTo('home', document.querySelectorAll('#main-nav .nav-item')[0]), 1200);
 }
 
-function renderUserProgress(){
-  const logs=LOGS.filter(l=>l.userId===currentUser.id);
-  if(!logs.length)return`<div class="section-title">🎯 Progress</div><div class="empty-state"><span class="empty-icon">🎯</span><p>เริ่ม Log เพื่อดู progress!</p></div>`;
-  const p=calcProgress(currentUser);
-  if(!p)return`<div class="empty-state"><p>ไม่สามารถคำนวณได้</p></div>`;
-  const dirClass=p.weightDelta<0?'var(--lime)':p.weightDelta>0?'var(--orange)':'var(--text2)';
-  const goalDir=currentUser.goalType==='ลดน้ำหนัก'?(p.weightDelta<0?'✅':'⚠'):(currentUser.goalType==='เพิ่มกล้ามเนื้อ'?(p.weightDelta>0?'✅':'⚠'):'─');
-  return`
+function renderUserProgress() {
+  const logs = LOGS.filter(l => l.userId === currentUser.id);
+  if(!logs.length) return `<div class="section-title">🎯 Progress</div><div class="empty-state"><span class="empty-icon">🎯</span><p>เริ่ม Log เพื่อดู progress!</p></div>`;
+  const p = calcProgress(currentUser);
+  if(!p) return `<div class="empty-state"><p>ไม่สามารถคำนวณได้</p></div>`;
+  const dirClass = p.weightDelta < 0 ? 'var(--lime)' : p.weightDelta > 0 ? 'var(--orange)' : 'var(--text2)';
+  const goalDir = currentUser.goalType === 'ลดน้ำหนัก' ? (p.weightDelta < 0 ? '✅' : '⚠') : (currentUser.goalType === 'เพิ่มกล้ามเนื้อ' ? (p.weightDelta > 0 ? '✅' : '⚠') : '─');
+  
+  return `
     <div class="section-title">🎯 Progress Tracking</div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">เป้าหมาย: <b style="color:var(--lime)">${currentUser.goalType}</b></p>
     <div class="progress-card">
@@ -984,20 +1002,20 @@ function renderUserProgress(){
   `;
 }
 
-function renderUserHistory(){
-  const logs=LOGS.filter(l=>l.userId===currentUser.id).sort((a,b)=>b.date.localeCompare(a.date));
-  if(!logs.length)return`<div class="section-title">ประวัติ</div><div class="empty-state"><span class="empty-icon">📋</span><p>ยังไม่มีประวัติ</p></div>`;
-  return`
+function renderUserHistory() {
+  const logs = LOGS.filter(l => l.userId === currentUser.id).sort((a,b) => b.date.localeCompare(a.date));
+  if(!logs.length) return `<div class="section-title">ประวัติ</div><div class="empty-state"><span class="empty-icon">📋</span><p>ยังไม่มีประวัติ</p></div>`;
+  return `
     <div class="section-flex">
       <div class="section-title">ประวัติข้อมูล</div>
       <button class="btn-export" onclick="exportUserCSV('${currentUser.id}')">📥 CSV</button>
     </div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">ทั้งหมด ${logs.length} รายการ</p>
-    ${logs.map(l=>{
-      const bmi=calcBMI(l.weight,currentUser.height);
-      const score=calcHealthScore(l,currentUser);
-      const rc=score>=80?'risk-low':score>=50?'risk-medium':'risk-high';
-      return`<div class="log-item">
+    ${logs.map(l => {
+      const bmi = calcBMI(l.weight, currentUser.height);
+      const score = calcHealthScore(l, currentUser);
+      const rc = score >= 80 ? 'risk-low' : score >= 50 ? 'risk-medium' : 'risk-high';
+      return `<div class="log-item">
         <div class="log-item-top"><span class="fw-600">📅 ${l.date}</span><span class="risk-badge ${rc}">Score: ${score}</span></div>
         <div class="log-stats">
           <div class="log-stat">⚖️ <span>${l.weight}kg</span></div>
@@ -1013,17 +1031,18 @@ function renderUserHistory(){
 // ════════════════════════════════════════════════════════════
 //  PROFILE
 // ════════════════════════════════════════════════════════════
-function renderUserProfile(){
-  const logs=LOGS.filter(l=>l.userId===currentUser.id);
-  const latest=[...logs].sort((a,b)=>b.date.localeCompare(a.date))[0];
-  const bmi=latest?calcBMI(latest.weight,currentUser.height):null;
-  const role=currentUser.role;
-  const avatarClass=role==='master'?'master':role==='admin'?'admin':'';
-  const photoStyle = currentUser.photo?`style="background-image:url('${currentUser.photo}');background-size:cover;background-position:center"`:'';
-  return`
+function renderUserProfile() {
+  const logs = LOGS.filter(l => l.userId === currentUser.id);
+  const latest = [...logs].sort((a,b) => b.date.localeCompare(a.date))[0];
+  const bmi = latest ? calcBMI(latest.weight, currentUser.height) : null;
+  const role = currentUser.role;
+  const avatarClass = role === 'master' ? 'master' : role === 'admin' ? 'admin' : '';
+  const photoStyle = currentUser.photo ? `style="background-image:url('${currentUser.photo}')"` : '';
+  
+  return `
     <div class="profile-header">
       <div class="profile-avatar-lg ${avatarClass}" ${photoStyle} onclick="document.getElementById('photo-input').click()">
-        ${!currentUser.photo?currentUser.name[0]:''}
+        ${!currentUser.photo ? currentUser.name[0] : ''}
         <div class="photo-edit-overlay">📷 เปลี่ยน</div>
       </div>
       <div style="flex:1;min-width:0">
@@ -1035,7 +1054,7 @@ function renderUserProfile(){
     <div class="card">
       <div class="section-sub">ข้อมูลสุขภาพ</div>
       ${[['อายุ',currentUser.age+' ปี'],['เพศ',currentUser.gender],['ส่วนสูง',currentUser.height+' cm'],['น้ำหนักเป้าหมาย',(currentUser.targetWeight||'-')+' kg'],['เป้าหมาย',currentUser.goalType],['จำนวน Log',logs.length+' รายการ'],...(bmi?[['BMI ล่าสุด',bmi.toFixed(1)+' ('+bmiCategory(bmi).label+')']]:[])]
-      .map(([k,v])=>`<div class="flex-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span class="text-muted">${k}</span><span class="fw-600">${v}</span></div>`).join('')}
+      .map(([k,v]) => `<div class="flex-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span class="text-muted">${k}</span><span class="fw-600">${v}</span></div>`).join('')}
     </div>
 
     <div class="section-sub">การตั้งค่า</div>
@@ -1052,7 +1071,7 @@ function renderUserProfile(){
         <div class="setting-icon">📧</div>
         <div class="setting-content">
           <div class="setting-title">เปลี่ยน Email</div>
-          <div class="setting-desc">${currentUser.email||'ยังไม่มี Email'}</div>
+          <div class="setting-desc">${currentUser.email || 'ยังไม่มี Email'}</div>
         </div>
         <span class="setting-arrow">›</span>
       </div>
@@ -1073,46 +1092,49 @@ function renderUserProfile(){
 // ════════════════════════════════════════════════════════════
 //  PHOTO UPLOAD
 // ════════════════════════════════════════════════════════════
-document.getElementById('photo-input').addEventListener('change', function(e){
+document.getElementById('photo-input').addEventListener('change', function(e) {
   const file = e.target.files[0];
-  if(!file)return;
-  if(!file.type.startsWith('image/')){showToast('❌ กรุณาเลือกไฟล์รูปภาพ');return}
-  if(file.size > 5*1024*1024){showToast('❌ ขนาดไฟล์ใหญ่เกิน 5MB');return}
+  if(!file) return;
+  if(!file.type.startsWith('image/')) { showToast('❌ กรุณาเลือกไฟล์รูปภาพ'); return; }
+  if(file.size > 5 * 1024 * 1024) { showToast('❌ ขนาดไฟล์ใหญ่เกิน 5MB'); return; }
+  
   const reader = new FileReader();
-  reader.onload = function(ev){
+  reader.onload = function(ev) {
     const img = new Image();
-    img.onload = function(){
+    img.onload = function() {
       const canvas = document.createElement('canvas');
       const max = 400;
-      let w=img.width, h=img.height;
-      if(w>h){if(w>max){h=h*(max/w);w=max}}else{if(h>max){w=w*(max/h);h=max}}
-      canvas.width=w;canvas.height=h;
-      const ctx=canvas.getContext('2d');
-      ctx.drawImage(img,0,0,w,h);
-      const dataUrl=canvas.toDataURL('image/jpeg',0.85);
-      currentUser.photo=dataUrl;
-      const u=USERS.find(x=>x.id===currentUser.id);
-      if(u)u.photo=dataUrl;
+      let w = img.width, h = img.height;
+      if(w > h) { if(w > max) { h = h * (max/w); w = max; } } else { if(h > max) { w = w * (max/h); h = max; } }
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      
+      currentUser.photo = dataUrl;
+      const u = USERS.find(x => x.id === currentUser.id);
+      if(u) u.photo = dataUrl;
+      
       saveData();
-      logActivity('update','เปลี่ยนรูปโปรไฟล์',currentUser.id,'user');
+      logActivity('update', 'เปลี่ยนรูปโปรไฟล์', currentUser.id, 'user');
       updateAvatar();
       showToast('✅ เปลี่ยนรูปโปรไฟล์สำเร็จ!');
       renderApp(currentPage);
     };
-    img.src=ev.target.result;
+    img.src = ev.target.result;
   };
   reader.readAsDataURL(file);
-  e.target.value='';
+  e.target.value = '';
 });
 
 // ════════════════════════════════════════════════════════════
 //  SETTINGS PAGES
 // ════════════════════════════════════════════════════════════
-function renderSettings(){
+function renderSettings() {
   return renderUserProfile();
 }
 
-function renderSettingsInfo(){
+function renderSettingsInfo() {
   return `
     <div class="subpage-header">
       <button class="subpage-back" onclick="navTo('profile')">←</button>
@@ -1122,13 +1144,13 @@ function renderSettingsInfo(){
     <div class="card">
       <div class="section-sub">รูปโปรไฟล์</div>
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px">
-        <div class="profile-avatar-lg ${currentUser.role==='master'?'master':currentUser.role==='admin'?'admin':''}" ${currentUser.photo?`style="background-image:url('${currentUser.photo}');background-size:cover"`:''} onclick="document.getElementById('photo-input').click()">
-          ${!currentUser.photo?currentUser.name[0]:''}
+        <div class="profile-avatar-lg ${currentUser.role==='master'?'master':currentUser.role==='admin'?'admin':''}" ${currentUser.photo ? `style="background-image:url('${currentUser.photo}')"` : ''} onclick="document.getElementById('photo-input').click()">
+          ${!currentUser.photo ? currentUser.name[0] : ''}
           <div class="photo-edit-overlay">📷</div>
         </div>
         <div style="flex:1">
           <button class="btn-sm" onclick="document.getElementById('photo-input').click()">📷 เลือกรูปใหม่</button>
-          ${currentUser.photo?'<button class="btn-danger" style="margin-left:6px" onclick="removePhoto()">🗑 ลบ</button>':''}
+          ${currentUser.photo ? '<button class="btn-danger" style="margin-left:6px" onclick="removePhoto()">🗑 ลบ</button>' : ''}
           <p class="field-hint" style="margin-top:8px">JPG, PNG, GIF · ไม่เกิน 5MB</p>
         </div>
       </div>
@@ -1153,7 +1175,7 @@ function renderSettingsInfo(){
       </div>
       <div class="form-group"><label>เป้าหมาย</label>
         <select id="info-goal">
-          ${['ลดน้ำหนัก','เพิ่มกล้ามเนื้อ','รักษาน้ำหนัก','ปรับปรุงสุขภาพโดยรวม'].map(g=>`<option ${currentUser.goalType===g?'selected':''}>${g}</option>`).join('')}
+          ${['ลดน้ำหนัก','เพิ่มกล้ามเนื้อ','รักษาน้ำหนัก','ปรับปรุงสุขภาพโดยรวม'].map(g => `<option ${currentUser.goalType===g?'selected':''}>${g}</option>`).join('')}
         </select>
       </div>
       <p class="error-msg" id="info-error"></p>
@@ -1162,42 +1184,45 @@ function renderSettingsInfo(){
   `;
 }
 
-function removePhoto(){
-  if(!confirm('ลบรูปโปรไฟล์?'))return;
-  currentUser.photo=null;
-  const u=USERS.find(x=>x.id===currentUser.id);
-  if(u)u.photo=null;
+function removePhoto() {
+  if(!confirm('ลบรูปโปรไฟล์?')) return;
+  currentUser.photo = null;
+  const u = USERS.find(x => x.id === currentUser.id);
+  if(u) u.photo = null;
   saveData();
-  logActivity('update','ลบรูปโปรไฟล์',currentUser.id,'user');
+  logActivity('update', 'ลบรูปโปรไฟล์', currentUser.id, 'user');
   updateAvatar();
   showToast('🗑 ลบรูปแล้ว');
   renderApp('settings-info');
 }
 
-function saveInfo(){
-  const name=document.getElementById('info-name').value.trim();
-  const age=parseInt(document.getElementById('info-age').value);
-  const gender=document.getElementById('info-gender').value;
-  const height=parseInt(document.getElementById('info-height').value);
-  const target=parseFloat(document.getElementById('info-target').value);
-  const goal=document.getElementById('info-goal').value;
-  const err=document.getElementById('info-error');
-  if(!name||!age||!gender||!height||!target||!goal){err.textContent='กรุณากรอกให้ครบ';return}
-  if(age<10||age>100){err.textContent='อายุไม่ถูกต้อง';return}
-  if(height<100||height>250){err.textContent='ส่วนสูงไม่ถูกต้อง';return}
-  if(target<20||target>300){err.textContent='น้ำหนักเป้าหมายไม่ถูกต้อง';return}
-  err.textContent='';
-  const u=USERS.find(x=>x.id===currentUser.id);
-  Object.assign(u,{name,age,gender,height,targetWeight:target,goalType:goal});
-  Object.assign(currentUser,{name,age,gender,height,targetWeight:target,goalType:goal});
+function saveInfo() {
+  const name = document.getElementById('info-name').value.trim();
+  const age = parseInt(document.getElementById('info-age').value);
+  const gender = document.getElementById('info-gender').value;
+  const height = parseInt(document.getElementById('info-height').value);
+  const target = parseFloat(document.getElementById('info-target').value);
+  const goal = document.getElementById('info-goal').value;
+  const err = document.getElementById('info-error');
+  
+  if(!name || !age || !gender || !height || !target || !goal) { err.textContent = 'กรุณากรอกให้ครบ'; return; }
+  if(age < 10 || age > 100) { err.textContent = 'อายุไม่ถูกต้อง'; return; }
+  if(height < 100 || height > 250) { err.textContent = 'ส่วนสูงไม่ถูกต้อง'; return; }
+  if(target < 20 || target > 300) { err.textContent = 'น้ำหนักเป้าหมายไม่ถูกต้อง'; return; }
+  err.textContent = '';
+  
+  const u = USERS.find(x => x.id === currentUser.id);
+  Object.assign(u, {name, age, gender, height, targetWeight: target, goalType: goal});
+  Object.assign(currentUser, {name, age, gender, height, targetWeight: target, goalType: goal});
+  
   saveData();
-  logActivity('update','แก้ไขข้อมูลส่วนตัว',currentUser.id,'user');
+  logActivity('update', 'แก้ไขข้อมูลส่วนตัว', currentUser.id, 'user');
   updateAvatar();
   showToast('✅ บันทึกสำเร็จ');
-  setTimeout(()=>navTo('profile'),500);
+  setTimeout(() => navTo('profile'), 500);
 }
 
-function renderSettingsEmail(){
+function renderSettingsEmail() {
   return `
     <div class="subpage-header">
       <button class="subpage-back" onclick="navTo('profile')">←</button>
@@ -1206,7 +1231,7 @@ function renderSettingsEmail(){
 
     <div class="card">
       <div class="section-sub">Email ปัจจุบัน</div>
-      <p style="font-size:14px;color:var(--text2);margin-bottom:14px">${currentUser.email||'ยังไม่มี Email'}</p>
+      <p style="font-size:14px;color:var(--text2);margin-bottom:14px">${currentUser.email || 'ยังไม่มี Email'}</p>
     </div>
 
     <div class="card">
@@ -1215,7 +1240,7 @@ function renderSettingsEmail(){
 
       <div class="form-group">
         <label>Email ใหม่</label>
-        <input type="email" id="new-email" placeholder="your@email.com" value="${currentUser.email||''}">
+        <input type="email" id="new-email" placeholder="your@email.com" value="${currentUser.email || ''}">
       </div>
 
       <div class="form-group">
@@ -1230,27 +1255,30 @@ function renderSettingsEmail(){
   `;
 }
 
-function saveNewEmail(){
-  const newEmail=document.getElementById('new-email').value.trim().toLowerCase();
-  const oldPin=getPinValue('change-pin-old');
-  const err=document.getElementById('email-error');
-  err.textContent='';
-  if(!newEmail){err.textContent='กรุณากรอก Email ใหม่';return}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)){err.textContent='รูปแบบ Email ไม่ถูกต้อง';return}
-  if(oldPin.length!==6){err.textContent='กรอก PIN ครบ 6 หลัก';return}
-  if(oldPin!==currentUser.pin){err.textContent='❌ PIN ไม่ถูกต้อง';return}
-  if(newEmail===currentUser.email){err.textContent='Email ใหม่เหมือนกับเก่า';return}
-  const oldEmail=currentUser.email;
-  currentUser.email=newEmail;
-  const u=USERS.find(x=>x.id===currentUser.id);
-  if(u)u.email=newEmail;
+function saveNewEmail() {
+  const newEmail = document.getElementById('new-email').value.trim().toLowerCase();
+  const oldPin = getPinValue('change-pin-old');
+  const err = document.getElementById('email-error');
+  err.textContent = '';
+  
+  if(!newEmail) { err.textContent = 'กรุณากรอก Email ใหม่'; return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { err.textContent = 'รูปแบบ Email ไม่ถูกต้อง'; return; }
+  if(oldPin.length !== 6) { err.textContent = 'กรอก PIN ครบ 6 หลัก'; return; }
+  if(oldPin !== currentUser.pin) { err.textContent = '❌ PIN ไม่ถูกต้อง'; return; }
+  if(newEmail === currentUser.email) { err.textContent = 'Email ใหม่เหมือนกับเก่า'; return; }
+  
+  const oldEmail = currentUser.email;
+  currentUser.email = newEmail;
+  const u = USERS.find(x => x.id === currentUser.id);
+  if(u) u.email = newEmail;
+  
   saveData();
-  logActivity('update',`เปลี่ยน Email: ${oldEmail||'(ว่าง)'} → ${newEmail}`,currentUser.id,'user');
+  logActivity('update', `เปลี่ยน Email: ${oldEmail || '(ว่าง)'} → ${newEmail}`, currentUser.id, 'user');
   showToast('✅ เปลี่ยน Email สำเร็จ');
-  setTimeout(()=>navTo('profile'),700);
+  setTimeout(() => navTo('profile'), 700);
 }
 
-function renderSettingsPin(){
+function renderSettingsPin() {
   return `
     <div class="subpage-header">
       <button class="subpage-back" onclick="navTo('profile')">←</button>
@@ -1289,43 +1317,47 @@ function renderSettingsPin(){
   `;
 }
 
-function saveNewPin(){
-  const oldPin=getPinValue('change-pin-old');
-  const newPin=getPinValue('change-pin-new');
-  const newPin2=getPinValue('change-pin-new2');
-  const err=document.getElementById('pin-error');
-  err.textContent='';
-  if(oldPin.length!==6){err.textContent='กรอก PIN ปัจจุบันครบ 6 หลัก';return}
-  if(oldPin!==currentUser.pin){err.textContent='❌ PIN ปัจจุบันไม่ถูกต้อง';return}
-  if(newPin.length!==6||newPin2.length!==6){err.textContent='กรอก PIN ใหม่ครบ 6 หลัก';return}
-  if(newPin!==newPin2){err.textContent='PIN ใหม่ไม่ตรงกัน';return}
-  if(newPin===oldPin){err.textContent='PIN ใหม่เหมือนกับเก่า';return}
-  currentUser.pin=newPin;
-  const u=USERS.find(x=>x.id===currentUser.id);
-  if(u)u.pin=newPin;
+function saveNewPin() {
+  const oldPin = getPinValue('change-pin-old');
+  const newPin = getPinValue('change-pin-new');
+  const newPin2 = getPinValue('change-pin-new2');
+  const err = document.getElementById('pin-error');
+  err.textContent = '';
+  
+  if(oldPin.length !== 6) { err.textContent = 'กรอก PIN ปัจจุบันครบ 6 หลัก'; return; }
+  if(oldPin !== currentUser.pin) { err.textContent = '❌ PIN ปัจจุบันไม่ถูกต้อง'; return; }
+  if(newPin.length !== 6 || newPin2.length !== 6) { err.textContent = 'กรอก PIN ใหม่ครบ 6 หลัก'; return; }
+  if(newPin !== newPin2) { err.textContent = 'PIN ใหม่ไม่ตรงกัน'; return; }
+  if(newPin === oldPin) { err.textContent = 'PIN ใหม่เหมือนกับเก่า'; return; }
+  
+  currentUser.pin = newPin;
+  const u = USERS.find(x => x.id === currentUser.id);
+  if(u) u.pin = newPin;
   saveData();
-  logActivity('update','เปลี่ยน PIN',currentUser.id,'user');
+  
+  logActivity('update', 'เปลี่ยน PIN', currentUser.id, 'user');
   showToast('✅ เปลี่ยน PIN สำเร็จ');
-  setTimeout(()=>navTo('profile'),700);
+  setTimeout(() => navTo('profile'), 700);
 }
 
 // ════════════════════════════════════════════════════════════
 //  ADMIN VIEW
 // ════════════════════════════════════════════════════════════
-function adminBackBtn(){
+function adminBackBtn() {
   return `<div class="mode-switch">
     <div class="mode-switch-info"><div class="ms-label">Admin Panel</div><div class="ms-title">🛡 ${currentUser.name}</div></div>
     <button class="mode-btn" style="background:var(--card);color:var(--text);border:1px solid var(--border)" onclick="switchView('user')">← User</button>
   </div>`;
 }
 
-function renderAdminDashboard(){
-  const total=USERS.filter(u=>u.role==='user').length;
-  const totalL=LOGS.length;
-  const highRisk=LOGS.filter(l=>{const u=USERS.find(x=>x.id===l.userId);return u&&calcHealthScore(l,u)<50}).length;
-  const avg=LOGS.reduce((s,l)=>{const u=USERS.find(x=>x.id===l.userId);return s+(u?calcHealthScore(l,u):0)},0)/(LOGS.length||1);
-  const sc=s=>s>=80?'#C8F000':s>=50?'#FF8C42':'#FF4757';
-  return`${adminBackBtn()}
+function renderAdminDashboard() {
+  const total = USERS.filter(u => u.role === 'user').length;
+  const totalL = LOGS.length;
+  const highRisk = LOGS.filter(l => { const u = USERS.find(x => x.id === l.userId); return u && calcHealthScore(l,u) < 50; }).length;
+  const avg = LOGS.reduce((s,l) => { const u = USERS.find(x => x.id === l.userId); return s + (u ? calcHealthScore(l,u) : 0); }, 0) / (LOGS.length || 1);
+  const sc = s => s >= 80 ? '#C8F000' : s >= 50 ? '#FF8C42' : '#FF4757';
+  
+  return `${adminBackBtn()}
     <div class="section-title">📊 Dashboard</div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">ภาพรวม · อัพเดท ${new Date().toLocaleTimeString('th-TH')}</p>
     <div class="admin-stats">
@@ -1335,22 +1367,22 @@ function renderAdminDashboard(){
       <div class="stat-card"><div class="s-num" style="color:${sc(avg)}">${avg.toFixed(0)}</div><div class="s-label">Avg Score</div></div>
     </div>
     <div class="section-title" style="margin-top:8px">⚡ กิจกรรมล่าสุด</div>
-    ${ACTIVITIES.slice(0,5).map(a=>renderActivityItem(a)).join('')}
+    ${ACTIVITIES.slice(0,5).map(a => renderActivityItem(a)).join('')}
     <div class="section-title" style="margin-top:16px">สรุปรายผู้ใช้</div>
-    ${USERS.filter(u=>u.role==='user').map(u=>{
-      const ul=LOGS.filter(l=>l.userId===u.id);
-      const avgS=ul.reduce((s,l)=>s+calcHealthScore(l,u),0)/(ul.length||1);
-      const latest=[...ul].sort((a,b)=>b.date.localeCompare(a.date))[0];
-      const bmi=latest?calcBMI(latest.weight,u.height):null;
-      const photoBg=u.photo?`background-image:url('${u.photo}');background-size:cover;background-position:center`:'';
-      return`<div class="card" style="margin-bottom:12px">
+    ${USERS.filter(u => u.role === 'user').map(u => {
+      const ul = LOGS.filter(l => l.userId === u.id);
+      const avgS = ul.reduce((s,l) => s + calcHealthScore(l,u), 0) / (ul.length || 1);
+      const latest = [...ul].sort((a,b) => b.date.localeCompare(a.date))[0];
+      const bmi = latest ? calcBMI(latest.weight, u.height) : null;
+      const photoBg = u.photo ? `background-image:url('${u.photo}')` : '';
+      return `<div class="card" style="margin-bottom:12px">
         <div class="flex-between" style="margin-bottom:12px">
           <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
-            <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;${photoBg}">${!u.photo?u.name[0]:''}</div>
+            <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;background-size:cover;background-position:center;${photoBg}">${!u.photo ? u.name[0] : ''}</div>
             <div style="min-width:0">
               <div class="fw-600">${u.name}</div>
               <div class="text-muted">@${u.username}</div>
-              ${u.email?`<div style="font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis">📧 ${u.email}</div>`:''}
+              ${u.email ? `<div style="font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis">📧 ${u.email}</div>` : ''}
             </div>
           </div>
           <div style="text-align:right;flex-shrink:0">
@@ -1360,39 +1392,39 @@ function renderAdminDashboard(){
         </div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px">
           <span class="text-muted">📋 <b style="color:var(--text)">${ul.length}</b></span>
-          <span class="text-muted">📅 <b style="color:var(--text)">${latest?latest.date:'-'}</b></span>
+          <span class="text-muted">📅 <b style="color:var(--text)">${latest ? latest.date : '-'}</b></span>
           <span class="text-muted">🎯 ${u.goalType}</span>
-          ${bmi?`<span class="text-muted">BMI <b style="color:var(--text)">${bmi.toFixed(1)}</b></span>`:''}
+          ${bmi ? `<span class="text-muted">BMI <b style="color:var(--text)">${bmi.toFixed(1)}</b></span>` : ''}
         </div>
       </div>`;
     }).join('')}`;
 }
 
-function renderAdminUsers(){
-  const realUsers=USERS.filter(u=>u.role!=='master');
-  return`${adminBackBtn()}
+function renderAdminUsers() {
+  const realUsers = USERS.filter(u => u.role !== 'master');
+  return `${adminBackBtn()}
     <div class="section-flex">
       <div class="section-title">👥 ผู้ใช้</div>
       <button class="btn-export" onclick="exportAllUsersCSV()">📥 Export</button>
     </div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:16px">${realUsers.length} คน</p>
-    ${realUsers.map(u=>{
-      const cnt=LOGS.filter(l=>l.userId===u.id).length;
-      const ul=LOGS.filter(l=>l.userId===u.id);
-      const avg=ul.reduce((s,l)=>s+calcHealthScore(l,u),0)/(ul.length||1);
-      const sc=avg>=80?'var(--lime)':avg>=50?'var(--orange)':'var(--red)';
-      const photoBg=u.photo?`background-image:url('${u.photo}');background-size:cover;background-position:center`:'';
-      return`<div class="log-item">
+    ${realUsers.map(u => {
+      const cnt = LOGS.filter(l => l.userId === u.id).length;
+      const ul = LOGS.filter(l => l.userId === u.id);
+      const avg = ul.reduce((s,l) => s + calcHealthScore(l,u), 0) / (ul.length || 1);
+      const sc = avg >= 80 ? 'var(--lime)' : avg >= 50 ? 'var(--orange)' : 'var(--red)';
+      const photoBg = u.photo ? `background-image:url('${u.photo}')` : '';
+      return `<div class="log-item">
         <div class="log-item-top">
           <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
-            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;font-size:14px;${photoBg}">${!u.photo?u.name[0]:''}</div>
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;font-size:14px;background-size:cover;background-position:center;${photoBg}">${!u.photo ? u.name[0] : ''}</div>
             <div style="min-width:0;flex:1">
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <span class="fw-600">${u.name}</span>
                 <span class="role-pill role-${u.role}">${u.role.toUpperCase()}</span>
               </div>
               <div class="text-muted" style="font-size:12px;margin-top:2px">@${u.username} · ${u.gender} · ${u.age}ปี · ${u.height}cm</div>
-              ${u.email?`<div style="font-size:11px;color:var(--blue);margin-top:2px;overflow:hidden;text-overflow:ellipsis">📧 ${u.email}</div>`:''}
+              ${u.email ? `<div style="font-size:11px;color:var(--blue);margin-top:2px;overflow:hidden;text-overflow:ellipsis">📧 ${u.email}</div>` : ''}
             </div>
           </div>
           <div style="text-align:right;flex-shrink:0">
@@ -1405,19 +1437,19 @@ function renderAdminUsers(){
     }).join('')}`;
 }
 
-function renderAdminLogs(){
-  const all=[...LOGS].sort((a,b)=>b.date.localeCompare(a.date));
-  return`${adminBackBtn()}
+function renderAdminLogs() {
+  const all = [...LOGS].sort((a,b) => b.date.localeCompare(a.date));
+  return `${adminBackBtn()}
     <div class="section-flex">
       <div class="section-title">📋 Logs</div>
       <button class="btn-export" onclick="exportAllLogsCSV()">📥 Export</button>
     </div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:16px">${all.length} รายการ</p>
-    ${all.map(l=>{
-      const u=USERS.find(x=>x.id===l.userId);if(!u)return'';
-      const bmi=calcBMI(l.weight,u.height);const score=calcHealthScore(l,u);
-      const rc=score>=80?'risk-low':score>=50?'risk-medium':'risk-high';
-      return`<div class="log-item">
+    ${all.map(l => {
+      const u = USERS.find(x => x.id === l.userId); if(!u) return '';
+      const bmi = calcBMI(l.weight, u.height); const score = calcHealthScore(l,u);
+      const rc = score >= 80 ? 'risk-low' : score >= 50 ? 'risk-medium' : 'risk-high';
+      return `<div class="log-item">
         <div class="log-item-top"><span class="fw-600">${u.name}</span><span class="risk-badge ${rc}">${score}pts</span></div>
         <div class="text-muted" style="font-size:12px;margin-bottom:8px">📅 ${l.date} · @${u.username}</div>
         <div class="log-stats">
@@ -1431,62 +1463,64 @@ function renderAdminLogs(){
     }).join('')}`;
 }
 
-function renderActivityItem(a){
-  const icons={create:'➕',update:'✏️',delete:'🗑',role:'🛡',log:'📝'};
-  const date=new Date(a.timestamp);
-  const time=date.toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'});
-  const targetUser=a.userId?USERS.find(u=>u.id===a.userId):null;
-  return`<div class="activity-item">
-    <div class="activity-icon">${icons[a.type]||'📌'}</div>
+function renderActivityItem(a) {
+  const icons = {create:'➕', update:'✏️', delete:'🗑', role:'🛡', log:'📝'};
+  const date = new Date(a.timestamp);
+  const time = date.toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'});
+  const targetUser = a.userId ? USERS.find(u => u.id === a.userId) : null;
+  return `<div class="activity-item">
+    <div class="activity-icon">${icons[a.type] || '📌'}</div>
     <div class="activity-content">
-      <div class="activity-text">${a.msg} ${targetUser?`<b>(@${targetUser.username})</b>`:''}</div>
-      <div class="activity-time">${time} · by ${a.actorName||'system'}</div>
+      <div class="activity-text">${a.msg} ${targetUser ? `<b>(@${targetUser.username})</b>` : ''}</div>
+      <div class="activity-time">${time} · by ${a.actorName || 'system'}</div>
     </div>
   </div>`;
 }
 
-function renderAdminActivity(){
-  const back = currentView==='master'?masterBackBtn():adminBackBtn();
-  return`${back}
+function renderAdminActivity() {
+  const back = currentView === 'master' ? masterBackBtn() : adminBackBtn();
+  return `${back}
     <div class="section-flex">
       <div class="section-title">⚡ Activity Log</div>
       <button class="btn-export" onclick="exportActivityCSV()">📥 Export</button>
     </div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:16px">การเปลี่ยนแปลง · ${ACTIVITIES.length} รายการ</p>
-    ${ACTIVITIES.length===0?'<div class="empty-state"><p>ยังไม่มีกิจกรรม</p></div>':ACTIVITIES.map(a=>renderActivityItem(a)).join('')}
+    ${ACTIVITIES.length === 0 ? '<div class="empty-state"><p>ยังไม่มีกิจกรรม</p></div>' : ACTIVITIES.map(a => renderActivityItem(a)).join('')}
   `;
 }
 
-function renderAdminAlerts(){
-  const alerts=LOGS.map(l=>{
-    const u=USERS.find(x=>x.id===l.userId);if(!u||u.role!=='user')return null;
-    const score=calcHealthScore(l,u);
-    const userLogs=LOGS.filter(x=>x.userId===u.id).sort((a,b)=>b.date.localeCompare(a.date));
-    const recs=getRecommendations(l,u,userLogs).filter(r=>r.severity==='high');
-    return{l,u,score,recs};
-  }).filter(x=>x&&x.score<70).sort((a,b)=>a.score-b.score);
-  if(!alerts.length)return`${adminBackBtn()}<div class="section-title">🚨 Alerts</div><div class="empty-state"><span class="empty-icon">✅</span><p>ไม่มีการแจ้งเตือน</p></div>`;
-  return`${adminBackBtn()}
+function renderAdminAlerts() {
+  const alerts = LOGS.map(l => {
+    const u = USERS.find(x => x.id === l.userId); if(!u || u.role !== 'user') return null;
+    const score = calcHealthScore(l, u);
+    const userLogs = LOGS.filter(x => x.userId === u.id).sort((a,b) => b.date.localeCompare(a.date));
+    const recs = getRecommendations(l, u, userLogs).filter(r => r.severity === 'high');
+    return {l, u, score, recs};
+  }).filter(x => x && x.score < 70).sort((a,b) => a.score - b.score);
+  
+  if(!alerts.length) return `${adminBackBtn()}<div class="section-title">🚨 Alerts</div><div class="empty-state"><span class="empty-icon">✅</span><p>ไม่มีการแจ้งเตือน</p></div>`;
+  
+  return `${adminBackBtn()}
     <div class="section-title">🚨 Alerts</div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:16px">พบ ${alerts.length} รายการที่ต้องดูแล</p>
-    ${alerts.map(a=>`
-      <div class="card" style="border-color:${a.score<50?'rgba(255,71,87,.3)':'rgba(255,140,66,.3)'}">
+    ${alerts.map(a => `
+      <div class="card" style="border-color:${a.score < 50 ? 'rgba(255,71,87,.3)' : 'rgba(255,140,66,.3)'}">
         <div class="flex-between" style="margin-bottom:12px">
           <div>
             <div class="fw-600">${a.u.name}</div>
             <div class="text-muted" style="font-size:12px">📅 ${a.l.date}</div>
-            ${a.u.email?`<div style="font-size:12px;color:var(--blue)">📧 ${a.u.email}</div>`:''}
+            ${a.u.email ? `<div style="font-size:12px;color:var(--blue)">📧 ${a.u.email}</div>` : ''}
           </div>
-          <span class="risk-badge ${a.score<50?'risk-high':'risk-medium'}">Score: ${a.score}</span>
+          <span class="risk-badge ${a.score < 50 ? 'risk-high' : 'risk-medium'}">Score: ${a.score}</span>
         </div>
-        ${a.recs.map(r=>`<div class="rec-box high"><div class="rec-label">${r.icon} ${r.title}</div><p>${r.msg}</p>${r.action?`<div class="rec-action">📋 ${r.action}</div>`:''}</div>`).join('')}
+        ${a.recs.map(r => `<div class="rec-box high"><div class="rec-label">${r.icon} ${r.title}</div><p>${r.msg}</p>${r.action ? `<div class="rec-action">📋 ${r.action}</div>` : ''}</div>`).join('')}
       </div>`).join('')}`;
 }
 
 // ════════════════════════════════════════════════════════════
 //  MASTER VIEW
 // ════════════════════════════════════════════════════════════
-function masterBackBtn(){
+function masterBackBtn() {
   return `<div class="mode-switch">
     <div class="mode-switch-info"><div class="ms-label">Master Control</div><div class="ms-title" style="color:var(--gold)">⚙ ${currentUser.name}</div></div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
@@ -1496,10 +1530,10 @@ function masterBackBtn(){
   </div>`;
 }
 
-function renderMasterControl(){
-  const total=USERS.filter(u=>u.role==='user').length;
-  const totalAdmins=USERS.filter(u=>u.role==='admin').length;
-  return`${masterBackBtn()}
+function renderMasterControl() {
+  const total = USERS.filter(u => u.role === 'user').length;
+  const totalAdmins = USERS.filter(u => u.role === 'admin').length;
+  return `${masterBackBtn()}
     <div class="section-title" style="color:var(--gold)">⚙ Master Control</div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">ภาพรวมระบบทั้งหมด</p>
     <div class="admin-stats">
@@ -1509,37 +1543,37 @@ function renderMasterControl(){
       <div class="stat-card"><div class="s-num" style="color:var(--gold)">${ACTIVITIES.length}</div><div class="s-label">Activities</div></div>
     </div>
     <div class="section-title" style="color:var(--gold);margin-top:8px">⚡ กิจกรรมล่าสุด</div>
-    ${ACTIVITIES.slice(0,8).map(a=>renderActivityItem(a)).join('')}
+    ${ACTIVITIES.slice(0,8).map(a => renderActivityItem(a)).join('')}
   `;
 }
 
-function renderMasterRoles(){
-  const realUsers=USERS.filter(u=>u.id!==currentUser.id);
-  return`${masterBackBtn()}
+function renderMasterRoles() {
+  const realUsers = USERS.filter(u => u.id !== currentUser.id);
+  return `${masterBackBtn()}
     <div class="section-flex">
       <div class="section-title" style="color:var(--gold)">🛡 จัดการ Roles</div>
       <button class="btn-export" onclick="exportAllUsersCSV()">📥 Export</button>
     </div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:16px">เปลี่ยน role / ลบบัญชี</p>
-    ${realUsers.length===0?'<div class="empty-state"><p>ยังไม่มีผู้ใช้งานคนอื่น</p></div>':realUsers.map(u=>{
-      const cnt=LOGS.filter(l=>l.userId===u.id).length;
-      const photoBg=u.photo?`background-image:url('${u.photo}');background-size:cover;background-position:center`:'';
-      return`<div class="card" style="margin-bottom:10px">
+    ${realUsers.length === 0 ? '<div class="empty-state"><p>ยังไม่มีผู้ใช้งานคนอื่น</p></div>' : realUsers.map(u => {
+      const cnt = LOGS.filter(l => l.userId === u.id).length;
+      const photoBg = u.photo ? `background-image:url('${u.photo}')` : '';
+      return `<div class="card" style="margin-bottom:10px">
         <div class="flex-between" style="margin-bottom:12px">
           <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
-            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;${photoBg}">${!u.photo?u.name[0]:''}</div>
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;background-size:cover;background-position:center;${photoBg}">${!u.photo ? u.name[0] : ''}</div>
             <div style="min-width:0;flex:1">
               <div class="fw-600">${u.name}</div>
               <div class="text-muted" style="font-size:12px">@${u.username} · ${cnt} logs</div>
-              ${u.email?`<div style="font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis">${u.email}</div>`:''}
+              ${u.email ? `<div style="font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis">${u.email}</div>` : ''}
             </div>
           </div>
           <span class="role-pill role-${u.role}">${u.role.toUpperCase()}</span>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          ${u.role!=='user'?`<button class="btn-sm" style="flex:1;min-width:90px" onclick="setRole('${u.id}','user')">⬇ User</button>`:''}
-          ${u.role!=='admin'?`<button class="btn-sm" style="flex:1;min-width:90px;background:var(--blue);color:white" onclick="setRole('${u.id}','admin')">⬆ Admin</button>`:''}
-          ${u.role!=='master'?`<button class="btn-sm" style="flex:1;min-width:90px;background:var(--gold);color:black" onclick="setRole('${u.id}','master')">⬆ Master</button>`:''}
+          ${u.role !== 'user' ? `<button class="btn-sm" style="flex:1;min-width:90px" onclick="setRole('${u.id}','user')">⬇ User</button>` : ''}
+          ${u.role !== 'admin' ? `<button class="btn-sm" style="flex:1;min-width:90px;background:var(--blue);color:white" onclick="setRole('${u.id}','admin')">⬆ Admin</button>` : ''}
+          ${u.role !== 'master' ? `<button class="btn-sm" style="flex:1;min-width:90px;background:var(--gold);color:black" onclick="setRole('${u.id}','master')">⬆ Master</button>` : ''}
           <button class="btn-danger" style="flex-shrink:0;padding:9px 14px" onclick="deleteUser('${u.id}')">🗑</button>
         </div>
       </div>`;
@@ -1547,8 +1581,8 @@ function renderMasterRoles(){
   `;
 }
 
-function renderMasterBackup(){
-  return`${masterBackBtn()}
+function renderMasterBackup() {
+  return `${masterBackBtn()}
     <div class="section-title" style="color:var(--gold)">💾 Backup & Export</div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">ดาวน์โหลดข้อมูลทั้งหมด</p>
     <div class="card">
@@ -1570,97 +1604,97 @@ function renderMasterBackup(){
   `;
 }
 
-function setRole(userId, newRole){
-  const u=USERS.find(x=>x.id===userId);
-  if(!u){showToast('❌ ไม่พบบัญชี');return}
-  if(!confirm(`เปลี่ยน role ของ ${u.name}\nจาก ${u.role.toUpperCase()} → ${newRole.toUpperCase()}?`))return;
-  const oldRole=u.role;
-  u.role=newRole;
+function setRole(userId, newRole) {
+  const u = USERS.find(x => x.id === userId);
+  if(!u) { showToast('❌ ไม่พบบัญชี'); return; }
+  if(!confirm(`เปลี่ยน role ของ ${u.name}\nจาก ${u.role.toUpperCase()} → ${newRole.toUpperCase()}?`)) return;
+  const oldRole = u.role;
+  u.role = newRole;
   saveData();
-  logActivity('role',`เปลี่ยน Role: ${u.name} (${oldRole.toUpperCase()} → ${newRole.toUpperCase()})`,userId,'user');
+  logActivity('role', `เปลี่ยน Role: ${u.name} (${oldRole.toUpperCase()} → ${newRole.toUpperCase()})`, userId, 'user');
   showToast(`✅ ${u.name} เป็น ${newRole.toUpperCase()} แล้ว`);
   renderApp('roles');
 }
 
-function deleteUser(userId){
-  const u=USERS.find(x=>x.id===userId);
-  if(!u)return;
-  if(!confirm(`ลบบัญชี ${u.name} และ logs ทั้งหมด?\nการกระทำนี้ไม่สามารถย้อนกลับได้`))return;
-  USERS=USERS.filter(x=>x.id!==userId);
-  LOGS=LOGS.filter(l=>l.userId!==userId);
+function deleteUser(userId) {
+  const u = USERS.find(x => x.id === userId);
+  if(!u) return;
+  if(!confirm(`ลบบัญชี ${u.name} และ logs ทั้งหมด?\nการกระทำนี้ไม่สามารถย้อนกลับได้`)) return;
+  USERS = USERS.filter(x => x.id !== userId);
+  LOGS = LOGS.filter(l => l.userId !== userId);
   saveData();
-  logActivity('delete',`ลบบัญชี: ${u.name}`,userId,'user');
+  logActivity('delete', `ลบบัญชี: ${u.name}`, userId, 'user');
   showToast('🗑 ลบบัญชีสำเร็จ');
   renderApp('roles');
 }
 
-function resetSystem(){
-  if(!confirm('⚠ รีเซ็ตข้อมูลทั้งระบบ?'))return;
-  if(!confirm('แน่ใจอีกครั้ง? ข้อมูลทั้งหมดจะหาย'))return;
+function resetSystem() {
+  if(!confirm('⚠ รีเซ็ตข้อมูลทั้งระบบ?')) return;
+  if(!confirm('แน่ใจอีกครั้ง? ข้อมูลทั้งหมดจะหาย')) return;
   localStorage.removeItem(STORAGE_KEY);
   showToast('🔄 กำลังรีเซ็ต...');
-  setTimeout(()=>location.reload(),1000);
+  setTimeout(() => location.reload(), 1000);
 }
 
 // ════════════════════════════════════════════════════════════
 //  EXPORT
 // ════════════════════════════════════════════════════════════
-function downloadCSV(filename, rows){
-  const BOM='\uFEFF';
-  const csv=BOM+rows.map(r=>r.map(c=>{const s=String(c==null?'':c);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}).join(',')).join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=filename;a.click();
+function downloadCSV(filename, rows) {
+  const BOM = '\uFEFF';
+  const csv = BOM + rows.map(r => r.map(c => { const s=String(c==null?'':c); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }).join(',')).join('\n');
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
   URL.revokeObjectURL(url);
 }
-function exportUserCSV(userId){
-  const u=USERS.find(x=>x.id===userId);if(!u)return;
-  const userLogs=LOGS.filter(l=>l.userId===userId).sort((a,b)=>a.date.localeCompare(b.date));
-  const rows=[
+function exportUserCSV(userId) {
+  const u = USERS.find(x => x.id === userId); if(!u) return;
+  const userLogs = LOGS.filter(l => l.userId === userId).sort((a,b) => a.date.localeCompare(b.date));
+  const rows = [
     ['FitFuel - User Report'],
-    ['ชื่อ',u.name],['Username',u.username],['Email',u.email||''],
-    ['อายุ',u.age],['เพศ',u.gender],['ส่วนสูง',u.height],
-    ['น้ำหนักเป้า',u.targetWeight||''],['เป้าหมาย',u.goalType],
-    ['สร้างบัญชี',u.createdAt],
-    [],['── Daily Logs ──'],
+    ['ชื่อ', u.name], ['Username', u.username], ['Email', u.email||''],
+    ['อายุ', u.age], ['เพศ', u.gender], ['ส่วนสูง', u.height],
+    ['น้ำหนักเป้า', u.targetWeight||''], ['เป้าหมาย', u.goalType],
+    ['สร้างบัญชี', u.createdAt],
+    [], ['── Daily Logs ──'],
     ['วันที่','น้ำหนัก','BMI','BMI Cat','Score','นอน','น้ำ','ออกกำลังกาย','บันทึกเมื่อ'],
-    ...userLogs.map(l=>{const bmi=calcBMI(l.weight,u.height);return[l.date,l.weight,bmi.toFixed(1),bmiCategory(bmi).label,calcHealthScore(l,u),l.sleep,l.water,l.exercise,l.createdAt||'']})
+    ...userLogs.map(l => { const bmi = calcBMI(l.weight, u.height); return [l.date, l.weight, bmi.toFixed(1), bmiCategory(bmi).label, calcHealthScore(l,u), l.sleep, l.water, l.exercise, l.createdAt||'']; })
   ];
-  downloadCSV(`FitFuel_${u.username}_${new Date().toISOString().split('T')[0]}.csv`,rows);
+  downloadCSV(`FitFuel_${u.username}_${new Date().toISOString().split('T')[0]}.csv`, rows);
   showToast('📥 ดาวน์โหลดสำเร็จ!');
 }
-function exportAllUsersCSV(){
-  const rows=[
-    ['FitFuel - All Users'],['Generated',new Date().toLocaleString('th-TH')],[],
+function exportAllUsersCSV() {
+  const rows = [
+    ['FitFuel - All Users'], ['Generated', new Date().toLocaleString('th-TH')], [],
     ['ID','Username','ชื่อ','Email','Role','อายุ','เพศ','สูง','เป้า','เป้าหมาย','Logs','AvgScore','สร้างเมื่อ'],
-    ...USERS.map(u=>{const ul=LOGS.filter(l=>l.userId===u.id);const avg=ul.length?ul.reduce((s,l)=>s+calcHealthScore(l,u),0)/ul.length:0;return[u.id,u.username,u.name,u.email||'',u.role,u.age,u.gender,u.height,u.targetWeight||'',u.goalType,ul.length,avg.toFixed(0),u.createdAt||'']})
+    ...USERS.map(u => { const ul = LOGS.filter(l => l.userId === u.id); const avg = ul.length ? ul.reduce((s,l)=>s+calcHealthScore(l,u),0)/ul.length : 0; return [u.id, u.username, u.name, u.email||'', u.role, u.age, u.gender, u.height, u.targetWeight||'', u.goalType, ul.length, avg.toFixed(0), u.createdAt||'']; })
   ];
-  downloadCSV(`FitFuel_All_Users_${new Date().toISOString().split('T')[0]}.csv`,rows);
+  downloadCSV(`FitFuel_All_Users_${new Date().toISOString().split('T')[0]}.csv`, rows);
   showToast('📥 ดาวน์โหลด Users.csv!');
 }
-function exportAllLogsCSV(){
-  const rows=[
-    ['FitFuel - All Logs'],['Generated',new Date().toLocaleString('th-TH')],[],
+function exportAllLogsCSV() {
+  const rows = [
+    ['FitFuel - All Logs'], ['Generated', new Date().toLocaleString('th-TH')], [],
     ['LogID','UserID','Username','ชื่อ','วันที่','น้ำหนัก','BMI','BMI Cat','Score','นอน','น้ำ','ออกกำลังกาย','บันทึกเมื่อ'],
-    ...[...LOGS].sort((a,b)=>b.date.localeCompare(a.date)).map(l=>{const u=USERS.find(x=>x.id===l.userId);if(!u)return null;const bmi=calcBMI(l.weight,u.height);return[l.id,u.id,u.username,u.name,l.date,l.weight,bmi.toFixed(1),bmiCategory(bmi).label,calcHealthScore(l,u),l.sleep,l.water,l.exercise,l.createdAt||'']}).filter(Boolean)
+    ...[...LOGS].sort((a,b)=>b.date.localeCompare(a.date)).map(l => { const u = USERS.find(x => x.id === l.userId); if(!u) return null; const bmi = calcBMI(l.weight, u.height); return [l.id, u.id, u.username, u.name, l.date, l.weight, bmi.toFixed(1), bmiCategory(bmi).label, calcHealthScore(l,u), l.sleep, l.water, l.exercise, l.createdAt||'']; }).filter(Boolean)
   ];
-  downloadCSV(`FitFuel_All_Logs_${new Date().toISOString().split('T')[0]}.csv`,rows);
+  downloadCSV(`FitFuel_All_Logs_${new Date().toISOString().split('T')[0]}.csv`, rows);
   showToast('📥 ดาวน์โหลด Logs.csv!');
 }
-function exportActivityCSV(){
-  const rows=[
-    ['FitFuel - Activity'],['Generated',new Date().toLocaleString('th-TH')],[],
+function exportActivityCSV() {
+  const rows = [
+    ['FitFuel - Activity'], ['Generated', new Date().toLocaleString('th-TH')], [],
     ['ID','Type','Target','Message','Actor','Timestamp'],
-    ...ACTIVITIES.map(a=>[a.id,a.type,a.target,a.msg,a.actorName||a.actorId,a.timestamp])
+    ...ACTIVITIES.map(a => [a.id, a.type, a.target, a.msg, a.actorName||a.actorId, a.timestamp])
   ];
-  downloadCSV(`FitFuel_Activity_${new Date().toISOString().split('T')[0]}.csv`,rows);
+  downloadCSV(`FitFuel_Activity_${new Date().toISOString().split('T')[0]}.csv`, rows);
   showToast('📥 ดาวน์โหลด Activity.csv!');
 }
-function exportFullBackup(){
-  const data={USERS,LOGS,ACTIVITIES,exportedAt:new Date().toISOString()};
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=`FitFuel_Backup_${new Date().toISOString().split('T')[0]}.json`;a.click();
+function exportFullBackup() {
+  const data = {USERS, LOGS, ACTIVITIES, exportedAt: new Date().toISOString()};
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `FitFuel_Backup_${new Date().toISOString().split('T')[0]}.json`; a.click();
   URL.revokeObjectURL(url);
   showToast('💾 Backup สำเร็จ!');
 }
@@ -1668,15 +1702,14 @@ function exportFullBackup(){
 // ════════════════════════════════════════════════════════════
 //  TOAST
 // ════════════════════════════════════════════════════════════
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
-document.addEventListener('keydown',e=>{
-  if(e.key==='Enter' && document.getElementById('screen-login').classList.contains('active')) doLogin();
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && document.getElementById('screen-login').classList.contains('active')) doLogin();
 });
 </script>
-
 </body>
 </html>

@@ -20,8 +20,7 @@
   .splash-logo h1 {font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:4px;color:var(--lime);line-height:1}
   .splash-btns {margin-top:60px;display:flex;flex-direction:column;gap:12px;width:290px;margin-left:auto;margin-right:auto}
   .auth-wrap {max-width:420px;width:100%;margin:0 auto;padding:40px 24px 60px}
-  .auth-header {margin-bottom:28px}
-  .auth-header .back {background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;margin-bottom:20px;display:block;padding:0}
+  .auth-header {margin-bottom:28px;text-align:center;}
   .auth-header h2 {font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;color:var(--lime)}
 
   .btn {border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:var(--radius-sm);transition:all .18s ease;letter-spacing:.3px}
@@ -36,8 +35,31 @@
 
   .form-group {margin-bottom:14px; width:100%}
   .form-group label {display:block;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
-  .form-group input, .form-group select {width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);padding:13px 16px;border-radius:var(--radius-sm);font-size:15px;box-sizing:border-box}
-  .form-group input[type=date] {font-family:'JetBrains Mono',monospace;text-align:center;min-height:46px}
+  .form-group input, .form-group select {width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);padding:13px 16px;border-radius:var(--radius-sm);font-size:15px;box-sizing:border-box;max-width:100%}
+  
+  /* ─── DATE INPUT FIX ─── */
+  .form-group input[type=date] {
+    font-family:'JetBrains Mono',monospace;
+    text-align:left;
+    padding:12px 12px;
+    font-size:14px;
+    min-height:46px;
+    width:100%;
+    appearance:none;
+    -webkit-appearance:none;
+    position:relative;
+  }
+  .form-group input[type=date]::-webkit-calendar-picker-indicator {
+    filter:invert(1) opacity(.6);
+    cursor:pointer;
+    padding:4px;
+    margin-left:0;
+    flex-shrink:0;
+  }
+  @media(max-width:380px){
+    .form-group input[type=date]{font-size:13px;padding:12px 8px}
+  }
+  
   .form-group input:focus, .form-group select:focus {outline:none;border-color:var(--lime)}
   .form-row {display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .error-msg {color:var(--red);font-size:13px;margin-top:8px;text-align:center;min-height:18px}
@@ -47,10 +69,6 @@
   .pin-box {width:44px;height:54px;text-align:center;font-size:22px;font-weight:600;background:var(--card);border:2px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'JetBrains Mono'}
   .pin-box:focus {outline:none;border-color:var(--lime);transform:scale(1.05)}
   .pin-box.filled {border-color:var(--lime)}
-
-  .step-tabs {display:flex;background:var(--card2);border-radius:var(--radius-sm);padding:3px;margin-bottom:22px;gap:3px}
-  .step-tab {flex:1;padding:10px 6px;border:none;background:transparent;color:var(--text2);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
-  .step-tab.active {background:var(--card);color:var(--lime)}
   
   .topbar {display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--dark);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
   .topbar-logo {font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--lime)}
@@ -86,11 +104,13 @@
   .metric-chip::before {content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.07}
   .metric-chip.lime::before {background:var(--lime)} .metric-chip.teal::before {background:var(--teal)}
   .metric-chip.orange::before {background:var(--orange)} .metric-chip.blue::before {background:var(--blue)}
+  .metric-chip.purple::before {background:var(--purple)}
   .metric-chip .chip-label {font-size:11px;color:var(--text2);text-transform:uppercase;margin-bottom:6px}
   .metric-chip .chip-value {font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1}
   .metric-chip .chip-unit {font-size:12px;color:var(--text2);margin-top:2px}
   .metric-chip.lime .chip-value{color:var(--lime)} .metric-chip.teal .chip-value{color:var(--teal)}
   .metric-chip.orange .chip-value{color:var(--orange)} .metric-chip.blue .chip-value{color:var(--blue)}
+  .metric-chip.purple .chip-value{color:var(--purple)}
 
   .bmi-card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
   .bmi-number {font-family:'Bebas Neue';font-size:80px;line-height:1}
@@ -133,10 +153,17 @@
   .mini-chart {display:flex;align-items:flex-end;gap:4px;height:50px;margin-top:12px}
   .bar-col {flex:1;background:var(--lime);border-radius:3px 3px 0 0;opacity:.7;transition:opacity .2s;min-width:8px}
 
-  .email-toggle-box {background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius-sm);padding:14px 16px;margin:12px 0}
-  .email-toggle-box label {display:flex;align-items:flex-start;gap:12px;cursor:pointer}
-  .email-toggle-box input[type=checkbox] {width:18px;height:18px;accent-color:var(--lime);margin-top:1px;flex-shrink:0}
-  
+  /* ─── ENERGY SLIDER ─── */
+  .energy-slider-box {margin-top:8px}
+  .energy-slider {width:100%;-webkit-appearance:none;appearance:none;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--red) 0%,var(--orange) 30%,var(--lime) 60%,var(--teal) 100%);outline:none}
+  .energy-slider::-webkit-slider-thumb {-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:var(--text);cursor:pointer;border:3px solid var(--card);box-shadow:0 0 0 1px var(--border)}
+  .energy-slider::-moz-range-thumb {width:24px;height:24px;border-radius:50%;background:var(--text);cursor:pointer;border:3px solid var(--card)}
+  .energy-display {display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:12px;color:var(--text2)}
+  .energy-value {font-family:'Bebas Neue';font-size:28px;color:var(--lime);line-height:1}
+  .energy-label-text {font-size:13px;font-weight:600}
+  .energy-info {background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);border-radius:var(--radius-sm);padding:10px 14px;margin-top:10px;font-size:12px;color:var(--text2);line-height:1.5}
+  .energy-info b {color:var(--purple)}
+
   .spinner {display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
   @keyframes spin {to {transform:rotate(360deg)}}
 
@@ -160,160 +187,247 @@
   .mono {font-family:'JetBrains Mono',monospace}
   .empty-state {text-align:center;padding:40px 20px;color:var(--text2)}
   .empty-state .empty-icon {font-size:48px;margin-bottom:12px;display:block}
+
+  /* ───── IMAGE CROPPER MODAL ───── */
+  .cropper-overlay {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.85);
+    z-index:9998;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    backdrop-filter:blur(8px);
+  }
+  .cropper-overlay.show {display:flex}
+  .cropper-modal {
+    background:var(--dark);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+    width:100%;
+    max-width:380px;
+    max-height:95vh;
+    overflow-y:auto;
+  }
+  .cropper-modal h3 {
+    font-family:'Bebas Neue';
+    font-size:24px;
+    letter-spacing:1px;
+    color:var(--lime);
+    margin-bottom:16px;
+    text-align:center;
+  }
+  .cropper-stage {
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    background:#000;
+    border-radius:var(--radius-sm);
+    overflow:hidden;
+    cursor:grab;
+    user-select:none;
+    -webkit-user-select:none;
+    touch-action:none;
+  }
+  .cropper-stage:active{cursor:grabbing}
+  .cropper-stage img {
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform-origin:center center;
+    pointer-events:none;
+    user-select:none;
+    -webkit-user-drag:none;
+    max-width:none;
+  }
+  .cropper-circle {
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+  }
+  .cropper-circle::before {
+    content:'';
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    -webkit-mask:radial-gradient(circle at center, transparent 49.5%, black 50%);
+    mask:radial-gradient(circle at center, transparent 49.5%, black 50%);
+  }
+  .cropper-circle::after {
+    content:'';
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    border:2px solid white;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 0 1px rgba(0,0,0,.5);
+  }
+  .cropper-zoom-row {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:18px 0 8px;
+  }
+  .cropper-zoom-icon {
+    font-size:14px;
+    color:var(--text2);
+    flex-shrink:0;
+  }
+  .cropper-zoom-icon.big {font-size:20px}
+  .cropper-zoom-slider {
+    flex:1;
+    -webkit-appearance:none;
+    appearance:none;
+    height:6px;
+    border-radius:3px;
+    background:var(--border);
+    outline:none;
+  }
+  .cropper-zoom-slider::-webkit-slider-thumb {
+    -webkit-appearance:none;
+    appearance:none;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:var(--text);
+    cursor:pointer;
+    border:2px solid var(--card);
+  }
+  .cropper-zoom-slider::-moz-range-thumb {
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:var(--text);
+    cursor:pointer;
+    border:2px solid var(--card)
+  }
+  .cropper-actions {
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+  }
+  .cropper-btn {
+    flex:1;
+    padding:12px;
+    border-radius:var(--radius-sm);
+    border:none;
+    font-family:'DM Sans';
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .cropper-btn-cancel {
+    background:var(--card2);
+    color:var(--text);
+  }
+  .cropper-btn-apply {
+    background:var(--lime);
+    color:var(--black);
+  }
+  .cropper-btn-reset {
+    background:transparent;
+    color:var(--text2);
+    text-decoration:underline;
+    border:none;
+    font-size:12px;
+    cursor:pointer;
+    margin-top:4px;
+    width:100%;
+    text-align:center;
+    padding:6px;
+  }
+
+  #global-loader {display:flex;position:fixed;inset:0;background:var(--black);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px}
   
   @media(max-width:400px){ .metrics-grid,.admin-stats,.form-row{grid-template-columns:1fr} .pin-box{width:40px;height:50px;font-size:18px} .content{padding:16px;padding-bottom:100px} }
 </style>
 </head>
 <body>
 
-<div id="otp-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:2000;align-items:center;justify-content:center;padding:24px">
-  <div class="card" style="width:100%;max-width:360px;text-align:center;border:1px solid var(--lime)">
-    <div style="font-size:40px;margin-bottom:10px">📧</div>
-    <h3 style="margin-bottom:8px">ยืนยันอีเมลของคุณ</h3>
-    <p class="text-muted" style="font-size:13px;margin-bottom:20px">ระบบได้ส่งรหัส 6 หลักไปที่อีเมลของคุณแล้ว<br>(รหัสจำลองเพื่อทดสอบ: <b id="otp-hint" style="color:var(--lime)">000000</b>)</p>
-    <div class="pin-wrap" id="otp-input-wrap">
-      <input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric">
-    </div>
-    <p id="otp-error" style="color:var(--red);font-size:12px;margin:10px 0"></p>
-    <button class="btn btn-primary" id="btn-otp-verify" onclick="verifyOTP()">✅ ยืนยันและสมัครสมาชิก</button>
-    <button class="btn btn-ghost" style="margin-top:10px" onclick="document.getElementById('otp-overlay').style.display='none'">ยกเลิก</button>
-  </div>
+<div id="global-loader">
+  <div class="spinner" style="width:30px;height:30px;border-width:3px;border-top-color:var(--lime)"></div>
+  <div style="font-size:14px;color:var(--lime);font-family:'Bebas Neue';letter-spacing:1px">CONNECTING TO DATABASE...</div>
 </div>
 
-<div id="screen-splash" class="screen active">
+<div id="screen-splash" class="screen">
   <div class="splash-logo">
     <span class="icon">🔥</span>
     <h1>FITFUEL</h1>
     <p>Health Tracking System</p>
   </div>
   <div class="splash-btns">
-    <button class="btn btn-primary" onclick="showScreen('login')">เข้าสู่ระบบ</button>
-    <button class="btn btn-secondary" onclick="showScreen('register')">✨ สร้างบัญชีใหม่</button>
+    <button class="btn btn-primary" onclick="showScreen('auth')">เข้าสู่ระบบ / สมัครสมาชิก</button>
   </div>
 </div>
 
-<div id="screen-register" class="screen">
-  <div class="auth-wrap">
-    <div class="auth-header">
-      <button class="back" onclick="showScreen('splash')">←</button>
-      <h2>สร้างบัญชี</h2>
-      <p>กรอกข้อมูลเพื่อเริ่มติดตามสุขภาพ</p>
-    </div>
-    <div class="step-tabs">
-      <button class="step-tab active" id="reg-tab-1">① บัญชี</button>
-      <button class="step-tab" id="reg-tab-2" disabled>② PIN</button>
-      <button class="step-tab" id="reg-tab-3" disabled>③ สุขภาพ</button>
-    </div>
-    <div id="reg-step-1">
-      <div class="form-group"><label>ชื่อ-นามสกุล *</label><input type="text" id="reg-name" placeholder="เช่น สมชาย ใจดี"></div>
-      <div class="form-group"><label>Email *</label><input type="email" id="reg-email" placeholder="your@email.com"><p class="field-hint">📧 ใช้รับรายงานและรับรหัสยืนยัน OTP</p></div>
-      <div class="form-group"><label>Username *</label><input type="text" id="reg-username" placeholder="ตัวอักษรและตัวเลข"></div>
-      <p class="error-msg" id="reg-err-1"></p>
-      <button class="btn btn-primary" id="btn-reg-1" onclick="regNext1()">ถัดไป →</button>
-    </div>
-    <div id="reg-step-2" style="display:none">
-      <div style="text-align:center;margin-bottom:20px">
-        <p style="font-size:14px;color:var(--text);margin-bottom:6px"><b>ตั้งรหัส PIN 6 หลัก</b></p>
-        <p class="text-muted" style="font-size:12px">ใช้สำหรับเข้าสู่ระบบ</p>
-      </div>
-      <div class="form-group">
-        <label style="text-align:center">PIN 6 หลัก</label>
-        <div class="pin-wrap" id="reg-pin-1">
-          <input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric">
-        </div>
-      </div>
-      <div class="form-group">
-        <label style="text-align:center">ยืนยัน PIN อีกครั้ง</label>
-        <div class="pin-wrap" id="reg-pin-2">
-          <input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric">
-        </div>
-      </div>
-      <p class="error-msg" id="reg-err-2"></p>
-      <button class="btn btn-primary" onclick="regNext2()">ถัดไป →</button>
-      <button class="btn btn-ghost" style="margin-top:8px" onclick="regStep(1)">← กลับ</button>
-    </div>
-    <div id="reg-step-3" style="display:none">
-      <div class="form-row">
-        <div class="form-group"><label>อายุ (ปี) *</label><input type="number" id="reg-age" placeholder="25" min="10" max="100"></div>
-        <div class="form-group"><label>เพศ *</label><select id="reg-gender"><option value="">เลือก</option><option>ชาย</option><option>หญิง</option><option>ไม่ระบุ</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>ส่วนสูง (cm) *</label><input type="number" id="reg-height" placeholder="170" min="100" max="250"></div>
-        <div class="form-group"><label>น้ำหนักเป้า (kg) *</label><input type="number" id="reg-target" placeholder="65" step="0.5"></div>
-      </div>
-      <div class="form-group"><label>เป้าหมายหลัก *</label><select id="reg-goal"><option value="">เลือก</option><option>ลดน้ำหนัก</option><option>เพิ่มกล้ามเนื้อ</option><option>รักษาน้ำหนัก</option><option>ปรับปรุงสุขภาพโดยรวม</option></select></div>
-      <div class="form-row">
-        <div class="form-group"><label>เป้าหมายการนอน (ชม.) *</label><input type="number" id="reg-sleep-target" placeholder="7.5" step="0.5" value="7.5"></div>
-        <div class="form-group"><label>เป้าออกกำลัง (นาที/สัปดาห์) *</label><input type="number" id="reg-ex-target" placeholder="150" step="10" value="150"></div>
-      </div>
-      <p class="error-msg" id="reg-err-3"></p>
-      <button class="btn btn-primary" onclick="startEmailVerification()">📧 ยืนยัน Email เพื่อสร้างบัญชี</button>
-      <button class="btn btn-ghost" style="margin-top:8px" onclick="regStep(2)">← กลับ</button>
-    </div>
-  </div>
-</div>
-
-<div id="screen-login" class="screen">
+<div id="screen-auth" class="screen">
   <div class="auth-wrap">
     <div class="auth-header">
       <button class="back" onclick="showScreen('splash')">←</button>
       <h2>เข้าสู่ระบบ</h2>
-      <p>กรอก Username และ PIN 6 หลัก</p>
+      <p>เข้าใช้งานด้วยอีเมล (ไม่ต้องใช้รหัสผ่าน)</p>
     </div>
-    <div class="form-group"><label>Username</label><input type="text" id="login-user" placeholder="กรอก username"></div>
     <div class="form-group">
-      <label style="text-align:center">PIN 6 หลัก</label>
-      <div class="pin-wrap" id="login-pin">
-        <input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric">
-      </div>
+      <label>Email ของคุณ</label>
+      <input type="email" id="auth-email" placeholder="your@email.com">
+      <p class="field-hint">ระบบจะส่งรหัส 6 หลักไปที่อีเมลนี้เพื่อยืนยันตัวตน</p>
     </div>
-    <p class="error-msg" id="login-error"></p>
-    <button class="btn btn-primary" id="btn-login" onclick="doLogin()">เข้าสู่ระบบ</button>
-    <button class="btn btn-ghost" style="margin-top:6px" onclick="showScreen('forgot')">ลืม PIN?</button>
-    <button class="btn btn-ghost" onclick="showScreen('register')">ยังไม่มีบัญชี? สมัครเลย →</button>
+    <p class="error-msg" id="auth-error"></p>
+    <button class="btn btn-primary" id="btn-send-otp" onclick="sendAuthOTP()">ส่งรหัส OTP ทางอีเมล</button>
   </div>
 </div>
 
-<div id="screen-forgot" class="screen">
+<div id="screen-verify-otp" class="screen">
   <div class="auth-wrap">
     <div class="auth-header">
-      <button class="back" onclick="showScreen('splash')">←</button>
-      <h2>ลืม PIN</h2>
-      <p>กรอก Username และ Email เพื่อรีเซ็ต</p>
+      <button class="back" onclick="showScreen('auth')">←</button>
+      <h2>ยืนยัน OTP</h2>
+      <p>กรอกรหัส 6 หลักที่ส่งไปที่ <br><span id="display-email" style="color:var(--lime)"></span></p>
     </div>
-    <div id="forgot-step-1">
-      <div class="form-group"><label>Username</label><input type="text" id="forgot-user" placeholder="กรอก username"></div>
-      <div class="form-group"><label>Email ที่ลงทะเบียน</label><input type="email" id="forgot-email" placeholder="your@email.com"></div>
-      <p class="error-msg" id="forgot-err-1"></p>
-      <button class="btn btn-primary" id="btn-forgot-verify" onclick="forgotVerify()">✓ ตรวจสอบ</button>
+    <div class="form-group">
+      <div class="pin-wrap" id="otp-input-wrap">
+        <input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric">
+      </div>
     </div>
-    <div id="forgot-step-2" style="display:none">
-      <div style="background:rgba(200,240,0,.08);border:1px solid rgba(200,240,0,.3);border-radius:var(--radius-sm);padding:14px;margin-bottom:18px">
-        <div style="font-size:13px;color:var(--lime);font-weight:600;margin-bottom:4px">✅ ตรวจสอบสำเร็จ</div>
-        <div style="font-size:12px;color:var(--text2)">ตั้ง PIN ใหม่ 6 หลักด้านล่าง</div>
-      </div>
-      <div class="form-group">
-        <label style="text-align:center">PIN ใหม่</label>
-        <div class="pin-wrap" id="forgot-pin-1">
-          <input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric">
-        </div>
-      </div>
-      <div class="form-group">
-        <label style="text-align:center">ยืนยัน PIN</label>
-        <div class="pin-wrap" id="forgot-pin-2">
-          <input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric">
-        </div>
-      </div>
-      <p class="error-msg" id="forgot-err-2"></p>
-      <button class="btn btn-primary" id="btn-forgot-reset" onclick="forgotReset()">🔓 รีเซ็ต PIN</button>
+    <p class="error-msg" id="verify-error"></p>
+    <button class="btn btn-primary" id="btn-verify-otp" onclick="verifyAuthOTP()">🔐 ยืนยันและเข้าสู่ระบบ</button>
+  </div>
+</div>
+
+<div id="screen-onboarding" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-header">
+      <h2>สร้างโปรไฟล์</h2>
+      <p>ยินดีต้อนรับ! กรอกข้อมูลสุขภาพเพื่อเริ่มต้น</p>
     </div>
+    <div class="form-group"><label>ชื่อ-นามสกุล *</label><input type="text" id="ob-name" placeholder="เช่น สมชาย ใจดี"></div>
+    <div class="form-row">
+      <div class="form-group"><label>อายุ (ปี) *</label><input type="number" id="ob-age" placeholder="25" min="10" max="100"></div>
+      <div class="form-group"><label>เพศ *</label><select id="ob-gender"><option value="">เลือก</option><option>ชาย</option><option>หญิง</option><option>ไม่ระบุ</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>ส่วนสูง (cm) *</label><input type="number" id="ob-height" placeholder="170" min="100" max="250"></div>
+      <div class="form-group"><label>น้ำหนักเป้า (kg) *</label><input type="number" id="ob-target" placeholder="65" step="0.5"></div>
+    </div>
+    <div class="form-group"><label>เป้าหมายหลัก *</label><select id="ob-goal"><option value="">เลือก</option><option>ลดน้ำหนัก</option><option>เพิ่มกล้ามเนื้อ</option><option>รักษาน้ำหนัก</option><option>ปรับปรุงสุขภาพโดยรวม</option></select></div>
+    <div class="form-row">
+      <div class="form-group"><label>เป้าการนอน (ชม.) *</label><input type="number" id="ob-sleep" placeholder="7.5" step="0.5" value="7.5"></div>
+      <div class="form-group"><label>เป้าออกกำลัง (นาที/สัปดาห์) *</label><input type="number" id="ob-ex" placeholder="150" step="10" value="150"></div>
+    </div>
+    <p class="error-msg" id="ob-error"></p>
+    <button class="btn btn-primary" id="btn-save-ob" onclick="submitOnboarding()">🎉 บันทึกและเริ่มใช้งาน</button>
   </div>
 </div>
 
 <div id="screen-main" class="screen">
   <div class="topbar">
     <span class="topbar-logo">🔥 FITFUEL</span>
-    <div class="topbar-right">
+    <div class="topbar-right" style="display:flex;align-items:center;gap:8px">
       <span class="role-badge" id="topbar-role">USER</span>
       <div class="avatar" id="user-avatar">U</div>
     </div>
@@ -323,33 +437,48 @@
 </div>
 
 <input type="file" id="photo-input" class="photo-input" accept="image/*">
+
+<!-- ───── IMAGE CROPPER MODAL ───── -->
+<div class="cropper-overlay" id="cropper-overlay">
+  <div class="cropper-modal">
+    <h3>แก้ไขรูปภาพ</h3>
+    <div class="cropper-stage" id="cropper-stage">
+      <img id="cropper-img" alt="">
+      <div class="cropper-circle"></div>
+    </div>
+    <div class="cropper-zoom-row">
+      <span class="cropper-zoom-icon">🖼</span>
+      <input type="range" id="cropper-zoom" class="cropper-zoom-slider" min="1" max="3" step="0.01" value="1">
+      <span class="cropper-zoom-icon big">🖼</span>
+    </div>
+    <button class="cropper-btn-reset" onclick="resetCropper()">↺ รีเซ็ต</button>
+    <div class="cropper-actions">
+      <button class="cropper-btn cropper-btn-cancel" onclick="cancelCropper()">ยกเลิก</button>
+      <button class="cropper-btn cropper-btn-apply" id="cropper-apply-btn" onclick="applyCropper()">ใช้</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 // ════════════════════════════════════════════════════════════
-//  SUPABASE DATABASE CONFIGURATION
+//  SUPABASE
 // ════════════════════════════════════════════════════════════
 const SUPABASE_URL = 'https://gyaptfiwxvruiorczbxv.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_phEtg4XZtjlbcz-xOz0Tjw_o-cQUJkf';
+const supaClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-let supaClient = null;
-if (window.supabase) {
-    supaClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-} else {
-    console.error("Supabase SDK is missing or blocked!");
-}
-
-const SESSION_KEY = 'fitfuel_session_uid';
 let USERS = [], LOGS = [], ACTIVITIES = [], RECOMMENDATIONS = [];
 let currentUser = null;
+let currentUserAuth = null;
 let currentView = 'user';
 let currentPage = 'home';
 
-// ─── Data Mappers ───
 function mapUser(u) {
   if(!u) return null;
   return {
-    id: u.id, username: u.username, pin: u.pin, name: u.name, email: u.email,
+    id: u.id, name: u.name, email: u.email,
     age: u.age, gender: u.gender, height: u.height, targetWeight: u.target_weight,
     goalType: u.goal_type, sleepTarget: u.sleep_target, weeklyExerciseTarget: u.weekly_exercise_target,
     role: u.role, photo: u.photo, createdAt: u.created_at
@@ -375,7 +504,6 @@ function mapAct(a) {
   };
 }
 
-// Fetch all necessary data into memory
 async function loadAllData() {
   if(!supaClient) return;
   const [uRes, lRes, rRes, aRes] = await Promise.all([
@@ -390,26 +518,29 @@ async function loadAllData() {
   if(aRes.data) ACTIVITIES = aRes.data.map(mapAct);
 }
 
-// Check auto-login on startup (Safe Mode - No Loader)
 window.onload = async () => {
   try {
-    if (!supaClient) return; // Prevent crash if blocked
-    const savedUid = localStorage.getItem(SESSION_KEY);
-    if(savedUid) {
-      const { data } = await supaClient.from('users').select('*').eq('id', savedUid).single();
-      if(data) {
-        currentUser = mapUser(data);
-        await loadAllData();
-        enterApp();
-      }
+    if (!supaClient) {
+      document.getElementById('global-loader').style.display = 'none';
+      showScreen('splash');
+      return;
+    }
+    const { data: { session } } = await supaClient.auth.getSession();
+    if (session) {
+      await handleSession(session.user);
+    } else {
+      document.getElementById('global-loader').style.display = 'none';
+      showScreen('splash');
     }
   } catch (err) {
-    console.error("Startup Logic Interrupted:", err);
+    console.error("Startup Error:", err);
+    document.getElementById('global-loader').style.display = 'none';
+    showScreen('splash');
   }
 };
 
 // ════════════════════════════════════════════════════════════
-//  PIN BEHAVIOR
+//  AUTH
 // ════════════════════════════════════════════════════════════
 function setupPinInputs(containerId) {
   const container = document.getElementById(containerId);
@@ -444,65 +575,105 @@ function clearPinInputs(containerId) {
   if(!container) return;
   container.querySelectorAll('.pin-box').forEach(i => { i.value=''; i.classList.remove('filled'); });
 }
+setupPinInputs('otp-input-wrap');
 
-['login-pin','reg-pin-1','reg-pin-2','forgot-pin-1','forgot-pin-2','otp-input-wrap'].forEach(id => setupPinInputs(id));
-
-// ════════════════════════════════════════════════════════════
-//  ACTIVITY (Database Insert)
-// ════════════════════════════════════════════════════════════
-async function logActivity(type, msg, userId=null, target='log') {
-  if(!supaClient) return;
-  const dbAct = {
-    type, target, user_id: userId,
-    actor_id: currentUser?.id, actor_name: currentUser?.name || 'System', msg
-  };
-  const { data } = await supaClient.from('activities').insert([dbAct]).select().single();
-  if(data) ACTIVITIES.unshift(mapAct(data));
+async function sendAuthOTP() {
+  const email = document.getElementById('auth-email').value.trim().toLowerCase();
+  const err = document.getElementById('auth-error');
+  const btn = document.getElementById('btn-send-otp');
+  err.textContent = '';
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'กรุณากรอกอีเมลให้ถูกต้อง'; return; }
+  btn.innerHTML = '<span class="spinner"></span> กำลังส่ง OTP...'; btn.disabled = true;
+  const { error } = await supaClient.auth.signInWithOtp({ email });
+  if (error) {
+    err.textContent = 'เกิดข้อผิดพลาด: ' + error.message;
+    btn.innerHTML = 'ส่งรหัส OTP ทางอีเมล'; btn.disabled = false;
+  } else {
+    document.getElementById('display-email').textContent = email;
+    btn.innerHTML = 'ส่งรหัส OTP ทางอีเมล'; btn.disabled = false;
+    clearPinInputs('otp-input-wrap');
+    document.getElementById('verify-error').textContent = '';
+    showScreen('verify-otp');
+    setTimeout(() => document.querySelector('#otp-input-wrap .pin-box').focus(), 100);
+  }
 }
-
-// ════════════════════════════════════════════════════════════
-//  NAV / LOGIN 
-// ════════════════════════════════════════════════════════════
+async function verifyAuthOTP() {
+  const email = document.getElementById('auth-email').value.trim().toLowerCase();
+  const token = getPinValue('otp-input-wrap');
+  const err = document.getElementById('verify-error');
+  const btn = document.getElementById('btn-verify-otp');
+  if(token.length !== 6) { err.textContent = 'กรุณากรอก OTP 6 หลัก'; return; }
+  btn.innerHTML = '<span class="spinner"></span> กำลังตรวจสอบ...'; btn.disabled = true;
+  const { data: { user }, error } = await supaClient.auth.verifyOtp({ email, token, type: 'email' });
+  if (error) {
+    err.textContent = '❌ รหัส OTP ไม่ถูกต้องหรือหมดอายุ';
+    btn.innerHTML = '🔐 ยืนยันและเข้าสู่ระบบ'; btn.disabled = false;
+  } else {
+    await handleSession(user);
+    btn.innerHTML = '🔐 ยืนยันและเข้าสู่ระบบ'; btn.disabled = false;
+  }
+}
+async function handleSession(authUser) {
+  document.getElementById('global-loader').style.display = 'flex';
+  currentUserAuth = authUser;
+  const { data: profile } = await supaClient.from('users').select('*').eq('id', authUser.id).single();
+  if (profile) {
+    currentUser = mapUser(profile);
+    await loadAllData();
+    document.getElementById('global-loader').style.display = 'none';
+    enterApp();
+  } else {
+    document.getElementById('global-loader').style.display = 'none';
+    showScreen('onboarding');
+  }
+}
+async function submitOnboarding() {
+  const name = document.getElementById('ob-name').value.trim();
+  const age = parseInt(document.getElementById('ob-age').value);
+  const gender = document.getElementById('ob-gender').value;
+  const height = parseInt(document.getElementById('ob-height').value);
+  const target = parseFloat(document.getElementById('ob-target').value);
+  const goal = document.getElementById('ob-goal').value;
+  const sleepTarget = parseFloat(document.getElementById('ob-sleep').value);
+  const exTarget = parseInt(document.getElementById('ob-ex').value);
+  const err = document.getElementById('ob-error');
+  const btn = document.getElementById('btn-save-ob');
+  if(!name || !age || !gender || !height || !target || !goal || !sleepTarget || !exTarget) { err.textContent = 'กรุณากรอกให้ครบทุกช่อง'; return; }
+  if(age < 10 || age > 100) { err.textContent = 'อายุไม่ถูกต้อง'; return; }
+  if(height < 100 || height > 250) { err.textContent = 'ส่วนสูงไม่ถูกต้อง'; return; }
+  if(target < 20 || target > 300) { err.textContent = 'น้ำหนักเป้าหมายไม่ถูกต้อง'; return; }
+  err.textContent = '';
+  btn.innerHTML = '<span class="spinner"></span> กำลังสร้างโปรไฟล์...'; btn.disabled = true;
+  const { count } = await supaClient.from('users').select('*', { count: 'exact', head: true });
+  const assignRole = count === 0 ? 'master' : 'user';
+  const dbUser = {
+    id: currentUserAuth.id, name, email: currentUserAuth.email,
+    age, gender, height, target_weight: target, goal_type: goal,
+    sleep_target: sleepTarget, weekly_exercise_target: exTarget, role: assignRole
+  };
+  const { data, error } = await supaClient.from('users').insert([dbUser]).select().single();
+  if (error) {
+     err.textContent = 'เกิดข้อผิดพลาด: ' + error.message;
+     btn.innerHTML = '🎉 บันทึกและเริ่มใช้งาน'; btn.disabled = false;
+     return;
+  }
+  currentUser = mapUser(data);
+  await loadAllData(); 
+  await logActivity('create', `สร้างบัญชีใหม่: ${currentUser.name} (${assignRole})`, currentUser.id, 'user');
+  showToast('🎉 ยินดีต้อนรับ ' + currentUser.name.split(' ')[0] + '!');
+  enterApp();
+}
+async function logout() { 
+  document.getElementById('global-loader').style.display = 'flex';
+  await supaClient.auth.signOut();
+  currentUser = null; currentUserAuth = null; currentView = 'user'; 
+  document.getElementById('global-loader').style.display = 'none';
+  showScreen('splash'); 
+}
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
 }
-
-function logout() { 
-  currentUser = null; currentView = 'user'; 
-  localStorage.removeItem(SESSION_KEY);
-  showScreen('splash'); 
-}
-
-async function doLogin() {
-  if(!supaClient) { alert("เชื่อมต่อ Database ไม่ได้ ลองใหม่อีกครั้ง"); return; }
-  const u = document.getElementById('login-user').value.trim().toLowerCase();
-  const pin = getPinValue('login-pin');
-  const err = document.getElementById('login-error');
-  const btn = document.getElementById('btn-login');
-  err.textContent = '';
-  
-  if(!u || pin.length !== 6) { err.textContent = 'กรอก Username และ PIN ครบ 6 หลัก'; return; }
-  
-  btn.innerHTML = '<span class="spinner"></span> กำลังเข้าสู่ระบบ...';
-  btn.disabled = true;
-
-  const { data } = await supaClient.from('users').select('*').ilike('username', u).eq('pin', pin).single();
-  
-  if(data) {
-    currentUser = mapUser(data);
-    localStorage.setItem(SESSION_KEY, currentUser.id);
-    await loadAllData();
-    enterApp();
-    document.getElementById('login-user').value = '';
-    clearPinInputs('login-pin');
-  } else {
-    err.textContent = 'Username หรือ PIN ไม่ถูกต้อง';
-  }
-  btn.innerHTML = 'เข้าสู่ระบบ';
-  btn.disabled = false;
-}
-
 function enterApp() {
   updateAvatar();
   const role = currentUser.role;
@@ -511,7 +682,6 @@ function enterApp() {
   renderApp('home');
   showScreen('main');
 }
-
 function updateAvatar() {
   const av = document.getElementById('user-avatar');
   av.className = 'avatar ' + (currentUser.role === 'master' ? 'master' : currentUser.role === 'admin' ? 'admin' : '');
@@ -524,192 +694,18 @@ function updateAvatar() {
   }
 }
 
-// ════════════════════════════════════════════════════════════
-//  FORGOT PIN
-// ════════════════════════════════════════════════════════════
-let _forgotUser = null;
-async function forgotVerify() {
-  if(!supaClient) return;
-  const u = document.getElementById('forgot-user').value.trim().toLowerCase();
-  const e = document.getElementById('forgot-email').value.trim().toLowerCase();
-  const err = document.getElementById('forgot-err-1');
-  const btn = document.getElementById('btn-forgot-verify');
-  err.textContent = '';
-  if(!u || !e) { err.textContent = 'กรุณากรอกให้ครบ'; return; }
-  
-  btn.innerHTML = '<span class="spinner"></span> กำลังตรวจสอบ...'; btn.disabled = true;
-  const { data } = await supaClient.from('users').select('*').ilike('username', u).ilike('email', e).single();
-  btn.innerHTML = '✓ ตรวจสอบ'; btn.disabled = false;
-
-  if(!data) { err.textContent = 'ไม่พบบัญชีที่ตรงกัน'; return; }
-  _forgotUser = mapUser(data);
-  document.getElementById('forgot-step-1').style.display = 'none';
-  document.getElementById('forgot-step-2').style.display = 'block';
-  setTimeout(() => document.querySelector('#forgot-pin-1 .pin-box').focus(), 100);
-}
-
-async function forgotReset() {
-  if(!supaClient) return;
-  const p1 = getPinValue('forgot-pin-1');
-  const p2 = getPinValue('forgot-pin-2');
-  const err = document.getElementById('forgot-err-2');
-  const btn = document.getElementById('btn-forgot-reset');
-  err.textContent = '';
-  if(p1.length !== 6 || p2.length !== 6) { err.textContent = 'กรอก PIN ครบ 6 หลัก'; return; }
-  if(p1 !== p2) { err.textContent = 'PIN ไม่ตรงกัน'; return; }
-  
-  btn.innerHTML = '<span class="spinner"></span> กำลังรีเซ็ต...'; btn.disabled = true;
-  await supaClient.from('users').update({pin: p1}).eq('id', _forgotUser.id);
-  await logActivity('update', 'รีเซ็ต PIN ผ่านระบบลืมรหัส', _forgotUser.id, 'user');
-  
-  btn.innerHTML = '🔓 รีเซ็ต PIN'; btn.disabled = false;
-  showToast('🔓 รีเซ็ต PIN สำเร็จ!');
-  clearPinInputs('forgot-pin-1'); clearPinInputs('forgot-pin-2');
-  document.getElementById('forgot-user').value = ''; document.getElementById('forgot-email').value = '';
-  document.getElementById('forgot-step-1').style.display = 'block';
-  document.getElementById('forgot-step-2').style.display = 'none';
-  setTimeout(() => showScreen('login'), 800);
-  _forgotUser = null;
-}
-
-// ════════════════════════════════════════════════════════════
-//  REGISTER & OTP VERIFICATION
-// ════════════════════════════════════════════════════════════
-let _regData = {};
-let currentOTP = '';
-
-function regStep(n) {
-  [1, 2, 3].forEach(i => {
-    document.getElementById('reg-step-' + i).style.display = (i === n) ? 'block' : 'none';
-    document.getElementById('reg-tab-' + i).classList.toggle('active', i === n);
-  });
-}
-async function regNext1() {
-  if(!supaClient) { alert("เชื่อมต่อ Database ไม่ได้"); return; }
-  const name = document.getElementById('reg-name').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
-  const username = document.getElementById('reg-username').value.trim();
-  const err = document.getElementById('reg-err-1');
-  const btn = document.getElementById('btn-reg-1');
-  if(!name || !email || !username) { err.textContent = 'กรุณากรอกให้ครบ'; return; }
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'รูปแบบ Email ไม่ถูกต้อง'; return; }
-  if(/\s/.test(username) || username.length < 3) { err.textContent = 'Username อย่างน้อย 3 ตัว ไม่มีช่องว่าง'; return; }
-  
-  btn.innerHTML = '<span class="spinner"></span> กำลังตรวจสอบ...'; btn.disabled = true;
-  const { data } = await supaClient.from('users').select('id').ilike('username', username).single();
-  btn.innerHTML = 'ถัดไป →'; btn.disabled = false;
-
-  if(data) { err.textContent = 'Username ถูกใช้แล้ว'; return; }
-  
-  err.textContent = '';
-  _regData = { name, email, username };
-  document.getElementById('reg-tab-2').disabled = false;
-  regStep(2);
-  setTimeout(() => document.querySelector('#reg-pin-1 .pin-box').focus(), 100);
-}
-function regNext2() {
-  const p1 = getPinValue('reg-pin-1');
-  const p2 = getPinValue('reg-pin-2');
-  const err = document.getElementById('reg-err-2');
-  if(p1.length !== 6 || p2.length !== 6) { err.textContent = 'กรอก PIN ครบ 6 หลัก'; return; }
-  if(p1 !== p2) { err.textContent = 'PIN ไม่ตรงกัน'; return; }
-  err.textContent = '';
-  _regData.pin = p1;
-  document.getElementById('reg-tab-3').disabled = false;
-  regStep(3);
-}
-
-function startEmailVerification() {
-  const age = parseInt(document.getElementById('reg-age').value);
-  const gender = document.getElementById('reg-gender').value;
-  const height = parseInt(document.getElementById('reg-height').value);
-  const target = parseFloat(document.getElementById('reg-target').value);
-  const goal = document.getElementById('reg-goal').value;
-  const sleepTarget = parseFloat(document.getElementById('reg-sleep-target').value);
-  const exTarget = parseInt(document.getElementById('reg-ex-target').value);
-  const err = document.getElementById('reg-err-3');
-  
-  if(!age || !gender || !height || !target || !goal || !sleepTarget || !exTarget) { err.textContent = 'กรุณากรอกให้ครบทุกช่อง'; return; }
-  if(age < 10 || age > 100) { err.textContent = 'อายุไม่ถูกต้อง'; return; }
-  if(height < 100 || height > 250) { err.textContent = 'ส่วนสูงไม่ถูกต้อง'; return; }
-  if(target < 20 || target > 300) { err.textContent = 'น้ำหนักเป้าหมายไม่ถูกต้อง'; return; }
-  err.textContent = '';
-
-  currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
-  document.getElementById('otp-hint').textContent = currentOTP;
-  clearPinInputs('otp-input-wrap');
-  document.getElementById('otp-error').textContent = '';
-  
-  document.getElementById('otp-overlay').style.display = 'flex';
-  setTimeout(() => document.querySelector('#otp-input-wrap .pin-box').focus(), 100);
-}
-
-function verifyOTP() {
-    const entered = getPinValue('otp-input-wrap');
-    if(entered === currentOTP) {
-        document.getElementById('otp-error').textContent = '';
-        const btn = document.getElementById('btn-otp-verify');
-        btn.innerHTML = '<span class="spinner"></span> กำลังสร้างบัญชี...';
-        btn.disabled = true;
-        regSubmit();
-    } else {
-        document.getElementById('otp-error').textContent = '❌ รหัส OTP ไม่ถูกต้อง กรุณาลองใหม่';
-    }
-}
-
-async function regSubmit() {
-  if(!supaClient) return;
-  const age = parseInt(document.getElementById('reg-age').value);
-  const gender = document.getElementById('reg-gender').value;
-  const height = parseInt(document.getElementById('reg-height').value);
-  const target = parseFloat(document.getElementById('reg-target').value);
-  const goal = document.getElementById('reg-goal').value;
-  const sleepTarget = parseFloat(document.getElementById('reg-sleep-target').value);
-  const exTarget = parseInt(document.getElementById('reg-ex-target').value);
-
-  const { count } = await supaClient.from('users').select('*', { count: 'exact', head: true });
-  const assignRole = count === 0 ? 'master' : 'user';
-
-  const dbUser = {
-    username: _regData.username.toLowerCase(),
-    pin: _regData.pin,
-    name: _regData.name,
-    email: _regData.email.toLowerCase(),
-    age, gender, height, target_weight: target, goal_type: goal,
-    sleep_target: sleepTarget, weekly_exercise_target: exTarget,
-    role: assignRole
+async function logActivity(type, msg, userId=null, target='log') {
+  if(!supaClient || !currentUser) return;
+  const dbAct = {
+    type, target, user_id: userId,
+    actor_id: currentUser.id, actor_name: currentUser.name, msg
   };
-
-  const { data, error } = await supaClient.from('users').insert([dbUser]).select().single();
-  
-  if (error) {
-     document.getElementById('otp-error').textContent = 'เกิดข้อผิดพลาด: ' + error.message;
-     const btn = document.getElementById('btn-otp-verify');
-     btn.innerHTML = '✅ ยืนยันและสมัครสมาชิก'; btn.disabled = false;
-     return;
-  }
-
-  currentUser = mapUser(data);
-  localStorage.setItem(SESSION_KEY, currentUser.id);
-  await loadAllData(); 
-  await logActivity('create', `สร้างบัญชีใหม่: ${currentUser.name} (${assignRole})`, currentUser.id, 'user');
-  
-  document.getElementById('otp-overlay').style.display = 'none';
-  const btn = document.getElementById('btn-otp-verify');
-  btn.innerHTML = '✅ ยืนยันและสมัครสมาชิก'; btn.disabled = false;
-
-  showToast('🎉 ยินดีต้อนรับ ' + currentUser.name.split(' ')[0] + '!');
-  enterApp();
-  
-  ['reg-name','reg-email','reg-username','reg-age','reg-height','reg-target','reg-sleep-target','reg-ex-target'].forEach(id => { const e = document.getElementById(id); if(e) e.value=''; });
-  document.getElementById('reg-gender').value = ''; document.getElementById('reg-goal').value = '';
-  clearPinInputs('reg-pin-1'); clearPinInputs('reg-pin-2');
-  document.getElementById('reg-tab-2').disabled = true; document.getElementById('reg-tab-3').disabled = true;
-  regStep(1);
+  const { data } = await supaClient.from('activities').insert([dbAct]).select().single();
+  if(data) ACTIVITIES.unshift(mapAct(data));
 }
 
 // ════════════════════════════════════════════════════════════
-//  CALCULATIONS & RECOMMENDATIONS ENGINE
+//  CALCULATIONS + ENERGY HELPERS
 // ════════════════════════════════════════════════════════════
 function calcBMI(w, h) { return w / Math.pow(h/100, 2); }
 function bmiCategory(bmi) {
@@ -726,6 +722,14 @@ function calcHealthScore(log, user) {
   if(log.water < 1.5) s -= 20; else if(log.water < 2) s -= 10;
   if(log.exercise < 15) s -= 20; else if(log.exercise < 30) s -= 10;
   return Math.max(0, s);
+}
+
+// ─── ENERGY HELPER ───
+function energyInfo(level) {
+  if(level <= 3) return {label:'พลังงานต่ำ', emoji:'😴', color:'#FF4757', advice:'ควรพักผ่อน เพิ่มการนอน หรือทบทวนความเครียด'};
+  if(level <= 6) return {label:'พลังงานปานกลาง', emoji:'😐', color:'#FF8C42', advice:'พลังงานปกติ ลองเพิ่มกิจกรรมเบาๆ'};
+  if(level <= 8) return {label:'พลังงานดี', emoji:'😊', color:'#C8F000', advice:'รักษาวินัยปัจจุบันต่อไป'};
+  return {label:'พลังงานเต็มเปี่ยม', emoji:'🔥', color:'#2DD4BF', advice:'สุดยอด! เป็นโอกาสดีในการ workout หนักๆ'};
 }
 
 function generateRecommendations(log, user, history=[]) {
@@ -745,6 +749,30 @@ function generateRecommendations(log, user, history=[]) {
   if(log.exercise < targetExDaily/2) recs.push({severity:'high', icon:'⚠', title:'ออกกำลังกายน้อยไป', msg:'วันนี้ออกกำลังกาย '+log.exercise+' นาที (เป้าเฉลี่ย: '+targetExDaily+' นาที/วัน)', action:'เริ่มเดินเร็ว 20 นาที หรือ HIIT 10 นาที'});
   else if(log.exercise < targetExDaily) recs.push({severity:'medium', icon:'💡', title:'ออกกำลังกายยังไม่ถึงเป้า', msg:'ออกกำลังกาย '+log.exercise+' นาที', action:'เพิ่มความเข้มข้นอีกนิด'});
   
+  // ─── ENERGY-BASED RECOMMENDATIONS ───
+  if(log.energyLevel) {
+    if(log.energyLevel <= 3) {
+      // Low energy
+      if(log.exercise >= 60) {
+        recs.push({severity:'high', icon:'⚠', title:'พลังงานต่ำ + ออกกำลังกายหนัก', msg:'พลังงาน '+log.energyLevel+'/10 + ออกกำลังกาย '+log.exercise+' นาที อาจเข้าข่าย Overtraining', action:'พักผ่อน 1-2 วัน เพิ่มการนอนและโภชนาการ'});
+      } else if(log.sleep < 7) {
+        recs.push({severity:'high', icon:'😴', title:'พลังงานต่ำ', msg:'พลังงาน '+log.energyLevel+'/10 น่าจะเป็นเพราะนอนน้อย', action:'นอนให้ครบ 7-9 ชม. + ดื่มน้ำเปล่ามากๆ + งดคาเฟอีนช่วงบ่าย'});
+      } else {
+        recs.push({severity:'medium', icon:'😴', title:'พลังงานต่ำผิดปกติ', msg:'พลังงาน '+log.energyLevel+'/10 ทั้งที่นอนพอ', action:'อาจมีความเครียด ขาดธาตุเหล็ก หรือสารอาหาร — ลองตรวจสุขภาพ'});
+      }
+    } else if(log.energyLevel >= 8 && log.exercise < targetExDaily/2) {
+      recs.push({severity:'low', icon:'🔥', title:'พลังงานดีเยี่ยม!', msg:'พลังงาน '+log.energyLevel+'/10 แต่ออกกำลังกายแค่ '+log.exercise+' นาที', action:'เป็นโอกาสดี! เพิ่มความเข้มข้นการออกกำลังกายได้เลย'});
+    }
+    
+    // Trend: energy declining
+    if(history.length >= 3) {
+      const recent3Energy = history.slice(0,3).map(l=>l.energyLevel).filter(e=>e!=null);
+      if(recent3Energy.length === 3 && recent3Energy.every((e,i,arr)=>i===0||e<arr[i-1]) && recent3Energy[0] < recent3Energy[recent3Energy.length-1]-2) {
+        recs.push({severity:'medium', icon:'📉', title:'พลังงานลดลงต่อเนื่อง', msg:'พลังงาน 3 วันล่าสุดลดลงเรื่อยๆ', action:'ทบทวนการนอน อาหาร และความเครียด — อาจต้อง deload week'});
+      }
+    }
+  }
+
   if(history.length >= 3) {
     const r3 = history.slice(0,3);
     const trend = r3[0].weight - r3[r3.length-1].weight;
@@ -771,6 +799,7 @@ function calcProgress(user) {
     if(Math.round((lastD - d)/(1000*60*60*24)) === 1) { streak++; lastD = d; } else break;
   }
   const recent = logs.slice(-7);
+  const energyLogs = recent.filter(l=>l.energyLevel!=null);
   return {
     startWeight: startW, currentWeight: curW, targetWeight: targetW,
     weightPct: weightPct.toFixed(0),
@@ -780,6 +809,7 @@ function calcProgress(user) {
     avgSleep: (recent.reduce((s,l)=>s+l.sleep,0)/recent.length).toFixed(1),
     avgWater: (recent.reduce((s,l)=>s+l.water,0)/recent.length).toFixed(1),
     avgExercise: (recent.reduce((s,l)=>s+l.exercise,0)/recent.length).toFixed(0),
+    avgEnergy: energyLogs.length ? (energyLogs.reduce((s,l)=>s+l.energyLevel,0)/energyLogs.length).toFixed(1) : null,
     sleepGoal: Math.min(100, (recent.reduce((s,l)=>s+l.sleep,0)/recent.length/(user.sleepTarget||7.5))*100).toFixed(0),
     waterGoal: Math.min(100, (recent.reduce((s,l)=>s+l.water,0)/recent.length/2.5)*100).toFixed(0),
     exerciseGoal: Math.min(100, (recent.reduce((s,l)=>s+l.exercise,0)/recent.length/((user.weeklyExerciseTarget||150)/7))*100).toFixed(0),
@@ -799,9 +829,6 @@ function renderApp(page) {
     else if(page === 'progress') el.innerHTML = renderUserProgress();
     else if(page === 'history') el.innerHTML = renderUserHistory();
     else if(page === 'profile') el.innerHTML = renderUserProfile();
-    else if(page === 'settings') el.innerHTML = renderSettings();
-    else if(page === 'settings-email') el.innerHTML = renderSettingsEmail();
-    else if(page === 'settings-pin') el.innerHTML = renderSettingsPin();
     else if(page === 'settings-info') el.innerHTML = renderSettingsInfo();
   } else if(currentView === 'admin') {
     if(page === 'dashboard') el.innerHTML = renderAdminDashboard();
@@ -815,10 +842,22 @@ function renderApp(page) {
     else if(page === 'activity') el.innerHTML = renderAdminActivity();
     else if(page === 'backup') el.innerHTML = renderMasterBackup();
   }
-  
-  ['change-pin-old', 'change-pin-new', 'change-pin-new2'].forEach(id => {
-    if(document.getElementById(id)) setupPinInputs(id);
-  });
+  // Setup energy slider listener if present
+  const energySlider = document.getElementById('log-energy');
+  if(energySlider) {
+    const updateEnergy = () => {
+      const v = parseInt(energySlider.value);
+      const info = energyInfo(v);
+      const display = document.getElementById('energy-display');
+      const advice = document.getElementById('energy-advice');
+      if(display) {
+        display.innerHTML = `<span class="energy-value" style="color:${info.color}">${v}</span><span class="energy-label-text" style="color:${info.color}">${info.emoji} ${info.label}</span>`;
+      }
+      if(advice) advice.innerHTML = `<b>${info.label}:</b> ${info.advice}`;
+    };
+    energySlider.oninput = updateEnergy;
+    updateEnergy();
+  }
 }
 
 function renderNav() {
@@ -884,7 +923,7 @@ function modeSwitchHTML() {
 }
 
 // ════════════════════════════════════════════════════════════
-//  USER PAGES
+//  USER HOME
 // ════════════════════════════════════════════════════════════
 function renderUserHome() {
   const logs = LOGS.filter(l => l.userId === currentUser.id).sort((a,b) => b.date.localeCompare(a.date));
@@ -912,6 +951,12 @@ function renderUserHome() {
   }).join('');
   const prog = calcProgress(currentUser);
   
+  // Energy display
+  const energyHTML = latest.energyLevel ? (() => {
+    const info = energyInfo(latest.energyLevel);
+    return `<div class="metric-chip purple"><div class="chip-label">⚡ พลังงานวันนี้</div><div class="chip-value" style="color:${info.color}">${latest.energyLevel}<span style="font-size:14px;color:var(--text2)">/10</span></div><div class="chip-unit">${info.emoji} ${info.label}</div></div>`;
+  })() : '';
+  
   return `${switcher}
     <div class="section-title">สวัสดี, ${currentUser.name.split(' ')[0]} 👋</div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">ข้อมูลล่าสุด: ${latest.date}</p>
@@ -935,12 +980,12 @@ function renderUserHome() {
       <div class="metric-chip teal"><div class="chip-label">BMI</div><div class="chip-value">${bmi.toFixed(1)}</div><div class="chip-unit">${cat.label}</div></div>
       <div class="metric-chip orange"><div class="chip-label">นอนหลับ</div><div class="chip-value">${latest.sleep}</div><div class="chip-unit">ชั่วโมง</div></div>
       <div class="metric-chip blue"><div class="chip-label">ออกกำลังกาย</div><div class="chip-value">${latest.exercise}</div><div class="chip-unit">นาที</div></div>
+      ${energyHTML}
     </div>
     <div class="bmi-card">
-      <h3>BMI Indicator</h3>
-      <div class="bmi-display"><div class="bmi-number" style="color:${cat.color}">${bmi.toFixed(1)}</div><div class="bmi-label" style="color:${cat.color}">${cat.label}</div></div>
-      <div class="bmi-bar"><div class="bmi-bar-fill" style="width:100%;background:linear-gradient(90deg,#3B82F6 0%,#C8F000 35%,#FF8C42 65%,#FF4757 100%)"></div><div class="bmi-indicator" style="left:${bmiPct}%"></div></div>
-      <div class="bmi-legend"><span>15|ต่ำ</span><span>18.5|ปกติ</span><span>25|เกิน</span><span>30|อ้วน|40</span></div>
+      <h3 style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px">BMI Indicator</h3>
+      <div style="text-align:center;margin-bottom:20px"><div class="bmi-number" style="color:${cat.color}">${bmi.toFixed(1)}</div><div style="font-size:14px;font-weight:500;margin-top:4px;color:${cat.color}">${cat.label}</div></div>
+      <div class="bmi-bar"><div class="bmi-bar-fill" style="width:100%;height:100%;border-radius:6px;background:linear-gradient(90deg,#3B82F6 0%,#C8F000 35%,#FF8C42 65%,#FF4757 100%)"></div><div class="bmi-indicator" style="left:${bmiPct}%"></div></div>
     </div>
     <div class="card">
       <div class="flex-between" style="margin-bottom:8px">
@@ -954,8 +999,10 @@ function renderUserHome() {
   `;
 }
 
+// ════════════════════════════════════════════════════════════
+//  USER LOG (with improved date input + energy)
+// ════════════════════════════════════════════════════════════
 function renderUserLog() {
-  const hasEmail = !!currentUser.email;
   const today = new Date().toISOString().split('T')[0];
   return `
     <div class="section-title">บันทึกข้อมูลวันนี้</div>
@@ -969,17 +1016,29 @@ function renderUserLog() {
         <div class="form-group"><label>ดื่มน้ำ (ลิตร)</label><input type="number" id="log-water" placeholder="2.0" step="0.1" inputmode="decimal"></div>
         <div class="form-group"><label>ออกกำลังกาย (นาที)</label><input type="number" id="log-exercise" placeholder="30" inputmode="numeric"></div>
       </div>
+      
+      <!-- ─── ENERGY LEVEL ─── -->
       <div class="form-group">
-        <label>ระดับพลังงานวันนี้ (1-10)</label>
-        <input type="range" id="log-energy" min="1" max="10" step="1" value="5" style="width:100%; accent-color:var(--lime); margin-top:8px">
-        <div style="display:flex;justify-content:space-between;font-size:10px;margin-top:5px;color:var(--text2)"><span>1 (เหนื่อยล้า)</span><span>10 (สดชื่นเต็มที่)</span></div>
+        <label>⚡ ระดับพลังงานวันนี้</label>
+        <div class="energy-slider-box">
+          <input type="range" id="log-energy" class="energy-slider" min="1" max="10" step="1" value="5">
+          <div class="energy-display" id="energy-display">
+            <span class="energy-value">5</span>
+            <span class="energy-label-text">😐 พลังงานปานกลาง</span>
+          </div>
+          <div class="energy-info" id="energy-advice">
+            <b>พลังงานปานกลาง:</b> พลังงานปกติ ลองเพิ่มกิจกรรมเบาๆ
+          </div>
+          <p class="field-hint" style="margin-top:8px">💡 ระบบจะใช้ค่านี้วิเคราะห์ overtraining, deload week, และคำแนะนำเฉพาะตัว</p>
+        </div>
       </div>
+      
       <p class="error-msg" id="log-error"></p>
       <button class="btn btn-primary" id="log-btn" onclick="submitLog()">💾 บันทึกข้อมูล</button>
     </div>
     <div class="section-sub">เป้าหมายที่ตั้งไว้</div>
     ${[['เป้าหมายออกกำลังกาย', (currentUser.weeklyExerciseTarget||150) + ' นาที/สัปดาห์'],['เป้าหมายการนอน', (currentUser.sleepTarget||7.5) + ' ชั่วโมง/วัน'],['BMI เป้าหมาย','18.5–24.9']].map(([k,v]) =>
-    `<div class="card-sm" style="margin-bottom:10px"><div class="flex-between"><span class="text-muted">${k}</span><span class="text-lime fw-600">${v}</span></div></div>`).join('')}
+    `<div class="card-sm" style="margin-bottom:10px"><div class="flex-between"><span class="text-muted">${k}</span><span style="color:var(--lime);font-weight:600">${v}</span></div></div>`).join('')}
   `;
 }
 
@@ -1015,7 +1074,7 @@ async function submitLog() {
   LOGS.push(mappedLog);
   await logActivity('create', `บันทึก Log: ${date} (${weight}kg, พลังงาน ${energy}/10)`, currentUser.id, 'log');
 
-  const recsToSave = generateRecommendations(mappedLog, currentUser, LOGS.filter(l=>l.userId===currentUser.id));
+  const recsToSave = generateRecommendations(mappedLog, currentUser, LOGS.filter(l=>l.userId===currentUser.id).sort((a,b)=>b.date.localeCompare(a.date)));
   const dbRecs = recsToSave.map(r => ({
       log_id: logData.id, rectype: r.title, severity: r.severity, message: r.msg, action: r.action, icon: r.icon
   }));
@@ -1055,7 +1114,7 @@ function renderUserProgress() {
       <div class="metric-chip lime"><div class="chip-label">วันที่ติดตาม</div><div class="chip-value">${p.daysTracked}</div><div class="chip-unit">วัน</div></div>
       <div class="metric-chip orange"><div class="chip-label">Streak</div><div class="chip-value">${p.streak}</div><div class="chip-unit">วันต่อเนื่อง</div></div>
       <div class="metric-chip teal"><div class="chip-label">Avg Score</div><div class="chip-value">${p.avgScore}</div><div class="chip-unit">/100</div></div>
-      <div class="metric-chip blue"><div class="chip-label">น้ำหนักปัจจุบัน</div><div class="chip-value">${parseFloat(p.currentWeight).toFixed(1)}</div><div class="chip-unit">kg</div></div>
+      ${p.avgEnergy ? `<div class="metric-chip purple"><div class="chip-label">⚡ Avg Energy</div><div class="chip-value">${p.avgEnergy}</div><div class="chip-unit">/10</div></div>` : `<div class="metric-chip blue"><div class="chip-label">น้ำหนักปัจจุบัน</div><div class="chip-value">${parseFloat(p.currentWeight).toFixed(1)}</div><div class="chip-unit">kg</div></div>`}
     </div>
     <div class="section-title" style="margin-top:8px">เฉลี่ย 7 วันล่าสุด</div>
     <div class="progress-card">
@@ -1087,15 +1146,16 @@ function renderUserHistory() {
       const bmi = calcBMI(l.weight, currentUser.height);
       const score = calcHealthScore(l, currentUser);
       const rc = score >= 80 ? 'risk-low' : score >= 50 ? 'risk-medium' : 'risk-high';
+      const energyEmoji = l.energyLevel ? energyInfo(l.energyLevel).emoji : '';
       return `<div class="log-item">
-        <div class="log-item-top"><span class="fw-600">📅 ${l.date}</span><span class="risk-badge ${rc}">Score: ${score}</span></div>
+        <div class="log-item-top" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px"><span class="fw-600">📅 ${l.date}</span><span class="risk-badge ${rc}">Score: ${score}</span></div>
         <div class="log-stats">
           <div class="log-stat">⚖️ <span>${l.weight}kg</span></div>
           <div class="log-stat">BMI <span>${bmi.toFixed(1)}</span></div>
           <div class="log-stat">🌙 <span>${l.sleep}h</span></div>
           <div class="log-stat">💧 <span>${l.water}L</span></div>
           <div class="log-stat">🏃 <span>${l.exercise}m</span></div>
-          <div class="log-stat">⚡ <span>${l.energyLevel||'-'}/10</span></div>
+          ${l.energyLevel ? `<div class="log-stat">⚡ <span>${l.energyLevel}/10 ${energyEmoji}</span></div>` : ''}
         </div>
       </div>`;
     }).join('')}`;
@@ -1120,7 +1180,7 @@ function renderUserProfile() {
       </div>
       <div style="flex:1;min-width:0">
         <div style="font-size:20px;font-weight:600">${currentUser.name}</div>
-        <div class="text-muted">@${currentUser.username} <span class="role-pill role-${role}">${role.toUpperCase()}</span></div>
+        <div class="text-muted">${currentUser.email} <span class="role-badge role-${role}">${role.toUpperCase()}</span></div>
       </div>
     </div>
 
@@ -1135,26 +1195,10 @@ function renderUserProfile() {
       <div class="setting-item" onclick="navTo('settings-info')">
         <div class="setting-icon">📷</div>
         <div class="setting-content">
-          <div class="setting-title">ข้อมูลส่วนตัว & รูปภาพ</div>
-          <div class="setting-desc">ชื่อ, รูปโปรไฟล์, ข้อมูลสุขภาพ</div>
+          <div class="setting-title">แก้ไขข้อมูลส่วนตัว</div>
+          <div class="setting-desc">ชื่อ, รูปโปรไฟล์, เป้าหมายสุขภาพ</div>
         </div>
-        <span class="setting-arrow">›</span>
-      </div>
-      <div class="setting-item" onclick="navTo('settings-email')">
-        <div class="setting-icon">📧</div>
-        <div class="setting-content">
-          <div class="setting-title">เปลี่ยน Email</div>
-          <div class="setting-desc">${currentUser.email || 'ยังไม่มี Email'}</div>
-        </div>
-        <span class="setting-arrow">›</span>
-      </div>
-      <div class="setting-item" onclick="navTo('settings-pin')">
-        <div class="setting-icon">🔐</div>
-        <div class="setting-content">
-          <div class="setting-title">เปลี่ยน PIN</div>
-          <div class="setting-desc">ต้องยืนยัน PIN เก่าก่อน</div>
-        </div>
-        <span class="setting-arrow">›</span>
+        <span style="color:var(--muted);font-size:18px">›</span>
       </div>
     </div>
 
@@ -1163,57 +1207,178 @@ function renderUserProfile() {
 }
 
 // ════════════════════════════════════════════════════════════
-//  PHOTO UPLOAD
+//  PHOTO UPLOAD → CROPPER
 // ════════════════════════════════════════════════════════════
-document.getElementById('photo-input').addEventListener('change', async function(e) {
+document.getElementById('photo-input').addEventListener('change', function(e) {
   const file = e.target.files[0];
   if(!file) return;
   if(!file.type.startsWith('image/')) { showToast('❌ กรุณาเลือกไฟล์รูปภาพ'); return; }
-  if(file.size > 5 * 1024 * 1024) { showToast('❌ ขนาดไฟล์ใหญ่เกิน 5MB'); return; }
-  
+  if(file.size > 10 * 1024 * 1024) { showToast('❌ ไฟล์ใหญ่เกิน 10MB'); return; }
   const reader = new FileReader();
-  reader.onload = function(ev) {
-    const img = new Image();
-    img.onload = async function() {
-      const canvas = document.createElement('canvas');
-      const max = 400;
-      let w = img.width, h = img.height;
-      if(w > h) { if(w > max) { h = h * (max/w); w = max; } } else { if(h > max) { w = w * (max/h); h = max; } }
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      
-      showToast('🔄 กำลังอัปโหลดรูป...');
-      await supaClient.from('users').update({photo: dataUrl}).eq('id', currentUser.id);
-      
-      currentUser.photo = dataUrl;
-      const u = USERS.find(x => x.id === currentUser.id);
-      if(u) u.photo = dataUrl;
-      
-      await logActivity('update', 'เปลี่ยนรูปโปรไฟล์', currentUser.id, 'user');
-      updateAvatar();
-      showToast('✅ เปลี่ยนรูปโปรไฟล์สำเร็จ!');
-      renderApp(currentPage);
-    };
-    img.src = ev.target.result;
-  };
+  reader.onload = ev => openCropper(ev.target.result);
   reader.readAsDataURL(file);
   e.target.value = '';
 });
 
 // ════════════════════════════════════════════════════════════
-//  SETTINGS PAGES
+//  IMAGE CROPPER (Discord-style)
 // ════════════════════════════════════════════════════════════
-function renderSettings() {
-  return renderUserProfile();
+let cropImg = null;
+let cropX = 0, cropY = 0, cropScale = 1;
+let cropDragging = false, cropDragStart = {x:0, y:0};
+let cropBaseScale = 1;
+const CROPPER_PREVIEW_SIZE = 280; // visual size in DOM (will be set to actual)
+
+function openCropper(dataUrl) {
+  const overlay = document.getElementById('cropper-overlay');
+  const img = document.getElementById('cropper-img');
+  cropImg = new Image();
+  cropImg.onload = () => {
+    img.src = dataUrl;
+    // Calculate base scale to "cover" the stage
+    const stage = document.getElementById('cropper-stage');
+    const stageW = stage.clientWidth;
+    cropBaseScale = Math.max(stageW / cropImg.naturalWidth, stageW / cropImg.naturalHeight);
+    cropX = 0; cropY = 0; cropScale = 1;
+    document.getElementById('cropper-zoom').value = 1;
+    applyCropTransform();
+    overlay.classList.add('show');
+  };
+  cropImg.src = dataUrl;
 }
 
+function applyCropTransform() {
+  const img = document.getElementById('cropper-img');
+  if(!cropImg) return;
+  const totalScale = cropBaseScale * cropScale;
+  const w = cropImg.naturalWidth * totalScale;
+  const h = cropImg.naturalHeight * totalScale;
+  img.style.width = w + 'px';
+  img.style.height = h + 'px';
+  img.style.transform = `translate(calc(-50% + ${cropX}px), calc(-50% + ${cropY}px))`;
+}
+
+function constrainCrop() {
+  // Optional: prevent image from showing edges outside circle
+  const stage = document.getElementById('cropper-stage');
+  const stageW = stage.clientWidth;
+  const totalScale = cropBaseScale * cropScale;
+  const w = cropImg.naturalWidth * totalScale;
+  const h = cropImg.naturalHeight * totalScale;
+  const maxX = (w - stageW) / 2;
+  const maxY = (h - stageW) / 2;
+  cropX = Math.max(-maxX, Math.min(maxX, cropX));
+  cropY = Math.max(-maxY, Math.min(maxY, cropY));
+}
+
+// Drag handlers
+const stage = document.getElementById('cropper-stage');
+function onCropDown(e) {
+  cropDragging = true;
+  const point = e.touches ? e.touches[0] : e;
+  cropDragStart = { x: point.clientX - cropX, y: point.clientY - cropY };
+  e.preventDefault();
+}
+function onCropMove(e) {
+  if(!cropDragging) return;
+  const point = e.touches ? e.touches[0] : e;
+  cropX = point.clientX - cropDragStart.x;
+  cropY = point.clientY - cropDragStart.y;
+  constrainCrop();
+  applyCropTransform();
+  e.preventDefault();
+}
+function onCropUp() { cropDragging = false; }
+
+stage.addEventListener('mousedown', onCropDown);
+window.addEventListener('mousemove', onCropMove);
+window.addEventListener('mouseup', onCropUp);
+stage.addEventListener('touchstart', onCropDown, {passive:false});
+window.addEventListener('touchmove', onCropMove, {passive:false});
+window.addEventListener('touchend', onCropUp);
+
+document.getElementById('cropper-zoom').addEventListener('input', e => {
+  cropScale = parseFloat(e.target.value);
+  constrainCrop();
+  applyCropTransform();
+});
+
+function resetCropper() {
+  cropX = 0; cropY = 0; cropScale = 1;
+  document.getElementById('cropper-zoom').value = 1;
+  applyCropTransform();
+}
+function cancelCropper() {
+  document.getElementById('cropper-overlay').classList.remove('show');
+  cropImg = null;
+}
+async function applyCropper() {
+  if(!cropImg) return;
+  const btn = document.getElementById('cropper-apply-btn');
+  btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
+  
+  try {
+    const stage = document.getElementById('cropper-stage');
+    const stageW = stage.clientWidth;
+    const OUTPUT_SIZE = 400;
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = OUTPUT_SIZE;
+    canvas.height = OUTPUT_SIZE;
+    const ctx = canvas.getContext('2d');
+    
+    // Compute the source rectangle in the original image
+    const totalScale = cropBaseScale * cropScale;
+    const displayW = cropImg.naturalWidth * totalScale;
+    const displayH = cropImg.naturalHeight * totalScale;
+    const imgLeft = stageW/2 - displayW/2 + cropX;
+    const imgTop = stageW/2 - displayH/2 + cropY;
+    
+    const sx = -imgLeft / totalScale;
+    const sy = -imgTop / totalScale;
+    const sw = stageW / totalScale;
+    const sh = stageW / totalScale;
+    
+    // Apply circular clip
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(OUTPUT_SIZE/2, OUTPUT_SIZE/2, OUTPUT_SIZE/2, 0, Math.PI*2);
+    ctx.clip();
+    ctx.drawImage(cropImg, sx, sy, sw, sh, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+    ctx.restore();
+    
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    
+    // Save to database
+    await supaClient.from('users').update({photo: dataUrl}).eq('id', currentUser.id);
+    currentUser.photo = dataUrl;
+    const u = USERS.find(x => x.id === currentUser.id);
+    if(u) u.photo = dataUrl;
+    
+    await logActivity('update', 'เปลี่ยนรูปโปรไฟล์', currentUser.id, 'user');
+    updateAvatar();
+    showToast('✅ เปลี่ยนรูปโปรไฟล์สำเร็จ!');
+    
+    cancelCropper();
+    btn.innerHTML = 'ใช้';
+    btn.disabled = false;
+    renderApp(currentPage);
+  } catch(e) {
+    console.error(e);
+    showToast('❌ เกิดข้อผิดพลาด');
+    btn.innerHTML = 'ใช้';
+    btn.disabled = false;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  SETTINGS PAGE
+// ════════════════════════════════════════════════════════════
 function renderSettingsInfo() {
   return `
     <div class="subpage-header">
       <button class="subpage-back" onclick="navTo('profile')">←</button>
-      <div class="subpage-title">ข้อมูลส่วนตัว</div>
+      <div style="font-family:'Bebas Neue';font-size:28px;letter-spacing:1px;color:var(--lime)">ข้อมูลส่วนตัว</div>
     </div>
 
     <div class="card">
@@ -1226,7 +1391,7 @@ function renderSettingsInfo() {
         <div style="flex:1">
           <button class="btn-sm" onclick="document.getElementById('photo-input').click()">📷 เลือกรูปใหม่</button>
           ${currentUser.photo ? '<button class="btn-danger" style="margin-left:6px" onclick="removePhoto()">🗑 ลบ</button>' : ''}
-          <p class="field-hint" style="margin-top:8px">JPG, PNG, GIF · ไม่เกิน 5MB</p>
+          <p class="field-hint" style="margin-top:8px">เลือกรูป → ปรับตำแหน่ง+ขนาดได้</p>
         </div>
       </div>
     </div>
@@ -1286,149 +1451,18 @@ async function saveInfo() {
   const exTarget = parseInt(document.getElementById('info-ex-target').value);
   const err = document.getElementById('info-error');
   const btn = document.getElementById('btn-save-info');
-  
   if(!name || !age || !gender || !height || !target || !goal || !sleepTarget || !exTarget) { err.textContent = 'กรุณากรอกให้ครบ'; return; }
   err.textContent = '';
-  
   btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
-
   const updates = {name, age, gender, height, target_weight: target, goal_type: goal, sleep_target: sleepTarget, weekly_exercise_target: exTarget};
   await supaClient.from('users').update(updates).eq('id', currentUser.id);
-
   const u = USERS.find(x => x.id === currentUser.id);
   Object.assign(u, {name, age, gender, height, targetWeight: target, goalType: goal, sleepTarget, weeklyExerciseTarget: exTarget});
   Object.assign(currentUser, {name, age, gender, height, targetWeight: target, goalType: goal, sleepTarget, weeklyExerciseTarget: exTarget});
-  
   await logActivity('update', 'แก้ไขข้อมูลส่วนตัว', currentUser.id, 'user');
   updateAvatar();
   showToast('✅ บันทึกสำเร็จ');
   setTimeout(() => navTo('profile'), 500);
-}
-
-function renderSettingsEmail() {
-  return `
-    <div class="subpage-header">
-      <button class="subpage-back" onclick="navTo('profile')">←</button>
-      <div class="subpage-title">เปลี่ยน Email</div>
-    </div>
-
-    <div class="card">
-      <div class="section-sub">Email ปัจจุบัน</div>
-      <p style="font-size:14px;color:var(--text2);margin-bottom:14px">${currentUser.email || 'ยังไม่มี Email'}</p>
-    </div>
-
-    <div class="card">
-      <div class="section-sub">เปลี่ยน Email ใหม่</div>
-      <p class="text-muted" style="margin-bottom:16px;font-size:13px">เพื่อความปลอดภัย ต้องยืนยัน PIN ปัจจุบันก่อนตั้งใหม่</p>
-
-      <div class="form-group">
-        <label>Email ใหม่</label>
-        <input type="email" id="new-email" placeholder="your@email.com" value="${currentUser.email || ''}">
-      </div>
-
-      <div class="form-group">
-        <label style="text-align:center">ยืนยัน PIN ปัจจุบัน 6 หลัก</label>
-        <div class="pin-wrap" id="change-pin-old">
-          <input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]">
-        </div>
-      </div>
-      <p class="error-msg" id="email-error"></p>
-      <button class="btn btn-primary" id="btn-save-email" onclick="saveNewEmail()">🔐 ยืนยันและเปลี่ยน Email</button>
-    </div>
-  `;
-}
-
-async function saveNewEmail() {
-  const newEmail = document.getElementById('new-email').value.trim().toLowerCase();
-  const oldPin = getPinValue('change-pin-old');
-  const err = document.getElementById('email-error');
-  const btn = document.getElementById('btn-save-email');
-  err.textContent = '';
-  
-  if(!newEmail) { err.textContent = 'กรุณากรอก Email ใหม่'; return; }
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { err.textContent = 'รูปแบบ Email ไม่ถูกต้อง'; return; }
-  if(oldPin.length !== 6) { err.textContent = 'กรอก PIN ครบ 6 หลัก'; return; }
-  if(oldPin !== currentUser.pin) { err.textContent = '❌ PIN ไม่ถูกต้อง'; return; }
-  if(newEmail === currentUser.email) { err.textContent = 'Email ใหม่เหมือนกับเก่า'; return; }
-  
-  btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
-
-  await supaClient.from('users').update({email: newEmail}).eq('id', currentUser.id);
-
-  const oldEmail = currentUser.email;
-  currentUser.email = newEmail;
-  const u = USERS.find(x => x.id === currentUser.id);
-  if(u) u.email = newEmail;
-  
-  await logActivity('update', `เปลี่ยน Email: ${oldEmail || '(ว่าง)'} → ${newEmail}`, currentUser.id, 'user');
-  showToast('✅ เปลี่ยน Email สำเร็จ');
-  setTimeout(() => navTo('profile'), 700);
-}
-
-function renderSettingsPin() {
-  return `
-    <div class="subpage-header">
-      <button class="subpage-back" onclick="navTo('profile')">←</button>
-      <div class="subpage-title">เปลี่ยน PIN</div>
-    </div>
-
-    <div class="card">
-      <p class="text-muted" style="margin-bottom:20px;font-size:13px">เพื่อความปลอดภัย ต้องยืนยัน PIN ปัจจุบันก่อนตั้งใหม่</p>
-
-      <div class="form-group">
-        <label style="text-align:center">PIN ปัจจุบัน</label>
-        <div class="pin-wrap" id="change-pin-old">
-          <input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]">
-        </div>
-      </div>
-
-      <div style="height:1px;background:var(--border);margin:20px 0"></div>
-
-      <div class="form-group">
-        <label style="text-align:center">PIN ใหม่ 6 หลัก</label>
-        <div class="pin-wrap" id="change-pin-new">
-          <input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label style="text-align:center">ยืนยัน PIN ใหม่</label>
-        <div class="pin-wrap" id="change-pin-new2">
-          <input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]">
-        </div>
-      </div>
-
-      <p class="error-msg" id="pin-error"></p>
-      <button class="btn btn-primary" id="btn-save-pin" onclick="saveNewPin()">🔐 ยืนยันและเปลี่ยน PIN</button>
-    </div>
-  `;
-}
-
-async function saveNewPin() {
-  const oldPin = getPinValue('change-pin-old');
-  const newPin = getPinValue('change-pin-new');
-  const newPin2 = getPinValue('change-pin-new2');
-  const err = document.getElementById('pin-error');
-  const btn = document.getElementById('btn-save-pin');
-  err.textContent = '';
-  
-  if(oldPin.length !== 6) { err.textContent = 'กรอก PIN ปัจจุบันครบ 6 หลัก'; return; }
-  if(oldPin !== currentUser.pin) { err.textContent = '❌ PIN ปัจจุบันไม่ถูกต้อง'; return; }
-  if(newPin.length !== 6 || newPin2.length !== 6) { err.textContent = 'กรอก PIN ใหม่ครบ 6 หลัก'; return; }
-  if(newPin !== newPin2) { err.textContent = 'PIN ใหม่ไม่ตรงกัน'; return; }
-  if(newPin === oldPin) { err.textContent = 'PIN ใหม่เหมือนกับเก่า'; return; }
-  
-  btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
-
-  await supaClient.from('users').update({pin: newPin}).eq('id', currentUser.id);
-
-  currentUser.pin = newPin;
-  const u = USERS.find(x => x.id === currentUser.id);
-  if(u) u.pin = newPin;
-  
-  await logActivity('update', 'เปลี่ยน PIN', currentUser.id, 'user');
-  showToast('✅ เปลี่ยน PIN สำเร็จ');
-  setTimeout(() => navTo('profile'), 700);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1447,15 +1481,14 @@ function renderAdminDashboard() {
   const highRisk = LOGS.filter(l => { const u = USERS.find(x => x.id === l.userId); return u && calcHealthScore(l,u) < 50; }).length;
   const avg = LOGS.reduce((s,l) => { const u = USERS.find(x => x.id === l.userId); return s + (u ? calcHealthScore(l,u) : 0); }, 0) / (LOGS.length || 1);
   const sc = s => s >= 80 ? '#C8F000' : s >= 50 ? '#FF8C42' : '#FF4757';
-  
   return `${adminBackBtn()}
     <div class="section-title">📊 Dashboard</div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">ภาพรวม · อัพเดท ${new Date().toLocaleTimeString('th-TH')}</p>
-    <div class="admin-stats">
-      <div class="stat-card"><div class="s-num">${total}</div><div class="s-label">Users</div></div>
-      <div class="stat-card"><div class="s-num">${totalL}</div><div class="s-label">Logs</div></div>
-      <div class="stat-card"><div class="s-num" style="color:var(--red)">${highRisk}</div><div class="s-label">High Risk</div></div>
-      <div class="stat-card"><div class="s-num" style="color:${sc(avg)}">${avg.toFixed(0)}</div><div class="s-label">Avg Score</div></div>
+    <div class="metrics-grid">
+      <div class="metric-chip lime"><div class="chip-label">Users</div><div class="chip-value">${total}</div></div>
+      <div class="metric-chip teal"><div class="chip-label">Logs</div><div class="chip-value">${totalL}</div></div>
+      <div class="metric-chip orange"><div class="chip-label">High Risk</div><div class="chip-value" style="color:var(--red)">${highRisk}</div></div>
+      <div class="metric-chip blue"><div class="chip-label">Avg Score</div><div class="chip-value" style="color:${sc(avg)}">${avg.toFixed(0)}</div></div>
     </div>
     <div class="section-title" style="margin-top:8px">⚡ กิจกรรมล่าสุด</div>
     ${ACTIVITIES.slice(0,5).map(a => renderActivityItem(a)).join('')}
@@ -1472,7 +1505,6 @@ function renderAdminDashboard() {
             <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;background-size:cover;background-position:center;${photoBg}">${!u.photo ? u.name[0] : ''}</div>
             <div style="min-width:0">
               <div class="fw-600">${u.name}</div>
-              <div class="text-muted">@${u.username}</div>
               ${u.email ? `<div style="font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis">📧 ${u.email}</div>` : ''}
             </div>
           </div>
@@ -1506,15 +1538,15 @@ function renderAdminUsers() {
       const sc = avg >= 80 ? 'var(--lime)' : avg >= 50 ? 'var(--orange)' : 'var(--red)';
       const photoBg = u.photo ? `background-image:url('${u.photo}')` : '';
       return `<div class="log-item">
-        <div class="log-item-top">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px">
           <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
             <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;font-size:14px;background-size:cover;background-position:center;${photoBg}">${!u.photo ? u.name[0] : ''}</div>
             <div style="min-width:0;flex:1">
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <span class="fw-600">${u.name}</span>
-                <span class="role-pill role-${u.role}">${u.role.toUpperCase()}</span>
+                <span class="role-badge role-${u.role}">${u.role.toUpperCase()}</span>
               </div>
-              <div class="text-muted" style="font-size:12px;margin-top:2px">@${u.username} · ${u.gender} · ${u.age}ปี · ${u.height}cm</div>
+              <div class="text-muted" style="font-size:12px;margin-top:2px">${u.gender} · ${u.age}ปี · ${u.height}cm</div>
               ${u.email ? `<div style="font-size:11px;color:var(--blue);margin-top:2px;overflow:hidden;text-overflow:ellipsis">📧 ${u.email}</div>` : ''}
             </div>
           </div>
@@ -1540,15 +1572,17 @@ function renderAdminLogs() {
       const u = USERS.find(x => x.id === l.userId); if(!u) return '';
       const bmi = calcBMI(l.weight, u.height); const score = calcHealthScore(l,u);
       const rc = score >= 80 ? 'risk-low' : score >= 50 ? 'risk-medium' : 'risk-high';
+      const energyEmoji = l.energyLevel ? energyInfo(l.energyLevel).emoji : '';
       return `<div class="log-item">
-        <div class="log-item-top"><span class="fw-600">${u.name}</span><span class="risk-badge ${rc}">${score}pts</span></div>
-        <div class="text-muted" style="font-size:12px;margin-bottom:8px">📅 ${l.date} · @${u.username}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px"><span class="fw-600">${u.name}</span><span class="risk-badge ${rc}">${score}pts</span></div>
+        <div class="text-muted" style="font-size:12px;margin-bottom:8px">📅 ${l.date}</div>
         <div class="log-stats">
           <div class="log-stat">⚖️ <span>${l.weight}kg</span></div>
           <div class="log-stat">BMI <span>${bmi.toFixed(1)}</span></div>
           <div class="log-stat">🌙 <span>${l.sleep}h</span></div>
           <div class="log-stat">💧 <span>${l.water}L</span></div>
           <div class="log-stat">🏃 <span>${l.exercise}m</span></div>
+          ${l.energyLevel ? `<div class="log-stat">⚡ <span>${l.energyLevel}/10 ${energyEmoji}</span></div>` : ''}
         </div>
       </div>`;
     }).join('')}`;
@@ -1558,11 +1592,10 @@ function renderActivityItem(a) {
   const icons = {create:'➕', update:'✏️', delete:'🗑', role:'🛡', log:'📝'};
   const date = new Date(a.timestamp);
   const time = date.toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'});
-  const targetUser = a.userId ? USERS.find(u => u.id === a.userId) : null;
   return `<div class="activity-item">
     <div class="activity-icon">${icons[a.type] || '📌'}</div>
-    <div class="activity-content">
-      <div class="activity-text">${a.msg} ${targetUser ? `<b>(@${targetUser.username})</b>` : ''}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;line-height:1.5;word-break:break-word">${a.msg}</div>
       <div class="activity-time">${time} · by ${a.actorName || 'system'}</div>
     </div>
   </div>`;
@@ -1588,9 +1621,7 @@ function renderAdminAlerts() {
     const recs = generateRecommendations(l, u, userLogs).filter(r => r.severity === 'high');
     return {l, u, score, recs};
   }).filter(x => x && x.score < 70).sort((a,b) => a.score - b.score);
-  
   if(!alerts.length) return `${adminBackBtn()}<div class="section-title">🚨 Alerts</div><div class="empty-state"><span class="empty-icon">✅</span><p>ไม่มีการแจ้งเตือน</p></div>`;
-  
   return `${adminBackBtn()}
     <div class="section-title">🚨 Alerts</div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:16px">พบ ${alerts.length} รายการที่ต้องดูแล</p>
@@ -1627,11 +1658,11 @@ function renderMasterControl() {
   return `${masterBackBtn()}
     <div class="section-title" style="color:var(--gold)">⚙ Master Control</div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">ภาพรวมระบบทั้งหมด</p>
-    <div class="admin-stats">
-      <div class="stat-card"><div class="s-num">${total}</div><div class="s-label">Users</div></div>
-      <div class="stat-card"><div class="s-num" style="color:var(--blue)">${totalAdmins}</div><div class="s-label">Admins</div></div>
-      <div class="stat-card"><div class="s-num">${LOGS.length}</div><div class="s-label">Logs</div></div>
-      <div class="stat-card"><div class="s-num" style="color:var(--gold)">${ACTIVITIES.length}</div><div class="s-label">Activities</div></div>
+    <div class="metrics-grid">
+      <div class="metric-chip lime"><div class="chip-label">Users</div><div class="chip-value">${total}</div></div>
+      <div class="metric-chip blue"><div class="chip-label">Admins</div><div class="chip-value" style="color:var(--blue)">${totalAdmins}</div></div>
+      <div class="metric-chip teal"><div class="chip-label">Logs</div><div class="chip-value">${LOGS.length}</div></div>
+      <div class="metric-chip orange"><div class="chip-label">Activities</div><div class="chip-value" style="color:var(--gold)">${ACTIVITIES.length}</div></div>
     </div>
     <div class="section-title" style="color:var(--gold);margin-top:8px">⚡ กิจกรรมล่าสุด</div>
     ${ACTIVITIES.slice(0,8).map(a => renderActivityItem(a)).join('')}
@@ -1655,11 +1686,11 @@ function renderMasterRoles() {
             <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;background-size:cover;background-position:center;${photoBg}">${!u.photo ? u.name[0] : ''}</div>
             <div style="min-width:0;flex:1">
               <div class="fw-600">${u.name}</div>
-              <div class="text-muted" style="font-size:12px">@${u.username} · ${cnt} logs</div>
+              <div class="text-muted" style="font-size:12px">${cnt} logs</div>
               ${u.email ? `<div style="font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis">${u.email}</div>` : ''}
             </div>
           </div>
-          <span class="role-pill role-${u.role}">${u.role.toUpperCase()}</span>
+          <span class="role-badge role-${u.role}">${u.role.toUpperCase()}</span>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           ${u.role !== 'user' ? `<button class="btn-sm" style="flex:1;min-width:90px" onclick="setRole('${u.id}','user')">⬇ User</button>` : ''}
@@ -1695,9 +1726,7 @@ async function setRole(userId, newRole) {
   const u = USERS.find(x => x.id === userId);
   if(!u) { showToast('❌ ไม่พบบัญชี'); return; }
   if(!confirm(`เปลี่ยน role ของ ${u.name}\nจาก ${u.role.toUpperCase()} → ${newRole.toUpperCase()}?`)) return;
-  
   await supaClient.from('users').update({role: newRole}).eq('id', userId);
-  
   const oldRole = u.role;
   u.role = newRole;
   await logActivity('role', `เปลี่ยน Role: ${u.name} (${oldRole.toUpperCase()} → ${newRole.toUpperCase()})`, userId, 'user');
@@ -1709,9 +1738,7 @@ async function deleteUser(userId) {
   const u = USERS.find(x => x.id === userId);
   if(!u) return;
   if(!confirm(`ลบบัญชี ${u.name} และ logs ทั้งหมด?\nการกระทำนี้ไม่สามารถย้อนกลับได้`)) return;
-  
   await supaClient.from('users').delete().eq('id', userId);
-  
   USERS = USERS.filter(x => x.id !== userId);
   LOGS = LOGS.filter(l => l.userId !== userId);
   await logActivity('delete', `ลบบัญชี: ${u.name}`, userId, 'user');
@@ -1722,10 +1749,7 @@ async function deleteUser(userId) {
 async function resetSystem() {
   if(!confirm('⚠ รีเซ็ตข้อมูลทั้งระบบ?')) return;
   if(!confirm('แน่ใจอีกครั้ง? ข้อมูลทั้งหมดจะถูกลบออกจาก Database')) return;
-  
-  await supaClient.from('users').delete().neq('username', 'impossible_string');
-  
-  localStorage.removeItem(SESSION_KEY);
+  await supaClient.from('users').delete().neq('name', 'impossible_string');
   showToast('🔄 กำลังรีเซ็ต...');
   setTimeout(() => location.reload(), 1000);
 }
@@ -1746,7 +1770,7 @@ function exportUserCSV(userId) {
   const userLogs = LOGS.filter(l => l.userId === userId).sort((a,b) => a.date.localeCompare(b.date));
   const rows = [
     ['FitFuel - User Report'],
-    ['ชื่อ', u.name], ['Username', u.username], ['Email', u.email||''],
+    ['ชื่อ', u.name], ['Email', u.email||''],
     ['อายุ', u.age], ['เพศ', u.gender], ['ส่วนสูง', u.height],
     ['น้ำหนักเป้า', u.targetWeight||''], ['เป้าหมาย', u.goalType],
     ['สร้างบัญชี', u.createdAt],
@@ -1754,14 +1778,14 @@ function exportUserCSV(userId) {
     ['วันที่','น้ำหนัก','BMI','BMI Cat','Score','นอน','น้ำ','ออกกำลังกาย','พลังงาน','บันทึกเมื่อ'],
     ...userLogs.map(l => { const bmi = calcBMI(l.weight, u.height); return [l.date, l.weight, bmi.toFixed(1), bmiCategory(bmi).label, calcHealthScore(l,u), l.sleep, l.water, l.exercise, l.energyLevel||'-', l.createdAt||'']; })
   ];
-  downloadCSV(`FitFuel_${u.username}_${new Date().toISOString().split('T')[0]}.csv`, rows);
+  downloadCSV(`FitFuel_${u.name}_${new Date().toISOString().split('T')[0]}.csv`, rows);
   showToast('📥 ดาวน์โหลดสำเร็จ!');
 }
 function exportAllUsersCSV() {
   const rows = [
     ['FitFuel - All Users'], ['Generated', new Date().toLocaleString('th-TH')], [],
-    ['ID','Username','ชื่อ','Email','Role','อายุ','เพศ','สูง','เป้า','เป้าหมาย','Logs','AvgScore','สร้างเมื่อ'],
-    ...USERS.map(u => { const ul = LOGS.filter(l => l.userId === u.id); const avg = ul.length ? ul.reduce((s,l)=>s+calcHealthScore(l,u),0)/ul.length : 0; return [u.id, u.username, u.name, u.email||'', u.role, u.age, u.gender, u.height, u.targetWeight||'', u.goalType, ul.length, avg.toFixed(0), u.createdAt||'']; })
+    ['ID','ชื่อ','Email','Role','อายุ','เพศ','สูง','เป้า','เป้าหมาย','Logs','AvgScore','สร้างเมื่อ'],
+    ...USERS.map(u => { const ul = LOGS.filter(l => l.userId === u.id); const avg = ul.length ? ul.reduce((s,l)=>s+calcHealthScore(l,u),0)/ul.length : 0; return [u.id, u.name, u.email||'', u.role, u.age, u.gender, u.height, u.targetWeight||'', u.goalType, ul.length, avg.toFixed(0), u.createdAt||'']; })
   ];
   downloadCSV(`FitFuel_All_Users_${new Date().toISOString().split('T')[0]}.csv`, rows);
   showToast('📥 ดาวน์โหลด Users.csv!');
@@ -1769,8 +1793,8 @@ function exportAllUsersCSV() {
 function exportAllLogsCSV() {
   const rows = [
     ['FitFuel - All Logs'], ['Generated', new Date().toLocaleString('th-TH')], [],
-    ['LogID','UserID','Username','ชื่อ','วันที่','น้ำหนัก','BMI','BMI Cat','Score','นอน','น้ำ','ออกกำลังกาย','พลังงาน','บันทึกเมื่อ'],
-    ...[...LOGS].sort((a,b)=>b.date.localeCompare(a.date)).map(l => { const u = USERS.find(x => x.id === l.userId); if(!u) return null; const bmi = calcBMI(l.weight, u.height); return [l.id, u.id, u.username, u.name, l.date, l.weight, bmi.toFixed(1), bmiCategory(bmi).label, calcHealthScore(l,u), l.sleep, l.water, l.exercise, l.energyLevel||'-', l.createdAt||'']; }).filter(Boolean)
+    ['LogID','UserID','ชื่อ','วันที่','น้ำหนัก','BMI','BMI Cat','Score','นอน','น้ำ','ออกกำลังกาย','พลังงาน','บันทึกเมื่อ'],
+    ...[...LOGS].sort((a,b)=>b.date.localeCompare(a.date)).map(l => { const u = USERS.find(x => x.id === l.userId); if(!u) return null; const bmi = calcBMI(l.weight, u.height); return [l.id, u.id, u.name, l.date, l.weight, bmi.toFixed(1), bmiCategory(bmi).label, calcHealthScore(l,u), l.sleep, l.water, l.exercise, l.energyLevel||'-', l.createdAt||'']; }).filter(Boolean)
   ];
   downloadCSV(`FitFuel_All_Logs_${new Date().toISOString().split('T')[0]}.csv`, rows);
   showToast('📥 ดาวน์โหลด Logs.csv!');
@@ -1785,17 +1809,11 @@ function exportActivityCSV() {
   showToast('📥 ดาวน์โหลด Activity.csv!');
 }
 
-// ════════════════════════════════════════════════════════════
-//  TOAST
-// ════════════════════════════════════════════════════════════
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
-document.addEventListener('keydown', e => {
-  if(e.key === 'Enter' && document.getElementById('screen-login').classList.contains('active')) doLogin();
-});
 </script>
 </body>
 </html>

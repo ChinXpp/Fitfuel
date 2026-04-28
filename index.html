@@ -116,6 +116,7 @@
   .rec-box p {font-size:13px;line-height:1.6}
   .rec-box .rec-label {font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600}
   .rec-box.low .rec-label{color:var(--lime)} .rec-box.medium .rec-label{color:var(--orange)} .rec-box.high .rec-label{color:var(--red)}
+  .rec-action {font-size:12px;color:var(--text2);margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-style:italic}
 
   .log-item {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px}
   .log-stats {display:flex;gap:12px;flex-wrap:wrap; margin-top:10px}
@@ -159,19 +160,11 @@
   .mono {font-family:'JetBrains Mono',monospace}
   .empty-state {text-align:center;padding:40px 20px;color:var(--text2)}
   .empty-state .empty-icon {font-size:48px;margin-bottom:12px;display:block}
-
-  /* Full Screen Loader */
-  #global-loader {display:flex;position:fixed;inset:0;background:var(--black);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px}
   
   @media(max-width:400px){ .metrics-grid,.admin-stats,.form-row{grid-template-columns:1fr} .pin-box{width:40px;height:50px;font-size:18px} .content{padding:16px;padding-bottom:100px} }
 </style>
 </head>
 <body>
-
-<div id="global-loader">
-  <div class="spinner" style="width:30px;height:30px;border-width:3px;border-top-color:var(--lime)"></div>
-  <div style="font-size:14px;color:var(--lime);font-family:'Bebas Neue';letter-spacing:1px">CONNECTING TO DATABASE...</div>
-</div>
 
 <div id="otp-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:2000;align-items:center;justify-content:center;padding:24px">
   <div class="card" style="width:100%;max-width:360px;text-align:center;border:1px solid var(--lime)">
@@ -187,7 +180,7 @@
   </div>
 </div>
 
-<div id="screen-splash" class="screen">
+<div id="screen-splash" class="screen active">
   <div class="splash-logo">
     <span class="icon">🔥</span>
     <h1>FITFUEL</h1>
@@ -284,7 +277,7 @@
 <div id="screen-forgot" class="screen">
   <div class="auth-wrap">
     <div class="auth-header">
-      <button class="back" onclick="showScreen('login')">←</button>
+      <button class="back" onclick="showScreen('splash')">←</button>
       <h2>ลืม PIN</h2>
       <p>กรอก Username และ Email เพื่อรีเซ็ต</p>
     </div>
@@ -338,7 +331,13 @@
 // ════════════════════════════════════════════════════════════
 const SUPABASE_URL = 'https://gyaptfiwxvruiorczbxv.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_phEtg4XZtjlbcz-xOz0Tjw_o-cQUJkf';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let supaClient = null;
+if (window.supabase) {
+    supaClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+} else {
+    console.error("Supabase SDK is missing or blocked!");
+}
 
 const SESSION_KEY = 'fitfuel_session_uid';
 let USERS = [], LOGS = [], ACTIVITIES = [], RECOMMENDATIONS = [];
@@ -346,7 +345,7 @@ let currentUser = null;
 let currentView = 'user';
 let currentPage = 'home';
 
-// ─── Data Mappers (JS CamelCase to SQL Snake_case) ───
+// ─── Data Mappers ───
 function mapUser(u) {
   if(!u) return null;
   return {
@@ -378,11 +377,12 @@ function mapAct(a) {
 
 // Fetch all necessary data into memory
 async function loadAllData() {
+  if(!supaClient) return;
   const [uRes, lRes, rRes, aRes] = await Promise.all([
-    supabase.from('users').select('*'),
-    supabase.from('daily_logs').select('*'),
-    supabase.from('recommendations').select('*'),
-    supabase.from('activities').select('*').order('created_at', { ascending: false }).limit(200)
+    supaClient.from('users').select('*'),
+    supaClient.from('daily_logs').select('*'),
+    supaClient.from('recommendations').select('*'),
+    supaClient.from('activities').select('*').order('created_at', { ascending: false }).limit(200)
   ]);
   if(uRes.data) USERS = uRes.data.map(mapUser);
   if(lRes.data) LOGS = lRes.data.map(mapLog);
@@ -390,21 +390,22 @@ async function loadAllData() {
   if(aRes.data) ACTIVITIES = aRes.data.map(mapAct);
 }
 
-// Check auto-login on startup
+// Check auto-login on startup (Safe Mode - No Loader)
 window.onload = async () => {
-  const savedUid = localStorage.getItem(SESSION_KEY);
-  if(savedUid) {
-    const { data } = await supabase.from('users').select('*').eq('id', savedUid).single();
-    if(data) {
-      currentUser = mapUser(data);
-      await loadAllData();
-      document.getElementById('global-loader').style.display = 'none';
-      enterApp();
-      return;
+  try {
+    if (!supaClient) return; // Prevent crash if blocked
+    const savedUid = localStorage.getItem(SESSION_KEY);
+    if(savedUid) {
+      const { data } = await supaClient.from('users').select('*').eq('id', savedUid).single();
+      if(data) {
+        currentUser = mapUser(data);
+        await loadAllData();
+        enterApp();
+      }
     }
+  } catch (err) {
+    console.error("Startup Logic Interrupted:", err);
   }
-  document.getElementById('global-loader').style.display = 'none';
-  showScreen('splash');
 };
 
 // ════════════════════════════════════════════════════════════
@@ -450,11 +451,12 @@ function clearPinInputs(containerId) {
 //  ACTIVITY (Database Insert)
 // ════════════════════════════════════════════════════════════
 async function logActivity(type, msg, userId=null, target='log') {
+  if(!supaClient) return;
   const dbAct = {
     type, target, user_id: userId,
     actor_id: currentUser?.id, actor_name: currentUser?.name || 'System', msg
   };
-  const { data } = await supabase.from('activities').insert([dbAct]).select().single();
+  const { data } = await supaClient.from('activities').insert([dbAct]).select().single();
   if(data) ACTIVITIES.unshift(mapAct(data));
 }
 
@@ -473,6 +475,7 @@ function logout() {
 }
 
 async function doLogin() {
+  if(!supaClient) { alert("เชื่อมต่อ Database ไม่ได้ ลองใหม่อีกครั้ง"); return; }
   const u = document.getElementById('login-user').value.trim().toLowerCase();
   const pin = getPinValue('login-pin');
   const err = document.getElementById('login-error');
@@ -484,7 +487,7 @@ async function doLogin() {
   btn.innerHTML = '<span class="spinner"></span> กำลังเข้าสู่ระบบ...';
   btn.disabled = true;
 
-  const { data, error } = await supabase.from('users').select('*').ilike('username', u).eq('pin', pin).single();
+  const { data } = await supaClient.from('users').select('*').ilike('username', u).eq('pin', pin).single();
   
   if(data) {
     currentUser = mapUser(data);
@@ -526,6 +529,7 @@ function updateAvatar() {
 // ════════════════════════════════════════════════════════════
 let _forgotUser = null;
 async function forgotVerify() {
+  if(!supaClient) return;
   const u = document.getElementById('forgot-user').value.trim().toLowerCase();
   const e = document.getElementById('forgot-email').value.trim().toLowerCase();
   const err = document.getElementById('forgot-err-1');
@@ -534,7 +538,7 @@ async function forgotVerify() {
   if(!u || !e) { err.textContent = 'กรุณากรอกให้ครบ'; return; }
   
   btn.innerHTML = '<span class="spinner"></span> กำลังตรวจสอบ...'; btn.disabled = true;
-  const { data } = await supabase.from('users').select('*').ilike('username', u).ilike('email', e).single();
+  const { data } = await supaClient.from('users').select('*').ilike('username', u).ilike('email', e).single();
   btn.innerHTML = '✓ ตรวจสอบ'; btn.disabled = false;
 
   if(!data) { err.textContent = 'ไม่พบบัญชีที่ตรงกัน'; return; }
@@ -545,6 +549,7 @@ async function forgotVerify() {
 }
 
 async function forgotReset() {
+  if(!supaClient) return;
   const p1 = getPinValue('forgot-pin-1');
   const p2 = getPinValue('forgot-pin-2');
   const err = document.getElementById('forgot-err-2');
@@ -554,7 +559,7 @@ async function forgotReset() {
   if(p1 !== p2) { err.textContent = 'PIN ไม่ตรงกัน'; return; }
   
   btn.innerHTML = '<span class="spinner"></span> กำลังรีเซ็ต...'; btn.disabled = true;
-  await supabase.from('users').update({pin: p1}).eq('id', _forgotUser.id);
+  await supaClient.from('users').update({pin: p1}).eq('id', _forgotUser.id);
   await logActivity('update', 'รีเซ็ต PIN ผ่านระบบลืมรหัส', _forgotUser.id, 'user');
   
   btn.innerHTML = '🔓 รีเซ็ต PIN'; btn.disabled = false;
@@ -580,6 +585,7 @@ function regStep(n) {
   });
 }
 async function regNext1() {
+  if(!supaClient) { alert("เชื่อมต่อ Database ไม่ได้"); return; }
   const name = document.getElementById('reg-name').value.trim();
   const email = document.getElementById('reg-email').value.trim();
   const username = document.getElementById('reg-username').value.trim();
@@ -590,7 +596,7 @@ async function regNext1() {
   if(/\s/.test(username) || username.length < 3) { err.textContent = 'Username อย่างน้อย 3 ตัว ไม่มีช่องว่าง'; return; }
   
   btn.innerHTML = '<span class="spinner"></span> กำลังตรวจสอบ...'; btn.disabled = true;
-  const { data } = await supabase.from('users').select('id').ilike('username', username).single();
+  const { data } = await supaClient.from('users').select('id').ilike('username', username).single();
   btn.innerHTML = 'ถัดไป →'; btn.disabled = false;
 
   if(data) { err.textContent = 'Username ถูกใช้แล้ว'; return; }
@@ -613,7 +619,7 @@ function regNext2() {
   regStep(3);
 }
 
-async function startEmailVerification() {
+function startEmailVerification() {
   const age = parseInt(document.getElementById('reg-age').value);
   const gender = document.getElementById('reg-gender').value;
   const height = parseInt(document.getElementById('reg-height').value);
@@ -629,7 +635,6 @@ async function startEmailVerification() {
   if(target < 20 || target > 300) { err.textContent = 'น้ำหนักเป้าหมายไม่ถูกต้อง'; return; }
   err.textContent = '';
 
-  // Generate 6-digit OTP
   currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
   document.getElementById('otp-hint').textContent = currentOTP;
   clearPinInputs('otp-input-wrap');
@@ -653,6 +658,7 @@ function verifyOTP() {
 }
 
 async function regSubmit() {
+  if(!supaClient) return;
   const age = parseInt(document.getElementById('reg-age').value);
   const gender = document.getElementById('reg-gender').value;
   const height = parseInt(document.getElementById('reg-height').value);
@@ -661,8 +667,7 @@ async function regSubmit() {
   const sleepTarget = parseFloat(document.getElementById('reg-sleep-target').value);
   const exTarget = parseInt(document.getElementById('reg-ex-target').value);
 
-  // Check if first user to assign Master role
-  const { count } = await supabase.from('users').select('*', { count: 'exact', head: true });
+  const { count } = await supaClient.from('users').select('*', { count: 'exact', head: true });
   const assignRole = count === 0 ? 'master' : 'user';
 
   const dbUser = {
@@ -675,7 +680,7 @@ async function regSubmit() {
     role: assignRole
   };
 
-  const { data, error } = await supabase.from('users').insert([dbUser]).select().single();
+  const { data, error } = await supaClient.from('users').insert([dbUser]).select().single();
   
   if (error) {
      document.getElementById('otp-error').textContent = 'เกิดข้อผิดพลาด: ' + error.message;
@@ -686,7 +691,7 @@ async function regSubmit() {
 
   currentUser = mapUser(data);
   localStorage.setItem(SESSION_KEY, currentUser.id);
-  await loadAllData(); // Load fresh context
+  await loadAllData(); 
   await logActivity('create', `สร้างบัญชีใหม่: ${currentUser.name} (${assignRole})`, currentUser.id, 'user');
   
   document.getElementById('otp-overlay').style.display = 'none';
@@ -891,7 +896,7 @@ function renderUserHome() {
   const cat = bmiCategory(bmi);
   const score = calcHealthScore(latest, currentUser);
   
-  // ERD Compliance: Fetch Recommendations directly from table
+  // ERD Compliance
   const savedRecs = RECOMMENDATIONS.filter(r => r.logId === latest.id);
   const recsHTML = savedRecs.length > 0 
         ? savedRecs.map(r => `<div class="rec-box ${r.severity}"><div class="rec-label">${r.icon || '📌'} ${r.rectype}</div><p>${r.message}</p>${r.action ? `<div class="rec-action">📋 ${r.action}</div>` : ''}</div>`).join('')
@@ -989,6 +994,7 @@ function renderUserLog() {
 }
 
 async function submitLog() {
+  if(!supaClient) { alert("เชื่อมต่อ Database ไม่ได้"); return; }
   const date = document.getElementById('log-date').value;
   const weight = parseFloat(document.getElementById('log-weight').value);
   const sleep = parseFloat(document.getElementById('log-sleep').value);
@@ -1008,7 +1014,7 @@ async function submitLog() {
   btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
 
   const dbLog = { user_id: currentUser.id, date, weight, sleep_hours: sleep, water_liters: water, exercise_minute: exercise, energy_level: energy };
-  const { data: logData, error } = await supabase.from('daily_logs').insert([dbLog]).select().single();
+  const { data: logData, error } = await supaClient.from('daily_logs').insert([dbLog]).select().single();
 
   if(error) {
      err.textContent = 'เกิดข้อผิดพลาด: ' + error.message;
@@ -1020,12 +1026,11 @@ async function submitLog() {
   LOGS.push(mappedLog);
   await logActivity('create', `บันทึก Log: ${date} (${weight}kg, พลังงาน ${energy}/10)`, currentUser.id, 'log');
 
-  // Insert Recommendations into DB Table
   const recsToSave = generateRecommendations(mappedLog, currentUser, LOGS.filter(l=>l.userId===currentUser.id));
   const dbRecs = recsToSave.map(r => ({
       log_id: logData.id, rectype: r.title, severity: r.severity, message: r.msg, action: r.action, icon: r.icon
   }));
-  const { data: recData } = await supabase.from('recommendations').insert(dbRecs).select();
+  const { data: recData } = await supaClient.from('recommendations').insert(dbRecs).select();
   if(recData) recData.forEach(r => RECOMMENDATIONS.push(mapRec(r)));
 
   if(sendEmail && currentUser.email) {
@@ -1219,7 +1224,7 @@ document.getElementById('photo-input').addEventListener('change', async function
       const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
       
       showToast('🔄 กำลังอัปโหลดรูป...');
-      await supabase.from('users').update({photo: dataUrl}).eq('id', currentUser.id);
+      await supaClient.from('users').update({photo: dataUrl}).eq('id', currentUser.id);
       
       currentUser.photo = dataUrl;
       const u = USERS.find(x => x.id === currentUser.id);
@@ -1299,7 +1304,7 @@ function renderSettingsInfo() {
 
 async function removePhoto() {
   if(!confirm('ลบรูปโปรไฟล์?')) return;
-  await supabase.from('users').update({photo: null}).eq('id', currentUser.id);
+  await supaClient.from('users').update({photo: null}).eq('id', currentUser.id);
   currentUser.photo = null;
   const u = USERS.find(x => x.id === currentUser.id);
   if(u) u.photo = null;
@@ -1327,7 +1332,7 @@ async function saveInfo() {
   btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
 
   const updates = {name, age, gender, height, target_weight: target, goal_type: goal, sleep_target: sleepTarget, weekly_exercise_target: exTarget};
-  await supabase.from('users').update(updates).eq('id', currentUser.id);
+  await supaClient.from('users').update(updates).eq('id', currentUser.id);
 
   const u = USERS.find(x => x.id === currentUser.id);
   Object.assign(u, {name, age, gender, height, targetWeight: target, goalType: goal, sleepTarget, weeklyExerciseTarget: exTarget});
@@ -1387,7 +1392,7 @@ async function saveNewEmail() {
   
   btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
 
-  await supabase.from('users').update({email: newEmail}).eq('id', currentUser.id);
+  await supaClient.from('users').update({email: newEmail}).eq('id', currentUser.id);
 
   const oldEmail = currentUser.email;
   currentUser.email = newEmail;
@@ -1454,7 +1459,7 @@ async function saveNewPin() {
   
   btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
 
-  await supabase.from('users').update({pin: newPin}).eq('id', currentUser.id);
+  await supaClient.from('users').update({pin: newPin}).eq('id', currentUser.id);
 
   currentUser.pin = newPin;
   const u = USERS.find(x => x.id === currentUser.id);
@@ -1730,7 +1735,7 @@ async function setRole(userId, newRole) {
   if(!u) { showToast('❌ ไม่พบบัญชี'); return; }
   if(!confirm(`เปลี่ยน role ของ ${u.name}\nจาก ${u.role.toUpperCase()} → ${newRole.toUpperCase()}?`)) return;
   
-  await supabase.from('users').update({role: newRole}).eq('id', userId);
+  await supaClient.from('users').update({role: newRole}).eq('id', userId);
   
   const oldRole = u.role;
   u.role = newRole;
@@ -1744,7 +1749,7 @@ async function deleteUser(userId) {
   if(!u) return;
   if(!confirm(`ลบบัญชี ${u.name} และ logs ทั้งหมด?\nการกระทำนี้ไม่สามารถย้อนกลับได้`)) return;
   
-  await supabase.from('users').delete().eq('id', userId);
+  await supaClient.from('users').delete().eq('id', userId);
   
   USERS = USERS.filter(x => x.id !== userId);
   LOGS = LOGS.filter(l => l.userId !== userId);
@@ -1757,8 +1762,7 @@ async function resetSystem() {
   if(!confirm('⚠ รีเซ็ตข้อมูลทั้งระบบ?')) return;
   if(!confirm('แน่ใจอีกครั้ง? ข้อมูลทั้งหมดจะถูกลบออกจาก Database')) return;
   
-  // ลบข้อมูล users ทั้งหมดจะทำให้ข้อมูลอื่นๆ ลบตามอัตโนมัติ (CASCADE)
-  await supabase.from('users').delete().neq('username', 'impossible_string');
+  await supaClient.from('users').delete().neq('username', 'impossible_string');
   
   localStorage.removeItem(SESSION_KEY);
   showToast('🔄 กำลังรีเซ็ต...');

@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>FitFuel – Health Tracking</title>
+<title>FitFuel – Health Tracking Pro</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {--lime:#C8F000;--lime-dark:#a8cc00;--gold:#FFD700;--black:#0A0A0A;--dark:#111214;--card:#1A1C1F;--card2:#222428;--border:#2A2D32;--muted:#555A62;--text:#E8EBF0;--text2:#9BA3AF;--red:#FF4757;--orange:#FF8C42;--teal:#2DD4BF;--blue:#3B82F6;--purple:#A78BFA;--radius:16px;--radius-sm:10px}
@@ -14,137 +15,95 @@
   .screen.active {display:flex}
   @keyframes fadeIn {from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)}}
 
-  /* SPLASH */
-  #screen-splash {align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 30%,#1a2a00 0%,var(--black) 70%);padding:24px}
-  .splash-logo {text-align:center}
+  .splash-logo {text-align:center; padding: 24px;}
   .splash-logo .icon {font-size:72px;margin-bottom:12px;display:block}
   .splash-logo h1 {font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:4px;color:var(--lime);line-height:1}
-  .splash-logo p {color:var(--text2);font-size:14px;letter-spacing:3px;text-transform:uppercase;margin-top:6px}
-  .splash-btns {margin-top:60px;display:flex;flex-direction:column;gap:12px;width:290px}
+  .splash-btns {margin-top:60px;display:flex;flex-direction:column;gap:12px;width:290px;margin-left:auto;margin-right:auto}
+  .auth-wrap {max-width:420px;width:100%;margin:0 auto;padding:40px 24px 60px}
+  .auth-header {margin-bottom:28px}
+  .auth-header .back {background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;margin-bottom:20px;display:block;padding:0}
+  .auth-header h2 {font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;color:var(--lime)}
 
-  /* BUTTONS */
   .btn {border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:var(--radius-sm);transition:all .18s ease;letter-spacing:.3px}
   .btn-primary {background:var(--lime);color:var(--black);padding:16px 24px;font-size:15px;width:100%}
   .btn-primary:hover {background:var(--lime-dark);transform:translateY(-1px)}
   .btn-primary:disabled {opacity:.5;cursor:not-allowed;transform:none}
   .btn-secondary {background:var(--card);color:var(--text);padding:16px 24px;font-size:15px;width:100%;border:1px solid var(--border)}
-  .btn-secondary:hover {background:var(--card2)}
-  .btn-ghost {background:transparent;color:var(--text2);padding:14px 24px;font-size:14px;width:100%;text-decoration:underline;text-underline-offset:3px;cursor:pointer;border:none}
-  .btn-ghost:hover {color:var(--text)}
-  .btn-sm {background:var(--lime);color:var(--black);padding:9px 16px;font-size:12px;border-radius:8px;cursor:pointer;border:none;font-weight:600;font-family:'DM Sans',sans-serif}
-  .btn-danger {background:rgba(255,71,87,.15);color:var(--red);border:1px solid rgba(255,71,87,.3);padding:10px 20px;font-size:13px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
-  .btn-export {background:rgba(45,212,191,.15);color:var(--teal);border:1px solid rgba(45,212,191,.3);padding:10px 16px;font-size:12px;border-radius:8px;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:6px}
-  .btn-export:hover {background:rgba(45,212,191,.25)}
+  .btn-ghost {background:transparent;color:var(--text2);padding:14px 24px;font-size:14px;width:100%;text-decoration:underline;cursor:pointer;border:none}
+  .btn-sm {background:var(--lime);color:var(--black);padding:9px 16px;font-size:12px;border-radius:8px;cursor:pointer;border:none;font-weight:600;font-family:'DM Sans'}
+  .btn-danger {background:rgba(255,71,87,.15);color:var(--red);border:1px solid rgba(255,71,87,.3);padding:10px 20px;font-size:13px;border-radius:8px;cursor:pointer;font-weight:600}
+  .btn-export {background:rgba(45,212,191,.15);color:var(--teal);border:1px solid rgba(45,212,191,.3);padding:10px 16px;font-size:12px;border-radius:8px;cursor:pointer;font-weight:600}
 
-  /* AUTH */
-  #screen-login,#screen-register,#screen-forgot {background:radial-gradient(ellipse at 20% 80%,#0d1f00 0%,var(--black) 60%);overflow-y:auto}
-  .auth-wrap {max-width:420px;width:100%;margin:0 auto;padding:40px 24px 60px}
-  .auth-header {margin-bottom:28px}
-  .auth-header .back {background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px;margin-bottom:20px;display:block;padding:0}
-  .auth-header h2 {font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;color:var(--lime)}
-  .auth-header p {color:var(--text2);font-size:14px;margin-top:4px}
-
-  /* FORMS */
   .form-group {margin-bottom:14px; width:100%}
   .form-group label {display:block;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
-  .form-group input, .form-group select {width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);padding:13px 16px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;transition:border-color .2s;box-sizing:border-box}
-  .form-group input[type=date] {font-family:'JetBrains Mono',monospace;font-size:14px;text-align:center;-webkit-appearance:none;appearance:none;min-height:46px;padding:13px 8px;width:100%}
-  .form-group input::-webkit-calendar-picker-indicator {filter:invert(1) opacity(.6);cursor:pointer}
+  .form-group input, .form-group select {width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);padding:13px 16px;border-radius:var(--radius-sm);font-size:15px;box-sizing:border-box}
+  .form-group input[type=date] {font-family:'JetBrains Mono',monospace;text-align:center;min-height:46px}
   .form-group input:focus, .form-group select:focus {outline:none;border-color:var(--lime)}
-  .form-group select option {background:var(--dark)}
   .form-row {display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .error-msg {color:var(--red);font-size:13px;margin-top:8px;text-align:center;min-height:18px}
-  .field-hint {font-size:11px;color:var(--text2);margin-top:5px;padding-left:2px}
+  .field-hint {font-size:11px;color:var(--text2);margin-top:5px}
 
-  /* PIN INPUT */
   .pin-wrap {display:flex;gap:8px;justify-content:center;margin:8px 0;max-width:100%}
-  .pin-box {width:44px;height:54px;text-align:center;font-size:22px;font-weight:600;background:var(--card);border:2px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'JetBrains Mono',monospace;transition:all .15s}
+  .pin-box {width:44px;height:54px;text-align:center;font-size:22px;font-weight:600;background:var(--card);border:2px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'JetBrains Mono'}
   .pin-box:focus {outline:none;border-color:var(--lime);transform:scale(1.05)}
   .pin-box.filled {border-color:var(--lime)}
 
-  /* STEP TABS */
   .step-tabs {display:flex;background:var(--card2);border-radius:var(--radius-sm);padding:3px;margin-bottom:22px;gap:3px}
-  .step-tab {flex:1;padding:10px 6px;border:none;background:transparent;color:var(--text2);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
+  .step-tab {flex:1;padding:10px 6px;border:none;background:transparent;color:var(--text2);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer}
   .step-tab.active {background:var(--card);color:var(--lime)}
-  .step-tab:disabled {opacity:.4;cursor:not-allowed}
-
-  /* TOPBAR */
+  
   .topbar {display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--dark);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
   .topbar-logo {font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--lime)}
-  .topbar-right {display:flex;align-items:center;gap:8px}
-  .avatar {width:36px;height:36px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--black);cursor:pointer;flex-shrink:0;background-size:cover;background-position:center;overflow:hidden}
+  .avatar {width:36px;height:36px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);cursor:pointer;background-size:cover;background-position:center}
   .avatar.admin {background:var(--blue);color:white}
   .avatar.master {background:var(--gold);color:var(--black)}
-  .role-badge {font-size:9px;padding:3px 8px;border-radius:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
-  .role-user {background:rgba(200,240,0,.15);color:var(--lime);border:1px solid rgba(200,240,0,.3)}
-  .role-admin {background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3)}
-  .role-master {background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.3)}
+  .role-badge {font-size:9px;padding:3px 8px;border-radius:10px;font-weight:700;text-transform:uppercase;background:rgba(200,240,0,.15);color:var(--lime);border:1px solid rgba(200,240,0,.3)}
+  .role-admin {background:rgba(59,130,246,.15);color:var(--blue);border-color:rgba(59,130,246,.3)}
+  .role-master {background:rgba(255,215,0,.15);color:var(--gold);border-color:rgba(255,215,0,.3)}
 
-  /* MODE SWITCH */
   .mode-switch {background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(255,215,0,.04));border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .mode-switch-info {flex:1;min-width:0}
-  .mode-switch-info .ms-label {font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
-  .mode-switch-info .ms-title {font-size:13px;font-weight:600;margin-top:2px}
-  .mode-btn {padding:8px 14px;font-size:12px;border-radius:8px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;white-space:nowrap}
+  .mode-btn {padding:8px 14px;font-size:12px;border-radius:8px;font-weight:600;cursor:pointer;border:none}
   .mode-btn-admin {background:var(--blue);color:white}
   .mode-btn-master {background:var(--gold);color:var(--black)}
 
-  /* CONTENT & NAV */
   .content {flex:1;overflow-y:auto;padding:20px;padding-bottom:100px}
   .bottom-nav {position:fixed;bottom:0;left:0;right:0;background:var(--dark);border-top:1px solid var(--border);display:flex;padding:8px 0 20px;z-index:100}
-  .nav-item {flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px;transition:color .2s;color:var(--muted);font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;background:none;border:none}
+  .nav-item {flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px;color:var(--muted);font-size:10px;font-weight:500;text-transform:uppercase;background:none;border:none}
   .nav-item.active {color:var(--lime)}
-  .nav-item .nav-icon {font-size:22px}
 
-  /* CARDS */
   .card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
   .card-sm {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px}
-
-  /* SETTINGS LIST */
   .settings-list {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
-  .setting-item {padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s}
+  .setting-item {padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;border-bottom:1px solid var(--border)}
   .setting-item:hover {background:var(--card2)}
-  .setting-item:last-child {border-bottom:none}
-  .setting-icon {width:36px;height:36px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .setting-icon {width:36px;height:36px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:18px}
   .setting-content {flex:1;min-width:0}
   .setting-title {font-size:14px;font-weight:600;margin-bottom:2px}
-  .setting-desc {font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .setting-arrow {color:var(--muted);font-size:18px;flex-shrink:0}
+  .setting-desc {font-size:12px;color:var(--text2)}
 
-  /* METRICS */
   .metrics-grid {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
   .metric-chip {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden}
   .metric-chip::before {content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.07}
   .metric-chip.lime::before {background:var(--lime)} .metric-chip.teal::before {background:var(--teal)}
   .metric-chip.orange::before {background:var(--orange)} .metric-chip.blue::before {background:var(--blue)}
-  .metric-chip .chip-label {font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-  .metric-chip .chip-value {font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;line-height:1}
+  .metric-chip .chip-label {font-size:11px;color:var(--text2);text-transform:uppercase;margin-bottom:6px}
+  .metric-chip .chip-value {font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1}
   .metric-chip .chip-unit {font-size:12px;color:var(--text2);margin-top:2px}
-  .metric-chip.lime .chip-value {color:var(--lime)} .metric-chip.teal .chip-value {color:var(--teal)}
-  .metric-chip.orange .chip-value {color:var(--orange)} .metric-chip.blue .chip-value {color:var(--blue)}
+  .metric-chip.lime .chip-value{color:var(--lime)} .metric-chip.teal .chip-value{color:var(--teal)}
+  .metric-chip.orange .chip-value{color:var(--orange)} .metric-chip.blue .chip-value{color:var(--blue)}
 
-  /* BMI */
   .bmi-card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
-  .bmi-card h3 {font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px}
-  .bmi-display {text-align:center;margin-bottom:20px}
-  .bmi-number {font-family:'Bebas Neue',sans-serif;font-size:80px;line-height:1}
-  .bmi-label {font-size:14px;font-weight:500;margin-top:4px}
-  .bmi-bar {background:var(--border);border-radius:6px;height:10px;position:relative;overflow:visible;margin:16px 0 8px}
-  .bmi-bar-fill {height:100%;border-radius:6px}
-  .bmi-indicator {position:absolute;top:-4px;width:18px;height:18px;border-radius:50%;background:white;border:3px solid var(--black);transform:translateX(-50%);transition:left .5s ease;box-shadow:0 0 0 2px white}
-  .bmi-legend {display:flex;justify-content:space-between;font-size:10px;color:var(--text2)}
+  .bmi-number {font-family:'Bebas Neue';font-size:80px;line-height:1}
+  .bmi-bar {background:var(--border);border-radius:6px;height:10px;position:relative;margin:16px 0 8px}
+  .bmi-indicator {position:absolute;top:-4px;width:18px;height:18px;border-radius:50%;background:white;border:3px solid var(--black);transform:translateX(-50%);box-shadow:0 0 0 2px white}
 
-  /* PROGRESS */
   .progress-card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
   .progress-bar {background:var(--border);height:8px;border-radius:4px;overflow:hidden;margin:8px 0}
-  .progress-bar-fill {height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+  .progress-bar-fill {height:100%;border-radius:4px}
   .progress-row {display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
-  .progress-row .label {color:var(--text2)}
-  .progress-row .value {font-weight:600}
   .streak-box {background:linear-gradient(135deg,rgba(255,140,66,.12),rgba(255,71,87,.06));border:1px solid rgba(255,140,66,.3);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:14px}
-  .streak-num {font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--orange);line-height:1}
+  .streak-num {font-family:'Bebas Neue';font-size:42px;color:var(--orange);line-height:1}
 
-  /* RISK & RECS */
   .risk-badge {display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600}
   .risk-low {background:rgba(200,240,0,.15);color:var(--lime);border:1px solid rgba(200,240,0,.3)}
   .risk-medium {background:rgba(255,140,66,.15);color:var(--orange);border:1px solid rgba(255,140,66,.3)}
@@ -156,54 +115,33 @@
   .rec-box.high {background:rgba(255,71,87,.08);border-color:var(--red)}
   .rec-box p {font-size:13px;line-height:1.6}
   .rec-box .rec-label {font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600}
-  .rec-box.low .rec-label {color:var(--lime)}
-  .rec-box.medium .rec-label {color:var(--orange)}
-  .rec-box.high .rec-label {color:var(--red)}
-  .rec-action {font-size:12px;color:var(--text2);margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-style:italic}
+  .rec-box.low .rec-label{color:var(--lime)} .rec-box.medium .rec-label{color:var(--orange)} .rec-box.high .rec-label{color:var(--red)}
 
-  /* LOGS & ACTIVITY */
   .log-item {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px}
-  .log-item-top {display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
-  .log-stats {display:flex;gap:12px;flex-wrap:wrap}
+  .log-stats {display:flex;gap:12px;flex-wrap:wrap; margin-top:10px}
   .log-stat {font-size:12px;color:var(--text2)}
   .log-stat span {color:var(--text);font-weight:600}
 
   .activity-item {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
   .activity-icon {width:32px;height:32px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
-  .activity-content {flex:1;min-width:0}
-  .activity-text {font-size:13px;line-height:1.5;word-break:break-word}
-  .activity-text b {color:var(--text)}
-  .activity-time {font-size:11px;color:var(--text2);margin-top:3px;font-family:'JetBrains Mono',monospace}
+  .activity-time {font-size:11px;color:var(--text2);margin-top:3px;font-family:'JetBrains Mono'}
 
-  /* SECTIONS */
-  .section-title {font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--lime);margin-bottom:16px}
+  .section-title {font-family:'Bebas Neue';font-size:24px;letter-spacing:1px;color:var(--lime);margin-bottom:16px}
   .section-sub {font-size:12px;color:var(--text2);margin-bottom:14px;text-transform:uppercase;letter-spacing:1px}
   .section-flex {display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px}
-  .section-flex .section-title {margin-bottom:0}
-
-  /* CHART & ADMIN */
   .mini-chart {display:flex;align-items:flex-end;gap:4px;height:50px;margin-top:12px}
   .bar-col {flex:1;background:var(--lime);border-radius:3px 3px 0 0;opacity:.7;transition:opacity .2s;min-width:8px}
-  .bar-col:hover {opacity:1}
-  .admin-stats {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-  .stat-card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
-  .stat-card .s-num {font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--lime);line-height:1}
-  .stat-card .s-label {font-size:12px;color:var(--text2);margin-top:4px}
 
-  /* TOGGLES & TOAST */
   .email-toggle-box {background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:var(--radius-sm);padding:14px 16px;margin:12px 0}
   .email-toggle-box label {display:flex;align-items:flex-start;gap:12px;cursor:pointer}
   .email-toggle-box input[type=checkbox] {width:18px;height:18px;accent-color:var(--lime);margin-top:1px;flex-shrink:0}
-  .email-toggle-box .etb-title {font-size:14px;font-weight:600;margin-bottom:2px}
-  .email-toggle-box .etb-sub {font-size:12px;color:var(--text2);word-break:break-word}
-
+  
   .spinner {display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
   @keyframes spin {to {transform:rotate(360deg)}}
 
-  .toast {position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--lime);color:var(--black);padding:12px 24px;border-radius:30px;font-weight:600;font-size:14px;opacity:0;transition:all .3s ease;z-index:999;white-space:nowrap;max-width:88vw;text-align:center;pointer-events:none}
+  .toast {position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--lime);color:var(--black);padding:12px 24px;border-radius:30px;font-weight:600;font-size:14px;opacity:0;transition:all .3s ease;z-index:9999;white-space:nowrap;max-width:88vw;text-align:center;pointer-events:none}
   .toast.show {opacity:1;transform:translateX(-50%) translateY(0)}
 
-  /* PROFILE SETTINGS */
   .profile-header {display:flex;align-items:center;gap:16px;margin-bottom:24px}
   .profile-avatar-lg {width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:var(--black);flex-shrink:0;background-size:cover;background-position:center;position:relative;overflow:hidden;cursor:pointer;border:3px solid var(--border)}
   .profile-avatar-lg.admin {background:linear-gradient(135deg,var(--blue),var(--purple));color:white}
@@ -211,37 +149,45 @@
   .profile-avatar-lg .photo-edit-overlay {position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:18px;color:white}
   .profile-avatar-lg:hover .photo-edit-overlay {opacity:1}
   .photo-input {display:none}
-  .role-pill {display:inline-flex;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+
   .subpage-header {display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
   .subpage-back {background:var(--card);border:1px solid var(--border);color:var(--text);width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-  .subpage-back:hover {background:var(--card2)}
-  .subpage-title {font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:var(--lime)}
-  .form-group input.input-lg {padding:14px 16px;font-size:15px}
-
-  /* UTIL */
+  
   .flex-between {display:flex;justify-content:space-between;align-items:center}
   .text-muted {color:var(--text2);font-size:13px}
-  .text-lime {color:var(--lime)}
   .fw-600 {font-weight:600}
   .mono {font-family:'JetBrains Mono',monospace}
   .empty-state {text-align:center;padding:40px 20px;color:var(--text2)}
   .empty-state .empty-icon {font-size:48px;margin-bottom:12px;display:block}
-  .empty-state p {font-size:14px}
 
-  ::-webkit-scrollbar {width:4px;height:4px}
-  ::-webkit-scrollbar-track {background:transparent}
-  ::-webkit-scrollbar-thumb {background:var(--border);border-radius:2px}
-  @media(max-width:400px){
-    .metrics-grid,.admin-stats,.form-row {grid-template-columns:1fr}
-    .pin-box {width:40px;height:50px;font-size:18px}
-    .pin-wrap {gap:6px}
-    .content {padding:16px;padding-bottom:100px}
-  }
+  /* Full Screen Loader */
+  #global-loader {display:flex;position:fixed;inset:0;background:var(--black);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+  
+  @media(max-width:400px){ .metrics-grid,.admin-stats,.form-row{grid-template-columns:1fr} .pin-box{width:40px;height:50px;font-size:18px} .content{padding:16px;padding-bottom:100px} }
 </style>
 </head>
 <body>
 
-<div id="screen-splash" class="screen active">
+<div id="global-loader">
+  <div class="spinner" style="width:30px;height:30px;border-width:3px;border-top-color:var(--lime)"></div>
+  <div style="font-size:14px;color:var(--lime);font-family:'Bebas Neue';letter-spacing:1px">CONNECTING TO DATABASE...</div>
+</div>
+
+<div id="otp-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:2000;align-items:center;justify-content:center;padding:24px">
+  <div class="card" style="width:100%;max-width:360px;text-align:center;border:1px solid var(--lime)">
+    <div style="font-size:40px;margin-bottom:10px">📧</div>
+    <h3 style="margin-bottom:8px">ยืนยันอีเมลของคุณ</h3>
+    <p class="text-muted" style="font-size:13px;margin-bottom:20px">ระบบได้ส่งรหัส 6 หลักไปที่อีเมลของคุณแล้ว<br>(รหัสจำลองเพื่อทดสอบ: <b id="otp-hint" style="color:var(--lime)">000000</b>)</p>
+    <div class="pin-wrap" id="otp-input-wrap">
+      <input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric">
+    </div>
+    <p id="otp-error" style="color:var(--red);font-size:12px;margin:10px 0"></p>
+    <button class="btn btn-primary" id="btn-otp-verify" onclick="verifyOTP()">✅ ยืนยันและสมัครสมาชิก</button>
+    <button class="btn btn-ghost" style="margin-top:10px" onclick="document.getElementById('otp-overlay').style.display='none'">ยกเลิก</button>
+  </div>
+</div>
+
+<div id="screen-splash" class="screen">
   <div class="splash-logo">
     <span class="icon">🔥</span>
     <h1>FITFUEL</h1>
@@ -267,10 +213,10 @@
     </div>
     <div id="reg-step-1">
       <div class="form-group"><label>ชื่อ-นามสกุล *</label><input type="text" id="reg-name" placeholder="เช่น สมชาย ใจดี"></div>
-      <div class="form-group"><label>Email *</label><input type="email" id="reg-email" placeholder="your@email.com"><p class="field-hint">📧 ใช้รับรายงานและรีเซ็ต PIN</p></div>
+      <div class="form-group"><label>Email *</label><input type="email" id="reg-email" placeholder="your@email.com"><p class="field-hint">📧 ใช้รับรายงานและรับรหัสยืนยัน OTP</p></div>
       <div class="form-group"><label>Username *</label><input type="text" id="reg-username" placeholder="ตัวอักษรและตัวเลข"></div>
       <p class="error-msg" id="reg-err-1"></p>
-      <button class="btn btn-primary" onclick="regNext1()">ถัดไป →</button>
+      <button class="btn btn-primary" id="btn-reg-1" onclick="regNext1()">ถัดไป →</button>
     </div>
     <div id="reg-step-2" style="display:none">
       <div style="text-align:center;margin-bottom:20px">
@@ -280,13 +226,13 @@
       <div class="form-group">
         <label style="text-align:center">PIN 6 หลัก</label>
         <div class="pin-wrap" id="reg-pin-1">
-          <input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric">
         </div>
       </div>
       <div class="form-group">
         <label style="text-align:center">ยืนยัน PIN อีกครั้ง</label>
         <div class="pin-wrap" id="reg-pin-2">
-          <input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric">
         </div>
       </div>
       <p class="error-msg" id="reg-err-2"></p>
@@ -303,8 +249,12 @@
         <div class="form-group"><label>น้ำหนักเป้า (kg) *</label><input type="number" id="reg-target" placeholder="65" step="0.5"></div>
       </div>
       <div class="form-group"><label>เป้าหมายหลัก *</label><select id="reg-goal"><option value="">เลือก</option><option>ลดน้ำหนัก</option><option>เพิ่มกล้ามเนื้อ</option><option>รักษาน้ำหนัก</option><option>ปรับปรุงสุขภาพโดยรวม</option></select></div>
+      <div class="form-row">
+        <div class="form-group"><label>เป้าหมายการนอน (ชม.) *</label><input type="number" id="reg-sleep-target" placeholder="7.5" step="0.5" value="7.5"></div>
+        <div class="form-group"><label>เป้าออกกำลัง (นาที/สัปดาห์) *</label><input type="number" id="reg-ex-target" placeholder="150" step="10" value="150"></div>
+      </div>
       <p class="error-msg" id="reg-err-3"></p>
-      <button class="btn btn-primary" onclick="regSubmit()">🎉 สร้างบัญชี</button>
+      <button class="btn btn-primary" onclick="startEmailVerification()">📧 ยืนยัน Email เพื่อสร้างบัญชี</button>
       <button class="btn btn-ghost" style="margin-top:8px" onclick="regStep(2)">← กลับ</button>
     </div>
   </div>
@@ -321,11 +271,11 @@
     <div class="form-group">
       <label style="text-align:center">PIN 6 หลัก</label>
       <div class="pin-wrap" id="login-pin">
-        <input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric">
       </div>
     </div>
     <p class="error-msg" id="login-error"></p>
-    <button class="btn btn-primary" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <button class="btn btn-primary" id="btn-login" onclick="doLogin()">เข้าสู่ระบบ</button>
     <button class="btn btn-ghost" style="margin-top:6px" onclick="showScreen('forgot')">ลืม PIN?</button>
     <button class="btn btn-ghost" onclick="showScreen('register')">ยังไม่มีบัญชี? สมัครเลย →</button>
   </div>
@@ -342,7 +292,7 @@
       <div class="form-group"><label>Username</label><input type="text" id="forgot-user" placeholder="กรอก username"></div>
       <div class="form-group"><label>Email ที่ลงทะเบียน</label><input type="email" id="forgot-email" placeholder="your@email.com"></div>
       <p class="error-msg" id="forgot-err-1"></p>
-      <button class="btn btn-primary" onclick="forgotVerify()">✓ ตรวจสอบ</button>
+      <button class="btn btn-primary" id="btn-forgot-verify" onclick="forgotVerify()">✓ ตรวจสอบ</button>
     </div>
     <div id="forgot-step-2" style="display:none">
       <div style="background:rgba(200,240,0,.08);border:1px solid rgba(200,240,0,.3);border-radius:var(--radius-sm);padding:14px;margin-bottom:18px">
@@ -352,17 +302,17 @@
       <div class="form-group">
         <label style="text-align:center">PIN ใหม่</label>
         <div class="pin-wrap" id="forgot-pin-1">
-          <input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric">
         </div>
       </div>
       <div class="form-group">
         <label style="text-align:center">ยืนยัน PIN</label>
         <div class="pin-wrap" id="forgot-pin-2">
-          <input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]"><input class="pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric">
         </div>
       </div>
       <p class="error-msg" id="forgot-err-2"></p>
-      <button class="btn btn-primary" onclick="forgotReset()">🔓 รีเซ็ต PIN</button>
+      <button class="btn btn-primary" id="btn-forgot-reset" onclick="forgotReset()">🔓 รีเซ็ต PIN</button>
     </div>
   </div>
 </div>
@@ -384,33 +334,78 @@
 
 <script>
 // ════════════════════════════════════════════════════════════
-//  STORAGE (Clean start - no dummy data)
+//  SUPABASE DATABASE CONFIGURATION
 // ════════════════════════════════════════════════════════════
-const STORAGE_KEY = 'fitfuel_data_v7';
+const SUPABASE_URL = 'https://gyaptfiwxvruiorczbxv.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_phEtg4XZtjlbcz-xOz0Tjw_o-cQUJkf';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function loadData() {
-  try { const s=localStorage.getItem(STORAGE_KEY); if(s) return JSON.parse(s); } catch(e){}
-  return null;
-}
-function saveData() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({USERS, LOGS, ACTIVITIES})); } catch(e) { console.error(e); }
-}
-
-const DEFAULT_USERS = [];
-const DEFAULT_LOGS = [];
-const DEFAULT_ACTIVITIES = [];
-
-const _saved = loadData();
-let USERS = _saved?.USERS || JSON.parse(JSON.stringify(DEFAULT_USERS));
-let LOGS = _saved?.LOGS || JSON.parse(JSON.stringify(DEFAULT_LOGS));
-let ACTIVITIES = _saved?.ACTIVITIES || JSON.parse(JSON.stringify(DEFAULT_ACTIVITIES));
-
-USERS.forEach(u => { if(u.photo === undefined) u.photo = null; });
-saveData();
-
+const SESSION_KEY = 'fitfuel_session_uid';
+let USERS = [], LOGS = [], ACTIVITIES = [], RECOMMENDATIONS = [];
 let currentUser = null;
 let currentView = 'user';
 let currentPage = 'home';
+
+// ─── Data Mappers (JS CamelCase to SQL Snake_case) ───
+function mapUser(u) {
+  if(!u) return null;
+  return {
+    id: u.id, username: u.username, pin: u.pin, name: u.name, email: u.email,
+    age: u.age, gender: u.gender, height: u.height, targetWeight: u.target_weight,
+    goalType: u.goal_type, sleepTarget: u.sleep_target, weeklyExerciseTarget: u.weekly_exercise_target,
+    role: u.role, photo: u.photo, createdAt: u.created_at
+  };
+}
+function mapLog(l) {
+  return {
+    id: l.id, userId: l.user_id, date: l.date, weight: l.weight,
+    sleep: l.sleep_hours, water: l.water_liters, exercise: l.exercise_minute,
+    energyLevel: l.energy_level, createdAt: l.created_at
+  };
+}
+function mapRec(r) {
+  return {
+    id: r.id, logId: r.log_id, rectype: r.rectype, severity: r.severity,
+    message: r.message, action: r.action, icon: r.icon, createdAt: r.created_at
+  };
+}
+function mapAct(a) {
+  return {
+    id: a.id, type: a.type, target: a.target, userId: a.user_id,
+    actorId: a.actor_id, actorName: a.actor_name, msg: a.msg, timestamp: a.created_at
+  };
+}
+
+// Fetch all necessary data into memory
+async function loadAllData() {
+  const [uRes, lRes, rRes, aRes] = await Promise.all([
+    supabase.from('users').select('*'),
+    supabase.from('daily_logs').select('*'),
+    supabase.from('recommendations').select('*'),
+    supabase.from('activities').select('*').order('created_at', { ascending: false }).limit(200)
+  ]);
+  if(uRes.data) USERS = uRes.data.map(mapUser);
+  if(lRes.data) LOGS = lRes.data.map(mapLog);
+  if(rRes.data) RECOMMENDATIONS = rRes.data.map(mapRec);
+  if(aRes.data) ACTIVITIES = aRes.data.map(mapAct);
+}
+
+// Check auto-login on startup
+window.onload = async () => {
+  const savedUid = localStorage.getItem(SESSION_KEY);
+  if(savedUid) {
+    const { data } = await supabase.from('users').select('*').eq('id', savedUid).single();
+    if(data) {
+      currentUser = mapUser(data);
+      await loadAllData();
+      document.getElementById('global-loader').style.display = 'none';
+      enterApp();
+      return;
+    }
+  }
+  document.getElementById('global-loader').style.display = 'none';
+  showScreen('splash');
+};
 
 // ════════════════════════════════════════════════════════════
 //  PIN BEHAVIOR
@@ -421,16 +416,13 @@ function setupPinInputs(containerId) {
   const inputs = container.querySelectorAll('.pin-box');
   inputs.forEach((inp,i) => {
     inp.oninput = e => {
-      const v = e.target.value.replace(/[^0-9]/g,'');
-      e.target.value = v;
+      const v = e.target.value.replace(/[^0-9]/g,''); e.target.value = v;
       if(v) e.target.classList.add('filled'); else e.target.classList.remove('filled');
       if(v && i < inputs.length-1) inputs[i+1].focus();
     };
     inp.onkeydown = e => {
       if(e.key === 'Backspace' && !e.target.value && i > 0) {
-        inputs[i-1].focus();
-        inputs[i-1].value = '';
-        inputs[i-1].classList.remove('filled');
+        inputs[i-1].focus(); inputs[i-1].value = ''; inputs[i-1].classList.remove('filled');
       }
     };
     inp.onpaste = e => {
@@ -452,44 +444,60 @@ function clearPinInputs(containerId) {
   container.querySelectorAll('.pin-box').forEach(i => { i.value=''; i.classList.remove('filled'); });
 }
 
-['login-pin','reg-pin-1','reg-pin-2','forgot-pin-1','forgot-pin-2'].forEach(id => setupPinInputs(id));
+['login-pin','reg-pin-1','reg-pin-2','forgot-pin-1','forgot-pin-2','otp-input-wrap'].forEach(id => setupPinInputs(id));
 
 // ════════════════════════════════════════════════════════════
-//  ACTIVITY
+//  ACTIVITY (Database Insert)
 // ════════════════════════════════════════════════════════════
-function logActivity(type, msg, userId=null, target='log') {
-  ACTIVITIES.unshift({
-    id: 'a' + Date.now() + Math.random().toString(36).slice(2,5),
-    type, target, userId,
-    actorId: currentUser?.id || 'system',
-    actorName: currentUser?.name || 'System',
-    msg, timestamp: new Date().toISOString()
-  });
-  if(ACTIVITIES.length > 200) ACTIVITIES.length = 200;
-  saveData();
+async function logActivity(type, msg, userId=null, target='log') {
+  const dbAct = {
+    type, target, user_id: userId,
+    actor_id: currentUser?.id, actor_name: currentUser?.name || 'System', msg
+  };
+  const { data } = await supabase.from('activities').insert([dbAct]).select().single();
+  if(data) ACTIVITIES.unshift(mapAct(data));
 }
 
 // ════════════════════════════════════════════════════════════
-//  NAV / LOGIN (Case Insensitive)
+//  NAV / LOGIN 
 // ════════════════════════════════════════════════════════════
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
 }
-function logout() { currentUser = null; currentView = 'user'; showScreen('splash'); }
 
-function doLogin() {
+function logout() { 
+  currentUser = null; currentView = 'user'; 
+  localStorage.removeItem(SESSION_KEY);
+  showScreen('splash'); 
+}
+
+async function doLogin() {
   const u = document.getElementById('login-user').value.trim().toLowerCase();
   const pin = getPinValue('login-pin');
-  document.getElementById('login-error').textContent = '';
-  if(!u || pin.length !== 6) { document.getElementById('login-error').textContent = 'กรอก Username และ PIN ครบ 6 หลัก'; return; }
-  const usr = USERS.find(x => x.username.toLowerCase() === u && x.pin === pin);
-  if(!usr) { document.getElementById('login-error').textContent = 'Username หรือ PIN ไม่ถูกต้อง'; return; }
-  currentUser = usr;
-  currentView = 'user';
-  enterApp();
-  document.getElementById('login-user').value = '';
-  clearPinInputs('login-pin');
+  const err = document.getElementById('login-error');
+  const btn = document.getElementById('btn-login');
+  err.textContent = '';
+  
+  if(!u || pin.length !== 6) { err.textContent = 'กรอก Username และ PIN ครบ 6 หลัก'; return; }
+  
+  btn.innerHTML = '<span class="spinner"></span> กำลังเข้าสู่ระบบ...';
+  btn.disabled = true;
+
+  const { data, error } = await supabase.from('users').select('*').ilike('username', u).eq('pin', pin).single();
+  
+  if(data) {
+    currentUser = mapUser(data);
+    localStorage.setItem(SESSION_KEY, currentUser.id);
+    await loadAllData();
+    enterApp();
+    document.getElementById('login-user').value = '';
+    clearPinInputs('login-pin');
+  } else {
+    err.textContent = 'Username หรือ PIN ไม่ถูกต้อง';
+  }
+  btn.innerHTML = 'เข้าสู่ระบบ';
+  btn.disabled = false;
 }
 
 function enterApp() {
@@ -514,32 +522,42 @@ function updateAvatar() {
 }
 
 // ════════════════════════════════════════════════════════════
-//  FORGOT (Case Insensitive)
+//  FORGOT PIN
 // ════════════════════════════════════════════════════════════
 let _forgotUser = null;
-function forgotVerify() {
+async function forgotVerify() {
   const u = document.getElementById('forgot-user').value.trim().toLowerCase();
   const e = document.getElementById('forgot-email').value.trim().toLowerCase();
   const err = document.getElementById('forgot-err-1');
+  const btn = document.getElementById('btn-forgot-verify');
   err.textContent = '';
   if(!u || !e) { err.textContent = 'กรุณากรอกให้ครบ'; return; }
-  const usr = USERS.find(x => x.username.toLowerCase() === u && (x.email||'').toLowerCase() === e);
-  if(!usr) { err.textContent = 'ไม่พบบัญชีที่ตรงกัน'; return; }
-  _forgotUser = usr;
+  
+  btn.innerHTML = '<span class="spinner"></span> กำลังตรวจสอบ...'; btn.disabled = true;
+  const { data } = await supabase.from('users').select('*').ilike('username', u).ilike('email', e).single();
+  btn.innerHTML = '✓ ตรวจสอบ'; btn.disabled = false;
+
+  if(!data) { err.textContent = 'ไม่พบบัญชีที่ตรงกัน'; return; }
+  _forgotUser = mapUser(data);
   document.getElementById('forgot-step-1').style.display = 'none';
   document.getElementById('forgot-step-2').style.display = 'block';
   setTimeout(() => document.querySelector('#forgot-pin-1 .pin-box').focus(), 100);
 }
-function forgotReset() {
+
+async function forgotReset() {
   const p1 = getPinValue('forgot-pin-1');
   const p2 = getPinValue('forgot-pin-2');
   const err = document.getElementById('forgot-err-2');
+  const btn = document.getElementById('btn-forgot-reset');
   err.textContent = '';
   if(p1.length !== 6 || p2.length !== 6) { err.textContent = 'กรอก PIN ครบ 6 หลัก'; return; }
   if(p1 !== p2) { err.textContent = 'PIN ไม่ตรงกัน'; return; }
-  _forgotUser.pin = p1;
-  saveData();
-  logActivity('update', 'รีเซ็ต PIN ผ่านระบบลืมรหัส', _forgotUser.id, 'user');
+  
+  btn.innerHTML = '<span class="spinner"></span> กำลังรีเซ็ต...'; btn.disabled = true;
+  await supabase.from('users').update({pin: p1}).eq('id', _forgotUser.id);
+  await logActivity('update', 'รีเซ็ต PIN ผ่านระบบลืมรหัส', _forgotUser.id, 'user');
+  
+  btn.innerHTML = '🔓 รีเซ็ต PIN'; btn.disabled = false;
   showToast('🔓 รีเซ็ต PIN สำเร็จ!');
   clearPinInputs('forgot-pin-1'); clearPinInputs('forgot-pin-2');
   document.getElementById('forgot-user').value = ''; document.getElementById('forgot-email').value = '';
@@ -550,24 +568,33 @@ function forgotReset() {
 }
 
 // ════════════════════════════════════════════════════════════
-//  REGISTER (Case Insensitive)
+//  REGISTER & OTP VERIFICATION
 // ════════════════════════════════════════════════════════════
 let _regData = {};
+let currentOTP = '';
+
 function regStep(n) {
   [1, 2, 3].forEach(i => {
     document.getElementById('reg-step-' + i).style.display = (i === n) ? 'block' : 'none';
     document.getElementById('reg-tab-' + i).classList.toggle('active', i === n);
   });
 }
-function regNext1() {
+async function regNext1() {
   const name = document.getElementById('reg-name').value.trim();
   const email = document.getElementById('reg-email').value.trim();
   const username = document.getElementById('reg-username').value.trim();
   const err = document.getElementById('reg-err-1');
+  const btn = document.getElementById('btn-reg-1');
   if(!name || !email || !username) { err.textContent = 'กรุณากรอกให้ครบ'; return; }
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'รูปแบบ Email ไม่ถูกต้อง'; return; }
   if(/\s/.test(username) || username.length < 3) { err.textContent = 'Username อย่างน้อย 3 ตัว ไม่มีช่องว่าง'; return; }
-  if(USERS.find(u => u.username.toLowerCase() === username.toLowerCase())) { err.textContent = 'Username ถูกใช้แล้ว'; return; }
+  
+  btn.innerHTML = '<span class="spinner"></span> กำลังตรวจสอบ...'; btn.disabled = true;
+  const { data } = await supabase.from('users').select('id').ilike('username', username).single();
+  btn.innerHTML = 'ถัดไป →'; btn.disabled = false;
+
+  if(data) { err.textContent = 'Username ถูกใช้แล้ว'; return; }
+  
   err.textContent = '';
   _regData = { name, email, username };
   document.getElementById('reg-tab-2').disabled = false;
@@ -585,43 +612,91 @@ function regNext2() {
   document.getElementById('reg-tab-3').disabled = false;
   regStep(3);
 }
-function regSubmit() {
+
+async function startEmailVerification() {
   const age = parseInt(document.getElementById('reg-age').value);
   const gender = document.getElementById('reg-gender').value;
   const height = parseInt(document.getElementById('reg-height').value);
   const target = parseFloat(document.getElementById('reg-target').value);
   const goal = document.getElementById('reg-goal').value;
+  const sleepTarget = parseFloat(document.getElementById('reg-sleep-target').value);
+  const exTarget = parseInt(document.getElementById('reg-ex-target').value);
   const err = document.getElementById('reg-err-3');
   
-  if(!age || !gender || !height || !target || !goal) { err.textContent = 'กรุณากรอกให้ครบ'; return; }
+  if(!age || !gender || !height || !target || !goal || !sleepTarget || !exTarget) { err.textContent = 'กรุณากรอกให้ครบทุกช่อง'; return; }
   if(age < 10 || age > 100) { err.textContent = 'อายุไม่ถูกต้อง'; return; }
   if(height < 100 || height > 250) { err.textContent = 'ส่วนสูงไม่ถูกต้อง'; return; }
   if(target < 20 || target > 300) { err.textContent = 'น้ำหนักเป้าหมายไม่ถูกต้อง'; return; }
   err.textContent = '';
 
-  const isFirstUser = USERS.length === 0;
-  const assignRole = isFirstUser ? 'master' : 'user';
+  // Generate 6-digit OTP
+  currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
+  document.getElementById('otp-hint').textContent = currentOTP;
+  clearPinInputs('otp-input-wrap');
+  document.getElementById('otp-error').textContent = '';
+  
+  document.getElementById('otp-overlay').style.display = 'flex';
+  setTimeout(() => document.querySelector('#otp-input-wrap .pin-box').focus(), 100);
+}
 
-  const newUser = {
-    id: 'u' + Date.now(),
-    username: _regData.username,
+function verifyOTP() {
+    const entered = getPinValue('otp-input-wrap');
+    if(entered === currentOTP) {
+        document.getElementById('otp-error').textContent = '';
+        const btn = document.getElementById('btn-otp-verify');
+        btn.innerHTML = '<span class="spinner"></span> กำลังสร้างบัญชี...';
+        btn.disabled = true;
+        regSubmit();
+    } else {
+        document.getElementById('otp-error').textContent = '❌ รหัส OTP ไม่ถูกต้อง กรุณาลองใหม่';
+    }
+}
+
+async function regSubmit() {
+  const age = parseInt(document.getElementById('reg-age').value);
+  const gender = document.getElementById('reg-gender').value;
+  const height = parseInt(document.getElementById('reg-height').value);
+  const target = parseFloat(document.getElementById('reg-target').value);
+  const goal = document.getElementById('reg-goal').value;
+  const sleepTarget = parseFloat(document.getElementById('reg-sleep-target').value);
+  const exTarget = parseInt(document.getElementById('reg-ex-target').value);
+
+  // Check if first user to assign Master role
+  const { count } = await supabase.from('users').select('*', { count: 'exact', head: true });
+  const assignRole = count === 0 ? 'master' : 'user';
+
+  const dbUser = {
+    username: _regData.username.toLowerCase(),
     pin: _regData.pin,
     name: _regData.name,
-    email: _regData.email,
-    age, gender, height, targetWeight: target, goalType: goal,
-    role: assignRole, photo: null,
-    createdAt: new Date().toISOString()
+    email: _regData.email.toLowerCase(),
+    age, gender, height, target_weight: target, goal_type: goal,
+    sleep_target: sleepTarget, weekly_exercise_target: exTarget,
+    role: assignRole
   };
 
-  USERS.push(newUser);
-  saveData();
-  currentUser = newUser;
-  currentView = 'user';
-  logActivity('create', `สร้างบัญชีใหม่: ${newUser.name} (${assignRole})`, newUser.id, 'user');
-  showToast('🎉 ยินดีต้อนรับ ' + newUser.name.split(' ')[0] + '!');
+  const { data, error } = await supabase.from('users').insert([dbUser]).select().single();
+  
+  if (error) {
+     document.getElementById('otp-error').textContent = 'เกิดข้อผิดพลาด: ' + error.message;
+     const btn = document.getElementById('btn-otp-verify');
+     btn.innerHTML = '✅ ยืนยันและสมัครสมาชิก'; btn.disabled = false;
+     return;
+  }
+
+  currentUser = mapUser(data);
+  localStorage.setItem(SESSION_KEY, currentUser.id);
+  await loadAllData(); // Load fresh context
+  await logActivity('create', `สร้างบัญชีใหม่: ${currentUser.name} (${assignRole})`, currentUser.id, 'user');
+  
+  document.getElementById('otp-overlay').style.display = 'none';
+  const btn = document.getElementById('btn-otp-verify');
+  btn.innerHTML = '✅ ยืนยันและสมัครสมาชิก'; btn.disabled = false;
+
+  showToast('🎉 ยินดีต้อนรับ ' + currentUser.name.split(' ')[0] + '!');
   enterApp();
   
-  ['reg-name','reg-email','reg-username','reg-age','reg-height','reg-target'].forEach(id => { const e = document.getElementById(id); if(e) e.value=''; });
+  ['reg-name','reg-email','reg-username','reg-age','reg-height','reg-target','reg-sleep-target','reg-ex-target'].forEach(id => { const e = document.getElementById(id); if(e) e.value=''; });
   document.getElementById('reg-gender').value = ''; document.getElementById('reg-goal').value = '';
   clearPinInputs('reg-pin-1'); clearPinInputs('reg-pin-2');
   document.getElementById('reg-tab-2').disabled = true; document.getElementById('reg-tab-3').disabled = true;
@@ -629,7 +704,7 @@ function regSubmit() {
 }
 
 // ════════════════════════════════════════════════════════════
-//  CALCULATIONS
+//  CALCULATIONS & RECOMMENDATIONS ENGINE
 // ════════════════════════════════════════════════════════════
 function calcBMI(w, h) { return w / Math.pow(h/100, 2); }
 function bmiCategory(bmi) {
@@ -647,7 +722,8 @@ function calcHealthScore(log, user) {
   if(log.exercise < 15) s -= 20; else if(log.exercise < 30) s -= 10;
   return Math.max(0, s);
 }
-function getRecommendations(log, user, history=[]) {
+
+function generateRecommendations(log, user, history=[]) {
   const recs = [];
   const bmi = calcBMI(log.weight, user.height);
   const cat = bmiCategory(bmi);
@@ -655,14 +731,14 @@ function getRecommendations(log, user, history=[]) {
   else if(cat.risk === 'medium') recs.push({severity:'medium', icon:'💡', title:'น้ำหนักเกิน', msg:'BMI '+bmi.toFixed(1)+' เกินมาตรฐาน', action:'ลดของหวาน เครื่องดื่มน้ำตาลสูง เดิน 30 นาทีหลังอาหาร'});
   else if(bmi < 18.5) recs.push({severity:'medium', icon:'💡', title:'น้ำหนักน้อย', msg:'BMI '+bmi.toFixed(1)+' ต่ำกว่ามาตรฐาน', action:'เพิ่มแคลอรี่จากโปรตีน 1.6–2 g/kg + ฝึกเวท'});
   
-  if(log.sleep < 6) recs.push({severity:'high', icon:'⚠', title:'นอนน้อยเกินไป', msg:'นอนเพียง '+log.sleep+' ชม.', action:'ปิดมือถือก่อนนอน 1 ชม. นอนตื่นเวลาเดียวกันทุกวัน'});
-  else if(log.sleep < 7) recs.push({severity:'medium', icon:'💡', title:'การนอนยังไม่พอ', msg:'นอน '+log.sleep+' ชม.', action:'เลื่อนเวลานอนเร็วขึ้น 15 นาที/สัปดาห์'});
+  if(log.sleep < (user.sleepTarget || 7)) recs.push({severity:'high', icon:'⚠', title:'นอนน้อยเกินไป', msg:'นอนเพียง '+log.sleep+' ชม. (เป้าหมาย: '+(user.sleepTarget||7)+' ชม.)', action:'ปิดมือถือก่อนนอน 1 ชม. นอนตื่นเวลาเดียวกันทุกวัน'});
   
   if(log.water < 1.5) recs.push({severity:'high', icon:'⚠', title:'ดื่มน้ำน้อยมาก', msg:'ดื่ม '+log.water+' L', action:'พกขวด 1L ติดตัว ดื่มทุก 2 ชม.'});
   else if(log.water < 2) recs.push({severity:'medium', icon:'💡', title:'ควรดื่มน้ำเพิ่ม', msg:'ดื่ม '+log.water+' L', action:'ตั้งเตือนทุก 2 ชม.'});
   
-  if(log.exercise < 15) recs.push({severity:'high', icon:'⚠', title:'ออกกำลังกายน้อยมาก', msg:'ออกกำลังกาย '+log.exercise+' นาที', action:'เริ่มเดินเร็ว 20 นาที/วัน หรือ HIIT 10 นาที'});
-  else if(log.exercise < 30) recs.push({severity:'medium', icon:'💡', title:'ออกกำลังกายยังไม่พอ', msg:'ออกกำลังกาย '+log.exercise+' นาที', action:'เพิ่มทีละ 5 นาที/สัปดาห์'});
+  const targetExDaily = user.weeklyExerciseTarget ? Math.round(user.weeklyExerciseTarget / 7) : 30;
+  if(log.exercise < targetExDaily/2) recs.push({severity:'high', icon:'⚠', title:'ออกกำลังกายน้อยไป', msg:'วันนี้ออกกำลังกาย '+log.exercise+' นาที (เป้าเฉลี่ย: '+targetExDaily+' นาที/วัน)', action:'เริ่มเดินเร็ว 20 นาที หรือ HIIT 10 นาที'});
+  else if(log.exercise < targetExDaily) recs.push({severity:'medium', icon:'💡', title:'ออกกำลังกายยังไม่ถึงเป้า', msg:'ออกกำลังกาย '+log.exercise+' นาที', action:'เพิ่มความเข้มข้นอีกนิด'});
   
   if(history.length >= 3) {
     const r3 = history.slice(0,3);
@@ -673,6 +749,7 @@ function getRecommendations(log, user, history=[]) {
   if(recs.length === 0) recs.push({severity:'low', icon:'🎉', title:'ทำได้ดีมาก!', msg:'สุขภาพอยู่ในเกณฑ์ดีเยี่ยม', action:'ความสม่ำเสมอคือกุญแจสำคัญ'});
   return recs;
 }
+
 function calcProgress(user) {
   const logs = LOGS.filter(l => l.userId === user.id).sort((a,b) => a.date.localeCompare(b.date));
   if(!logs.length) return null;
@@ -698,9 +775,9 @@ function calcProgress(user) {
     avgSleep: (recent.reduce((s,l)=>s+l.sleep,0)/recent.length).toFixed(1),
     avgWater: (recent.reduce((s,l)=>s+l.water,0)/recent.length).toFixed(1),
     avgExercise: (recent.reduce((s,l)=>s+l.exercise,0)/recent.length).toFixed(0),
-    sleepGoal: Math.min(100, (recent.reduce((s,l)=>s+l.sleep,0)/recent.length/7.5)*100).toFixed(0),
+    sleepGoal: Math.min(100, (recent.reduce((s,l)=>s+l.sleep,0)/recent.length/(user.sleepTarget||7.5))*100).toFixed(0),
     waterGoal: Math.min(100, (recent.reduce((s,l)=>s+l.water,0)/recent.length/2.5)*100).toFixed(0),
-    exerciseGoal: Math.min(100, (recent.reduce((s,l)=>s+l.exercise,0)/recent.length/30)*100).toFixed(0),
+    exerciseGoal: Math.min(100, (recent.reduce((s,l)=>s+l.exercise,0)/recent.length/((user.weeklyExerciseTarget||150)/7))*100).toFixed(0),
   };
 }
 
@@ -813,7 +890,13 @@ function renderUserHome() {
   const bmi = calcBMI(latest.weight, currentUser.height);
   const cat = bmiCategory(bmi);
   const score = calcHealthScore(latest, currentUser);
-  const recs = getRecommendations(latest, currentUser, logs);
+  
+  // ERD Compliance: Fetch Recommendations directly from table
+  const savedRecs = RECOMMENDATIONS.filter(r => r.logId === latest.id);
+  const recsHTML = savedRecs.length > 0 
+        ? savedRecs.map(r => `<div class="rec-box ${r.severity}"><div class="rec-label">${r.icon || '📌'} ${r.rectype}</div><p>${r.message}</p>${r.action ? `<div class="rec-action">📋 ${r.action}</div>` : ''}</div>`).join('')
+        : generateRecommendations(latest, currentUser, logs).map(r => `<div class="rec-box ${r.severity}"><div class="rec-label">${r.icon} ${r.title}</div><p>${r.msg}</p>${r.action ? `<div class="rec-action">📋 ${r.action}</div>` : ''}</div>`).join('');
+
   const bmiPct = Math.min(100, Math.max(0, ((bmi - 15) / (40 - 15)) * 100));
   const scoreColor = score >= 80 ? '#C8F000' : score >= 50 ? '#FF8C42' : '#FF4757';
   const riskClass = cat.risk === 'low' ? 'risk-low' : cat.risk === 'medium' ? 'risk-medium' : 'risk-high';
@@ -862,8 +945,8 @@ function renderUserHome() {
       </div>
       <div class="mini-chart">${bars}</div>
     </div>
-    <div class="section-title" style="margin-top:8px">คำแนะนำ</div>
-    ${recs.map(r => `<div class="rec-box ${r.severity}"><div class="rec-label">${r.icon} ${r.title}</div><p>${r.msg}</p>${r.action ? `<div class="rec-action">📋 ${r.action}</div>` : ''}</div>`).join('')}
+    <div class="section-title" style="margin-top:8px">คำแนะนำจากระบบ</div>
+    ${recsHTML}
   `;
 }
 
@@ -882,6 +965,11 @@ function renderUserLog() {
         <div class="form-group"><label>ดื่มน้ำ (ลิตร)</label><input type="number" id="log-water" placeholder="2.0" step="0.1" inputmode="decimal"></div>
         <div class="form-group"><label>ออกกำลังกาย (นาที)</label><input type="number" id="log-exercise" placeholder="30" inputmode="numeric"></div>
       </div>
+      <div class="form-group">
+        <label>ระดับพลังงานวันนี้ (1-10)</label>
+        <input type="range" id="log-energy" min="1" max="10" step="1" value="5" style="width:100%; accent-color:var(--lime); margin-top:8px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;margin-top:5px;color:var(--text2)"><span>1 (เหนื่อยล้า)</span><span>10 (สดชื่นเต็มที่)</span></div>
+      </div>
       <div class="email-toggle-box">
         <label>
           <input type="checkbox" id="send-email-chk" ${hasEmail ? 'checked' : ''} ${hasEmail ? '' : 'disabled'}>
@@ -894,8 +982,8 @@ function renderUserLog() {
       <p class="error-msg" id="log-error"></p>
       <button class="btn btn-primary" id="log-btn" onclick="submitLog()">💾 บันทึกข้อมูล</button>
     </div>
-    <div class="section-sub">เป้าหมายที่แนะนำ</div>
-    ${[['BMI เป้าหมาย','18.5–24.9'],['นอนหลับ','7–9 ชั่วโมง'],['ดื่มน้ำ','2–3 ลิตร'],['ออกกำลังกาย','30+ นาที/วัน']].map(([k,v]) =>
+    <div class="section-sub">เป้าหมายที่ตั้งไว้</div>
+    ${[['เป้าหมายออกกำลังกาย', (currentUser.weeklyExerciseTarget||150) + ' นาที/สัปดาห์'],['เป้าหมายการนอน', (currentUser.sleepTarget||7.5) + ' ชั่วโมง/วัน'],['BMI เป้าหมาย','18.5–24.9']].map(([k,v]) =>
     `<div class="card-sm" style="margin-bottom:10px"><div class="flex-between"><span class="text-muted">${k}</span><span class="text-lime fw-600">${v}</span></div></div>`).join('')}
   `;
 }
@@ -906,6 +994,7 @@ async function submitLog() {
   const sleep = parseFloat(document.getElementById('log-sleep').value);
   const water = parseFloat(document.getElementById('log-water').value);
   const exercise = parseInt(document.getElementById('log-exercise').value);
+  const energy = parseInt(document.getElementById('log-energy').value);
   const sendEmail = document.getElementById('send-email-chk')?.checked;
   const err = document.getElementById('log-error');
   const btn = document.getElementById('log-btn');
@@ -916,15 +1005,32 @@ async function submitLog() {
   if(water < 0 || water > 20) { err.textContent = 'ปริมาณน้ำไม่ถูกต้อง'; return; }
   err.textContent = '';
 
-  const newLog = {id: 'l' + Date.now(), userId: currentUser.id, date, weight, sleep, water, exercise, createdAt: new Date().toISOString()};
-  LOGS.push(newLog);
-  saveData();
-  logActivity('create', `บันทึก Log: ${date} (${weight}kg, ${sleep}h sleep)`, currentUser.id, 'log');
+  btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
+
+  const dbLog = { user_id: currentUser.id, date, weight, sleep_hours: sleep, water_liters: water, exercise_minute: exercise, energy_level: energy };
+  const { data: logData, error } = await supabase.from('daily_logs').insert([dbLog]).select().single();
+
+  if(error) {
+     err.textContent = 'เกิดข้อผิดพลาด: ' + error.message;
+     btn.innerHTML = '💾 บันทึกข้อมูล'; btn.disabled = false;
+     return;
+  }
+
+  const mappedLog = mapLog(logData);
+  LOGS.push(mappedLog);
+  await logActivity('create', `บันทึก Log: ${date} (${weight}kg, พลังงาน ${energy}/10)`, currentUser.id, 'log');
+
+  // Insert Recommendations into DB Table
+  const recsToSave = generateRecommendations(mappedLog, currentUser, LOGS.filter(l=>l.userId===currentUser.id));
+  const dbRecs = recsToSave.map(r => ({
+      log_id: logData.id, rectype: r.title, severity: r.severity, message: r.msg, action: r.action, icon: r.icon
+  }));
+  const { data: recData } = await supabase.from('recommendations').insert(dbRecs).select();
+  if(recData) recData.forEach(r => RECOMMENDATIONS.push(mapRec(r)));
 
   if(sendEmail && currentUser.email) {
-    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>กำลังสร้างรายงาน...';
-    await generateAndOpenEmail(newLog, currentUser);
-    btn.disabled = false; btn.innerHTML = '💾 บันทึกข้อมูล';
+    btn.innerHTML = '<span class="spinner"></span>กำลังสร้างรายงาน...';
+    await generateAndOpenEmail(mappedLog, currentUser);
   } else {
     showToast('✅ บันทึกข้อมูลสำเร็จ!');
     setTimeout(() => navTo('home', document.querySelectorAll('#main-nav .nav-item')[0]), 600);
@@ -936,7 +1042,7 @@ async function generateAndOpenEmail(log, user) {
   const cat = bmiCategory(parseFloat(bmi));
   const score = calcHealthScore(log, user);
   const userLogs = LOGS.filter(l => l.userId === user.id).sort((a,b) => b.date.localeCompare(a.date));
-  const recs = getRecommendations(log, user, userLogs);
+  const recs = generateRecommendations(log, user, userLogs);
   let aiBody = '';
   try {
     const prompt = `คุณคือ AI โค้ชสุขภาพของ FitFuel
@@ -948,7 +1054,7 @@ async function generateAndOpenEmail(log, user) {
   } catch(e) { aiBody = recs.map(r => r.title + ': ' + r.msg).join('\n\n'); }
   
   const subject = encodeURIComponent(`🔥 [FitFuel] รายงาน ${log.date} | Score: ${score}/100`);
-  const body = `สวัสดีคุณ ${user.name} 👋\n\nรายงานสุขภาพประจำวันจาก FitFuel\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📅 วันที่: ${log.date}\n⚖️ น้ำหนัก: ${log.weight} kg\n📊 BMI: ${bmi} — ${cat.label}\n💯 Health Score: ${score}/100\n🌙 นอนหลับ: ${log.sleep} ชม.\n💧 ดื่มน้ำ: ${log.water} L\n🏃 ออกกำลังกาย: ${log.exercise} นาที\n🎯 เป้าหมาย: ${user.goalType}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 รายงานจาก AI Coach\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${aiBody}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\nFitFuel Health Tracking`;
+  const body = `สวัสดีคุณ ${user.name} 👋\n\nรายงานสุขภาพประจำวันจาก FitFuel\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📅 วันที่: ${log.date}\n⚖️ น้ำหนัก: ${log.weight} kg\n📊 BMI: ${bmi} — ${cat.label}\n💯 Health Score: ${score}/100\n🌙 นอนหลับ: ${log.sleep} ชม.\n💧 ดื่มน้ำ: ${log.water} L\n🏃 ออกกำลังกาย: ${log.exercise} นาที\n⚡ พลังงาน: ${log.energyLevel}/10\n🎯 เป้าหมาย: ${user.goalType}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 รายงานจาก AI Coach\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n${aiBody}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━\nFitFuel Health Tracking`;
   window.location.href = `mailto:${user.email}?subject=${subject}&body=${encodeURIComponent(body)}`;
   showToast('📧 เปิด Email Client แล้ว!');
   setTimeout(() => navTo('home', document.querySelectorAll('#main-nav .nav-item')[0]), 1200);
@@ -1023,6 +1129,7 @@ function renderUserHistory() {
           <div class="log-stat">🌙 <span>${l.sleep}h</span></div>
           <div class="log-stat">💧 <span>${l.water}L</span></div>
           <div class="log-stat">🏃 <span>${l.exercise}m</span></div>
+          <div class="log-stat">⚡ <span>${l.energyLevel||'-'}/10</span></div>
         </div>
       </div>`;
     }).join('')}`;
@@ -1092,7 +1199,7 @@ function renderUserProfile() {
 // ════════════════════════════════════════════════════════════
 //  PHOTO UPLOAD
 // ════════════════════════════════════════════════════════════
-document.getElementById('photo-input').addEventListener('change', function(e) {
+document.getElementById('photo-input').addEventListener('change', async function(e) {
   const file = e.target.files[0];
   if(!file) return;
   if(!file.type.startsWith('image/')) { showToast('❌ กรุณาเลือกไฟล์รูปภาพ'); return; }
@@ -1101,7 +1208,7 @@ document.getElementById('photo-input').addEventListener('change', function(e) {
   const reader = new FileReader();
   reader.onload = function(ev) {
     const img = new Image();
-    img.onload = function() {
+    img.onload = async function() {
       const canvas = document.createElement('canvas');
       const max = 400;
       let w = img.width, h = img.height;
@@ -1111,12 +1218,14 @@ document.getElementById('photo-input').addEventListener('change', function(e) {
       ctx.drawImage(img, 0, 0, w, h);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
       
+      showToast('🔄 กำลังอัปโหลดรูป...');
+      await supabase.from('users').update({photo: dataUrl}).eq('id', currentUser.id);
+      
       currentUser.photo = dataUrl;
       const u = USERS.find(x => x.id === currentUser.id);
       if(u) u.photo = dataUrl;
       
-      saveData();
-      logActivity('update', 'เปลี่ยนรูปโปรไฟล์', currentUser.id, 'user');
+      await logActivity('update', 'เปลี่ยนรูปโปรไฟล์', currentUser.id, 'user');
       updateAvatar();
       showToast('✅ เปลี่ยนรูปโปรไฟล์สำเร็จ!');
       renderApp(currentPage);
@@ -1173,50 +1282,58 @@ function renderSettingsInfo() {
         <div class="form-group"><label>ส่วนสูง (cm)</label><input type="number" id="info-height" value="${currentUser.height}"></div>
         <div class="form-group"><label>น้ำหนักเป้า (kg)</label><input type="number" id="info-target" step="0.5" value="${currentUser.targetWeight||''}"></div>
       </div>
-      <div class="form-group"><label>เป้าหมาย</label>
+      <div class="form-row">
+        <div class="form-group"><label>เป้าการนอน (ชม.)</label><input type="number" id="info-sleep-target" step="0.5" value="${currentUser.sleepTarget||7.5}"></div>
+        <div class="form-group"><label>เป้าออกกำลัง (นาที)</label><input type="number" id="info-ex-target" step="10" value="${currentUser.weeklyExerciseTarget||150}"></div>
+      </div>
+      <div class="form-group"><label>เป้าหมายหลัก</label>
         <select id="info-goal">
           ${['ลดน้ำหนัก','เพิ่มกล้ามเนื้อ','รักษาน้ำหนัก','ปรับปรุงสุขภาพโดยรวม'].map(g => `<option ${currentUser.goalType===g?'selected':''}>${g}</option>`).join('')}
         </select>
       </div>
       <p class="error-msg" id="info-error"></p>
-      <button class="btn btn-primary" onclick="saveInfo()">💾 บันทึก</button>
+      <button class="btn btn-primary" id="btn-save-info" onclick="saveInfo()">💾 บันทึก</button>
     </div>
   `;
 }
 
-function removePhoto() {
+async function removePhoto() {
   if(!confirm('ลบรูปโปรไฟล์?')) return;
+  await supabase.from('users').update({photo: null}).eq('id', currentUser.id);
   currentUser.photo = null;
   const u = USERS.find(x => x.id === currentUser.id);
   if(u) u.photo = null;
-  saveData();
-  logActivity('update', 'ลบรูปโปรไฟล์', currentUser.id, 'user');
+  await logActivity('update', 'ลบรูปโปรไฟล์', currentUser.id, 'user');
   updateAvatar();
   showToast('🗑 ลบรูปแล้ว');
   renderApp('settings-info');
 }
 
-function saveInfo() {
+async function saveInfo() {
   const name = document.getElementById('info-name').value.trim();
   const age = parseInt(document.getElementById('info-age').value);
   const gender = document.getElementById('info-gender').value;
   const height = parseInt(document.getElementById('info-height').value);
   const target = parseFloat(document.getElementById('info-target').value);
   const goal = document.getElementById('info-goal').value;
+  const sleepTarget = parseFloat(document.getElementById('info-sleep-target').value);
+  const exTarget = parseInt(document.getElementById('info-ex-target').value);
   const err = document.getElementById('info-error');
+  const btn = document.getElementById('btn-save-info');
   
-  if(!name || !age || !gender || !height || !target || !goal) { err.textContent = 'กรุณากรอกให้ครบ'; return; }
-  if(age < 10 || age > 100) { err.textContent = 'อายุไม่ถูกต้อง'; return; }
-  if(height < 100 || height > 250) { err.textContent = 'ส่วนสูงไม่ถูกต้อง'; return; }
-  if(target < 20 || target > 300) { err.textContent = 'น้ำหนักเป้าหมายไม่ถูกต้อง'; return; }
+  if(!name || !age || !gender || !height || !target || !goal || !sleepTarget || !exTarget) { err.textContent = 'กรุณากรอกให้ครบ'; return; }
   err.textContent = '';
   
+  btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
+
+  const updates = {name, age, gender, height, target_weight: target, goal_type: goal, sleep_target: sleepTarget, weekly_exercise_target: exTarget};
+  await supabase.from('users').update(updates).eq('id', currentUser.id);
+
   const u = USERS.find(x => x.id === currentUser.id);
-  Object.assign(u, {name, age, gender, height, targetWeight: target, goalType: goal});
-  Object.assign(currentUser, {name, age, gender, height, targetWeight: target, goalType: goal});
+  Object.assign(u, {name, age, gender, height, targetWeight: target, goalType: goal, sleepTarget, weeklyExerciseTarget: exTarget});
+  Object.assign(currentUser, {name, age, gender, height, targetWeight: target, goalType: goal, sleepTarget, weeklyExerciseTarget: exTarget});
   
-  saveData();
-  logActivity('update', 'แก้ไขข้อมูลส่วนตัว', currentUser.id, 'user');
+  await logActivity('update', 'แก้ไขข้อมูลส่วนตัว', currentUser.id, 'user');
   updateAvatar();
   showToast('✅ บันทึกสำเร็จ');
   setTimeout(() => navTo('profile'), 500);
@@ -1250,15 +1367,16 @@ function renderSettingsEmail() {
         </div>
       </div>
       <p class="error-msg" id="email-error"></p>
-      <button class="btn btn-primary" onclick="saveNewEmail()">🔐 ยืนยันและเปลี่ยน Email</button>
+      <button class="btn btn-primary" id="btn-save-email" onclick="saveNewEmail()">🔐 ยืนยันและเปลี่ยน Email</button>
     </div>
   `;
 }
 
-function saveNewEmail() {
+async function saveNewEmail() {
   const newEmail = document.getElementById('new-email').value.trim().toLowerCase();
   const oldPin = getPinValue('change-pin-old');
   const err = document.getElementById('email-error');
+  const btn = document.getElementById('btn-save-email');
   err.textContent = '';
   
   if(!newEmail) { err.textContent = 'กรุณากรอก Email ใหม่'; return; }
@@ -1267,13 +1385,16 @@ function saveNewEmail() {
   if(oldPin !== currentUser.pin) { err.textContent = '❌ PIN ไม่ถูกต้อง'; return; }
   if(newEmail === currentUser.email) { err.textContent = 'Email ใหม่เหมือนกับเก่า'; return; }
   
+  btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
+
+  await supabase.from('users').update({email: newEmail}).eq('id', currentUser.id);
+
   const oldEmail = currentUser.email;
   currentUser.email = newEmail;
   const u = USERS.find(x => x.id === currentUser.id);
   if(u) u.email = newEmail;
   
-  saveData();
-  logActivity('update', `เปลี่ยน Email: ${oldEmail || '(ว่าง)'} → ${newEmail}`, currentUser.id, 'user');
+  await logActivity('update', `เปลี่ยน Email: ${oldEmail || '(ว่าง)'} → ${newEmail}`, currentUser.id, 'user');
   showToast('✅ เปลี่ยน Email สำเร็จ');
   setTimeout(() => navTo('profile'), 700);
 }
@@ -1312,16 +1433,17 @@ function renderSettingsPin() {
       </div>
 
       <p class="error-msg" id="pin-error"></p>
-      <button class="btn btn-primary" onclick="saveNewPin()">🔐 ยืนยันและเปลี่ยน PIN</button>
+      <button class="btn btn-primary" id="btn-save-pin" onclick="saveNewPin()">🔐 ยืนยันและเปลี่ยน PIN</button>
     </div>
   `;
 }
 
-function saveNewPin() {
+async function saveNewPin() {
   const oldPin = getPinValue('change-pin-old');
   const newPin = getPinValue('change-pin-new');
   const newPin2 = getPinValue('change-pin-new2');
   const err = document.getElementById('pin-error');
+  const btn = document.getElementById('btn-save-pin');
   err.textContent = '';
   
   if(oldPin.length !== 6) { err.textContent = 'กรอก PIN ปัจจุบันครบ 6 หลัก'; return; }
@@ -1330,12 +1452,15 @@ function saveNewPin() {
   if(newPin !== newPin2) { err.textContent = 'PIN ใหม่ไม่ตรงกัน'; return; }
   if(newPin === oldPin) { err.textContent = 'PIN ใหม่เหมือนกับเก่า'; return; }
   
+  btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
+
+  await supabase.from('users').update({pin: newPin}).eq('id', currentUser.id);
+
   currentUser.pin = newPin;
   const u = USERS.find(x => x.id === currentUser.id);
   if(u) u.pin = newPin;
-  saveData();
   
-  logActivity('update', 'เปลี่ยน PIN', currentUser.id, 'user');
+  await logActivity('update', 'เปลี่ยน PIN', currentUser.id, 'user');
   showToast('✅ เปลี่ยน PIN สำเร็จ');
   setTimeout(() => navTo('profile'), 700);
 }
@@ -1494,7 +1619,7 @@ function renderAdminAlerts() {
     const u = USERS.find(x => x.id === l.userId); if(!u || u.role !== 'user') return null;
     const score = calcHealthScore(l, u);
     const userLogs = LOGS.filter(x => x.userId === u.id).sort((a,b) => b.date.localeCompare(a.date));
-    const recs = getRecommendations(l, u, userLogs).filter(r => r.severity === 'high');
+    const recs = generateRecommendations(l, u, userLogs).filter(r => r.severity === 'high');
     return {l, u, score, recs};
   }).filter(x => x && x.score < 70).sort((a,b) => a.score - b.score);
   
@@ -1593,45 +1718,49 @@ function renderMasterBackup() {
         <button class="btn-export" style="justify-content:center;padding:12px" onclick="exportActivityCSV()">📥 Activity.csv (${ACTIVITIES.length} รายการ)</button>
       </div>
     </div>
-    <div class="card">
-      <div class="section-sub">Backup ทั้งระบบ</div>
-      <button class="btn-export" style="justify-content:center;padding:12px;width:100%" onclick="exportFullBackup()">💾 Full Backup (.json)</button>
-    </div>
     <div class="card" style="border-color:rgba(255,71,87,.3)">
       <div class="section-sub" style="color:var(--red)">⚠ อันตราย</div>
-      <button class="btn-danger" style="width:100%" onclick="resetSystem()">🗑 รีเซ็ตข้อมูลทั้งหมด</button>
+      <button class="btn-danger" style="width:100%" onclick="resetSystem()">🗑 รีเซ็ตข้อมูลทั้งหมดใน Database</button>
     </div>
   `;
 }
 
-function setRole(userId, newRole) {
+async function setRole(userId, newRole) {
   const u = USERS.find(x => x.id === userId);
   if(!u) { showToast('❌ ไม่พบบัญชี'); return; }
   if(!confirm(`เปลี่ยน role ของ ${u.name}\nจาก ${u.role.toUpperCase()} → ${newRole.toUpperCase()}?`)) return;
+  
+  await supabase.from('users').update({role: newRole}).eq('id', userId);
+  
   const oldRole = u.role;
   u.role = newRole;
-  saveData();
-  logActivity('role', `เปลี่ยน Role: ${u.name} (${oldRole.toUpperCase()} → ${newRole.toUpperCase()})`, userId, 'user');
+  await logActivity('role', `เปลี่ยน Role: ${u.name} (${oldRole.toUpperCase()} → ${newRole.toUpperCase()})`, userId, 'user');
   showToast(`✅ ${u.name} เป็น ${newRole.toUpperCase()} แล้ว`);
   renderApp('roles');
 }
 
-function deleteUser(userId) {
+async function deleteUser(userId) {
   const u = USERS.find(x => x.id === userId);
   if(!u) return;
   if(!confirm(`ลบบัญชี ${u.name} และ logs ทั้งหมด?\nการกระทำนี้ไม่สามารถย้อนกลับได้`)) return;
+  
+  await supabase.from('users').delete().eq('id', userId);
+  
   USERS = USERS.filter(x => x.id !== userId);
   LOGS = LOGS.filter(l => l.userId !== userId);
-  saveData();
-  logActivity('delete', `ลบบัญชี: ${u.name}`, userId, 'user');
+  await logActivity('delete', `ลบบัญชี: ${u.name}`, userId, 'user');
   showToast('🗑 ลบบัญชีสำเร็จ');
   renderApp('roles');
 }
 
-function resetSystem() {
+async function resetSystem() {
   if(!confirm('⚠ รีเซ็ตข้อมูลทั้งระบบ?')) return;
-  if(!confirm('แน่ใจอีกครั้ง? ข้อมูลทั้งหมดจะหาย')) return;
-  localStorage.removeItem(STORAGE_KEY);
+  if(!confirm('แน่ใจอีกครั้ง? ข้อมูลทั้งหมดจะถูกลบออกจาก Database')) return;
+  
+  // ลบข้อมูล users ทั้งหมดจะทำให้ข้อมูลอื่นๆ ลบตามอัตโนมัติ (CASCADE)
+  await supabase.from('users').delete().neq('username', 'impossible_string');
+  
+  localStorage.removeItem(SESSION_KEY);
   showToast('🔄 กำลังรีเซ็ต...');
   setTimeout(() => location.reload(), 1000);
 }
@@ -1657,8 +1786,8 @@ function exportUserCSV(userId) {
     ['น้ำหนักเป้า', u.targetWeight||''], ['เป้าหมาย', u.goalType],
     ['สร้างบัญชี', u.createdAt],
     [], ['── Daily Logs ──'],
-    ['วันที่','น้ำหนัก','BMI','BMI Cat','Score','นอน','น้ำ','ออกกำลังกาย','บันทึกเมื่อ'],
-    ...userLogs.map(l => { const bmi = calcBMI(l.weight, u.height); return [l.date, l.weight, bmi.toFixed(1), bmiCategory(bmi).label, calcHealthScore(l,u), l.sleep, l.water, l.exercise, l.createdAt||'']; })
+    ['วันที่','น้ำหนัก','BMI','BMI Cat','Score','นอน','น้ำ','ออกกำลังกาย','พลังงาน','บันทึกเมื่อ'],
+    ...userLogs.map(l => { const bmi = calcBMI(l.weight, u.height); return [l.date, l.weight, bmi.toFixed(1), bmiCategory(bmi).label, calcHealthScore(l,u), l.sleep, l.water, l.exercise, l.energyLevel||'-', l.createdAt||'']; })
   ];
   downloadCSV(`FitFuel_${u.username}_${new Date().toISOString().split('T')[0]}.csv`, rows);
   showToast('📥 ดาวน์โหลดสำเร็จ!');
@@ -1675,8 +1804,8 @@ function exportAllUsersCSV() {
 function exportAllLogsCSV() {
   const rows = [
     ['FitFuel - All Logs'], ['Generated', new Date().toLocaleString('th-TH')], [],
-    ['LogID','UserID','Username','ชื่อ','วันที่','น้ำหนัก','BMI','BMI Cat','Score','นอน','น้ำ','ออกกำลังกาย','บันทึกเมื่อ'],
-    ...[...LOGS].sort((a,b)=>b.date.localeCompare(a.date)).map(l => { const u = USERS.find(x => x.id === l.userId); if(!u) return null; const bmi = calcBMI(l.weight, u.height); return [l.id, u.id, u.username, u.name, l.date, l.weight, bmi.toFixed(1), bmiCategory(bmi).label, calcHealthScore(l,u), l.sleep, l.water, l.exercise, l.createdAt||'']; }).filter(Boolean)
+    ['LogID','UserID','Username','ชื่อ','วันที่','น้ำหนัก','BMI','BMI Cat','Score','นอน','น้ำ','ออกกำลังกาย','พลังงาน','บันทึกเมื่อ'],
+    ...[...LOGS].sort((a,b)=>b.date.localeCompare(a.date)).map(l => { const u = USERS.find(x => x.id === l.userId); if(!u) return null; const bmi = calcBMI(l.weight, u.height); return [l.id, u.id, u.username, u.name, l.date, l.weight, bmi.toFixed(1), bmiCategory(bmi).label, calcHealthScore(l,u), l.sleep, l.water, l.exercise, l.energyLevel||'-', l.createdAt||'']; }).filter(Boolean)
   ];
   downloadCSV(`FitFuel_All_Logs_${new Date().toISOString().split('T')[0]}.csv`, rows);
   showToast('📥 ดาวน์โหลด Logs.csv!');
@@ -1689,14 +1818,6 @@ function exportActivityCSV() {
   ];
   downloadCSV(`FitFuel_Activity_${new Date().toISOString().split('T')[0]}.csv`, rows);
   showToast('📥 ดาวน์โหลด Activity.csv!');
-}
-function exportFullBackup() {
-  const data = {USERS, LOGS, ACTIVITIES, exportedAt: new Date().toISOString()};
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = `FitFuel_Backup_${new Date().toISOString().split('T')[0]}.json`; a.click();
-  URL.revokeObjectURL(url);
-  showToast('💾 Backup สำเร็จ!');
 }
 
 // ════════════════════════════════════════════════════════════

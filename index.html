@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root {--lime:#C8F000;--lime-dark:#a8cc00;--gold:#FFD700;--black:#0A0A0A;--dark:#111214;--card:#1A1C1F;--card2:#222428;--border:#2A2D32;--muted:#555A62;--text:#E8EBF0;--text2:#9BA3AF;--red:#FF4757;--orange:#FF8C42;--teal:#2DD4BF;--blue:#3B82F6;--purple:#A78BFA;--radius:16px;--radius-sm:10px}
+  :root {--lime:#C8F000;--lime-dark:#a8cc00;--gold:#FFD700;--black:#0A0A0A;--dark:#111214;--card:#1A1C1F;--card2:#222428;--border:#2A2D32;--muted:#555A62;--text:#E8EBF0;--text2:#9BA3AF;--red:#FF4757;--orange:#FF8C42;--teal:#2DD4BF;--blue:#3B82F6;--purple:#A78BFA;--aqua:#38bdf8;--radius:16px;--radius-sm:10px}
   * {margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body {max-width:100%;overflow-x:hidden}
   body {font-family:'DM Sans',sans-serif;background:var(--black);color:var(--text);min-height:100vh}
@@ -36,7 +36,7 @@
   .form-group {margin-bottom:14px; width:100%}
   .form-group label {display:block;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
   .form-group input, .form-group select {width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);padding:13px 16px;border-radius:var(--radius-sm);font-size:15px;box-sizing:border-box;max-width:100%}
-  
+
   /* ─── DATE INPUT FIX ─── */
   .form-group input[type=date] {
     font-family:'JetBrains Mono',monospace;
@@ -59,7 +59,7 @@
   @media(max-width:380px){
     .form-group input[type=date]{font-size:13px;padding:12px 8px}
   }
-  
+
   .form-group input:focus, .form-group select:focus {outline:none;border-color:var(--lime)}
   .form-row {display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .error-msg {color:var(--red);font-size:13px;margin-top:8px;text-align:center;min-height:18px}
@@ -69,7 +69,7 @@
   .pin-box {width:44px;height:54px;text-align:center;font-size:22px;font-weight:600;background:var(--card);border:2px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'JetBrains Mono'}
   .pin-box:focus {outline:none;border-color:var(--lime);transform:scale(1.05)}
   .pin-box.filled {border-color:var(--lime)}
-  
+
   .topbar {display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--dark);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
   .topbar-logo {font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--lime)}
   .avatar {width:36px;height:36px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);cursor:pointer;background-size:cover;background-position:center}
@@ -104,13 +104,13 @@
   .metric-chip::before {content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.07}
   .metric-chip.lime::before {background:var(--lime)} .metric-chip.teal::before {background:var(--teal)}
   .metric-chip.orange::before {background:var(--orange)} .metric-chip.blue::before {background:var(--blue)}
-  .metric-chip.purple::before {background:var(--purple)}
+  .metric-chip.purple::before {background:var(--purple)} .metric-chip.aqua::before {background:var(--aqua)}
   .metric-chip .chip-label {font-size:11px;color:var(--text2);text-transform:uppercase;margin-bottom:6px}
   .metric-chip .chip-value {font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1}
   .metric-chip .chip-unit {font-size:12px;color:var(--text2);margin-top:2px}
   .metric-chip.lime .chip-value{color:var(--lime)} .metric-chip.teal .chip-value{color:var(--teal)}
   .metric-chip.orange .chip-value{color:var(--orange)} .metric-chip.blue .chip-value{color:var(--blue)}
-  .metric-chip.purple .chip-value{color:var(--purple)}
+  .metric-chip.purple .chip-value{color:var(--purple)} .metric-chip.aqua .chip-value{color:var(--aqua)}
 
   .bmi-card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
   .bmi-number {font-family:'Bebas Neue';font-size:80px;line-height:1}
@@ -180,7 +180,7 @@
 
   .subpage-header {display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
   .subpage-back {background:var(--card);border:1px solid var(--border);color:var(--text);width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-  
+
   .flex-between {display:flex;justify-content:space-between;align-items:center}
   .text-muted {color:var(--text2);font-size:13px}
   .fw-600 {font-weight:600}
@@ -241,7 +241,11 @@
     user-select:none;
     -webkit-user-drag:none;
     max-width:none;
+    /* ── FIX: hide until positioned correctly ── */
+    opacity:0;
+    transition:opacity .2s ease;
   }
+  .cropper-stage img.ready {opacity:1}
   .cropper-circle {
     position:absolute;
     inset:0;
@@ -343,7 +347,7 @@
   }
 
   #global-loader {display:flex;position:fixed;inset:0;background:var(--black);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px}
-  
+
   @media(max-width:400px){ .metrics-grid,.admin-stats,.form-row{grid-template-columns:1fr} .pin-box{width:40px;height:50px;font-size:18px} .content{padding:16px;padding-bottom:100px} }
 </style>
 </head>
@@ -658,17 +662,17 @@ async function submitOnboarding() {
      return;
   }
   currentUser = mapUser(data);
-  await loadAllData(); 
+  await loadAllData();
   await logActivity('create', `สร้างบัญชีใหม่: ${currentUser.name} (${assignRole})`, currentUser.id, 'user');
   showToast('🎉 ยินดีต้อนรับ ' + currentUser.name.split(' ')[0] + '!');
   enterApp();
 }
-async function logout() { 
+async function logout() {
   document.getElementById('global-loader').style.display = 'flex';
   await supaClient.auth.signOut();
-  currentUser = null; currentUserAuth = null; currentView = 'user'; 
+  currentUser = null; currentUserAuth = null; currentView = 'user';
   document.getElementById('global-loader').style.display = 'none';
-  showScreen('splash'); 
+  showScreen('splash');
 }
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -739,20 +743,18 @@ function generateRecommendations(log, user, history=[]) {
   if(cat.risk === 'high') recs.push({severity:'high', icon:'⚠', title:'BMI โรคอ้วน', msg:'BMI '+bmi.toFixed(1)+' อยู่ในระดับโรคอ้วน', action:'ลดน้ำหนัก 0.5–1 kg/สัปดาห์ ลดแคลอรี่ 500 kcal/วัน + ออกกำลังกาย 150 นาที/สัปดาห์'});
   else if(cat.risk === 'medium') recs.push({severity:'medium', icon:'💡', title:'น้ำหนักเกิน', msg:'BMI '+bmi.toFixed(1)+' เกินมาตรฐาน', action:'ลดของหวาน เครื่องดื่มน้ำตาลสูง เดิน 30 นาทีหลังอาหาร'});
   else if(bmi < 18.5) recs.push({severity:'medium', icon:'💡', title:'น้ำหนักน้อย', msg:'BMI '+bmi.toFixed(1)+' ต่ำกว่ามาตรฐาน', action:'เพิ่มแคลอรี่จากโปรตีน 1.6–2 g/kg + ฝึกเวท'});
-  
+
   if(log.sleep < (user.sleepTarget || 7)) recs.push({severity:'high', icon:'⚠', title:'นอนน้อยเกินไป', msg:'นอนเพียง '+log.sleep+' ชม. (เป้าหมาย: '+(user.sleepTarget||7)+' ชม.)', action:'ปิดมือถือก่อนนอน 1 ชม. นอนตื่นเวลาเดียวกันทุกวัน'});
-  
+
   if(log.water < 1.5) recs.push({severity:'high', icon:'⚠', title:'ดื่มน้ำน้อยมาก', msg:'ดื่ม '+log.water+' L', action:'พกขวด 1L ติดตัว ดื่มทุก 2 ชม.'});
   else if(log.water < 2) recs.push({severity:'medium', icon:'💡', title:'ควรดื่มน้ำเพิ่ม', msg:'ดื่ม '+log.water+' L', action:'ตั้งเตือนทุก 2 ชม.'});
-  
+
   const targetExDaily = user.weeklyExerciseTarget ? Math.round(user.weeklyExerciseTarget / 7) : 30;
   if(log.exercise < targetExDaily/2) recs.push({severity:'high', icon:'⚠', title:'ออกกำลังกายน้อยไป', msg:'วันนี้ออกกำลังกาย '+log.exercise+' นาที (เป้าเฉลี่ย: '+targetExDaily+' นาที/วัน)', action:'เริ่มเดินเร็ว 20 นาที หรือ HIIT 10 นาที'});
   else if(log.exercise < targetExDaily) recs.push({severity:'medium', icon:'💡', title:'ออกกำลังกายยังไม่ถึงเป้า', msg:'ออกกำลังกาย '+log.exercise+' นาที', action:'เพิ่มความเข้มข้นอีกนิด'});
-  
-  // ─── ENERGY-BASED RECOMMENDATIONS ───
+
   if(log.energyLevel) {
     if(log.energyLevel <= 3) {
-      // Low energy
       if(log.exercise >= 60) {
         recs.push({severity:'high', icon:'⚠', title:'พลังงานต่ำ + ออกกำลังกายหนัก', msg:'พลังงาน '+log.energyLevel+'/10 + ออกกำลังกาย '+log.exercise+' นาที อาจเข้าข่าย Overtraining', action:'พักผ่อน 1-2 วัน เพิ่มการนอนและโภชนาการ'});
       } else if(log.sleep < 7) {
@@ -763,8 +765,6 @@ function generateRecommendations(log, user, history=[]) {
     } else if(log.energyLevel >= 8 && log.exercise < targetExDaily/2) {
       recs.push({severity:'low', icon:'🔥', title:'พลังงานดีเยี่ยม!', msg:'พลังงาน '+log.energyLevel+'/10 แต่ออกกำลังกายแค่ '+log.exercise+' นาที', action:'เป็นโอกาสดี! เพิ่มความเข้มข้นการออกกำลังกายได้เลย'});
     }
-    
-    // Trend: energy declining
     if(history.length >= 3) {
       const recent3Energy = history.slice(0,3).map(l=>l.energyLevel).filter(e=>e!=null);
       if(recent3Energy.length === 3 && recent3Energy.every((e,i,arr)=>i===0||e<arr[i-1]) && recent3Energy[0] < recent3Energy[recent3Energy.length-1]-2) {
@@ -842,7 +842,6 @@ function renderApp(page) {
     else if(page === 'activity') el.innerHTML = renderAdminActivity();
     else if(page === 'backup') el.innerHTML = renderMasterBackup();
   }
-  // Setup energy slider listener if present
   const energySlider = document.getElementById('log-energy');
   if(energySlider) {
     const updateEnergy = () => {
@@ -923,20 +922,20 @@ function modeSwitchHTML() {
 }
 
 // ════════════════════════════════════════════════════════════
-//  USER HOME
+//  USER HOME  ── 6-chip grid, always complete
 // ════════════════════════════════════════════════════════════
 function renderUserHome() {
   const logs = LOGS.filter(l => l.userId === currentUser.id).sort((a,b) => b.date.localeCompare(a.date));
   const latest = logs[0];
   const switcher = modeSwitchHTML();
   if(!latest) return `${switcher}<div class="section-title">สวัสดี, ${currentUser.name.split(' ')[0]} 👋</div><div class="empty-state"><span class="empty-icon">📊</span><p>ยังไม่มีข้อมูล<br>กดแท็บ <b>Log</b> เพื่อเริ่ม!</p></div>`;
-  
+
   const bmi = calcBMI(latest.weight, currentUser.height);
   const cat = bmiCategory(bmi);
   const score = calcHealthScore(latest, currentUser);
-  
+
   const savedRecs = RECOMMENDATIONS.filter(r => r.logId === latest.id);
-  const recsHTML = savedRecs.length > 0 
+  const recsHTML = savedRecs.length > 0
         ? savedRecs.map(r => `<div class="rec-box ${r.severity}"><div class="rec-label">${r.icon || '📌'} ${r.rectype}</div><p>${r.message}</p>${r.action ? `<div class="rec-action">📋 ${r.action}</div>` : ''}</div>`).join('')
         : generateRecommendations(latest, currentUser, logs).map(r => `<div class="rec-box ${r.severity}"><div class="rec-label">${r.icon} ${r.title}</div><p>${r.msg}</p>${r.action ? `<div class="rec-action">📋 ${r.action}</div>` : ''}</div>`).join('');
 
@@ -950,13 +949,11 @@ function renderUserHome() {
     return `<div class="bar-col" style="height:${h}%"></div>`;
   }).join('');
   const prog = calcProgress(currentUser);
-  
-  // Energy display
-  const energyHTML = latest.energyLevel ? (() => {
-    const info = energyInfo(latest.energyLevel);
-    return `<div class="metric-chip purple"><div class="chip-label">⚡ พลังงานวันนี้</div><div class="chip-value" style="color:${info.color}">${latest.energyLevel}<span style="font-size:14px;color:var(--text2)">/10</span></div><div class="chip-unit">${info.emoji} ${info.label}</div></div>`;
-  })() : '';
-  
+
+  // ── Energy (always show, default 5 if missing) ──
+  const ei = energyInfo(latest.energyLevel || 5);
+  const energyVal = latest.energyLevel || 5;
+
   return `${switcher}
     <div class="section-title">สวัสดี, ${currentUser.name.split(' ')[0]} 👋</div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">ข้อมูลล่าสุด: ${latest.date}</p>
@@ -976,11 +973,36 @@ function renderUserHome() {
     </div>
     ${prog && prog.streak > 1 ? `<div class="streak-box"><div class="streak-num">${prog.streak}</div><div><div class="fw-600" style="font-size:14px">🔥 Streak ${prog.streak} วันต่อเนื่อง!</div><div class="text-muted" style="font-size:12px">รักษาวินัยให้ต่อเนื่อง</div></div></div>` : ''}
     <div class="metrics-grid">
-      <div class="metric-chip lime"><div class="chip-label">น้ำหนัก</div><div class="chip-value">${latest.weight}</div><div class="chip-unit">กิโลกรัม</div></div>
-      <div class="metric-chip teal"><div class="chip-label">BMI</div><div class="chip-value">${bmi.toFixed(1)}</div><div class="chip-unit">${cat.label}</div></div>
-      <div class="metric-chip orange"><div class="chip-label">นอนหลับ</div><div class="chip-value">${latest.sleep}</div><div class="chip-unit">ชั่วโมง</div></div>
-      <div class="metric-chip blue"><div class="chip-label">ออกกำลังกาย</div><div class="chip-value">${latest.exercise}</div><div class="chip-unit">นาที</div></div>
-      ${energyHTML}
+      <div class="metric-chip lime">
+        <div class="chip-label">น้ำหนัก</div>
+        <div class="chip-value">${latest.weight}</div>
+        <div class="chip-unit">กิโลกรัม</div>
+      </div>
+      <div class="metric-chip teal">
+        <div class="chip-label">BMI</div>
+        <div class="chip-value">${bmi.toFixed(1)}</div>
+        <div class="chip-unit">${cat.label}</div>
+      </div>
+      <div class="metric-chip orange">
+        <div class="chip-label">นอนหลับ</div>
+        <div class="chip-value">${latest.sleep}</div>
+        <div class="chip-unit">ชั่วโมง</div>
+      </div>
+      <div class="metric-chip blue">
+        <div class="chip-label">ออกกำลังกาย</div>
+        <div class="chip-value">${latest.exercise}</div>
+        <div class="chip-unit">นาที</div>
+      </div>
+      <div class="metric-chip aqua">
+        <div class="chip-label">💧 ดื่มน้ำ</div>
+        <div class="chip-value">${latest.water}</div>
+        <div class="chip-unit">ลิตร</div>
+      </div>
+      <div class="metric-chip purple">
+        <div class="chip-label">⚡ พลังงาน</div>
+        <div class="chip-value" style="color:${ei.color}">${energyVal}<span style="font-size:14px;color:var(--text2)">/10</span></div>
+        <div class="chip-unit">${ei.emoji} ${ei.label}</div>
+      </div>
     </div>
     <div class="bmi-card">
       <h3 style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px">BMI Indicator</h3>
@@ -1000,7 +1022,7 @@ function renderUserHome() {
 }
 
 // ════════════════════════════════════════════════════════════
-//  USER LOG (with improved date input + energy)
+//  USER LOG
 // ════════════════════════════════════════════════════════════
 function renderUserLog() {
   const today = new Date().toISOString().split('T')[0];
@@ -1016,8 +1038,6 @@ function renderUserLog() {
         <div class="form-group"><label>ดื่มน้ำ (ลิตร)</label><input type="number" id="log-water" placeholder="2.0" step="0.1" inputmode="decimal"></div>
         <div class="form-group"><label>ออกกำลังกาย (นาที)</label><input type="number" id="log-exercise" placeholder="30" inputmode="numeric"></div>
       </div>
-      
-      <!-- ─── ENERGY LEVEL ─── -->
       <div class="form-group">
         <label>⚡ ระดับพลังงานวันนี้</label>
         <div class="energy-slider-box">
@@ -1032,7 +1052,6 @@ function renderUserLog() {
           <p class="field-hint" style="margin-top:8px">💡 ระบบจะใช้ค่านี้วิเคราะห์ overtraining, deload week, และคำแนะนำเฉพาะตัว</p>
         </div>
       </div>
-      
       <p class="error-msg" id="log-error"></p>
       <button class="btn btn-primary" id="log-btn" onclick="submitLog()">💾 บันทึกข้อมูล</button>
     </div>
@@ -1052,7 +1071,7 @@ async function submitLog() {
   const energy = parseInt(document.getElementById('log-energy').value);
   const err = document.getElementById('log-error');
   const btn = document.getElementById('log-btn');
-  
+
   if(!date || isNaN(weight) || isNaN(sleep) || isNaN(water) || isNaN(exercise)) { err.textContent = 'กรุณากรอกข้อมูลให้ครบ'; return; }
   if(weight < 20 || weight > 300) { err.textContent = 'น้ำหนักไม่ถูกต้อง'; return; }
   if(sleep < 0 || sleep > 24) { err.textContent = 'ชั่วโมงนอนไม่ถูกต้อง'; return; }
@@ -1092,7 +1111,7 @@ function renderUserProgress() {
   if(!p) return `<div class="empty-state"><p>ไม่สามารถคำนวณได้</p></div>`;
   const dirClass = p.weightDelta < 0 ? 'var(--lime)' : p.weightDelta > 0 ? 'var(--orange)' : 'var(--text2)';
   const goalDir = currentUser.goalType === 'ลดน้ำหนัก' ? (p.weightDelta < 0 ? '✅' : '⚠') : (currentUser.goalType === 'เพิ่มกล้ามเนื้อ' ? (p.weightDelta > 0 ? '✅' : '⚠') : '─');
-  
+
   return `
     <div class="section-title">🎯 Progress Tracking</div>
     <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">เป้าหมาย: <b style="color:var(--lime)">${currentUser.goalType}</b></p>
@@ -1171,7 +1190,7 @@ function renderUserProfile() {
   const role = currentUser.role;
   const avatarClass = role === 'master' ? 'master' : role === 'admin' ? 'admin' : '';
   const photoStyle = currentUser.photo ? `style="background-image:url('${currentUser.photo}')"` : '';
-  
+
   return `
     <div class="profile-header">
       <div class="profile-avatar-lg ${avatarClass}" ${photoStyle} onclick="document.getElementById('photo-input').click()">
@@ -1221,49 +1240,67 @@ document.getElementById('photo-input').addEventListener('change', function(e) {
 });
 
 // ════════════════════════════════════════════════════════════
-//  IMAGE CROPPER (Discord-style)
+//  IMAGE CROPPER — TIMING BUG FIXED
+//  Strategy: show overlay FIRST → double-rAF ensures the
+//  browser has laid out the modal → clientWidth is real
 // ════════════════════════════════════════════════════════════
 let cropImg = null;
 let cropX = 0, cropY = 0, cropScale = 1;
 let cropDragging = false, cropDragStart = {x:0, y:0};
 let cropBaseScale = 1;
-const CROPPER_PREVIEW_SIZE = 280; // visual size in DOM (will be set to actual)
 
 function openCropper(dataUrl) {
   const overlay = document.getElementById('cropper-overlay');
-  const img = document.getElementById('cropper-img');
+  const imgEl   = document.getElementById('cropper-img');
+
+  // ── 1. Show overlay FIRST so the DOM has real pixel dimensions ──
+  imgEl.classList.remove('ready');   // hide image until positioned
+  overlay.classList.add('show');
+
+  // ── 2. Load image object ──
   cropImg = new Image();
   cropImg.onload = () => {
-    img.src = dataUrl;
-    // Calculate base scale to "cover" the stage
-    const stage = document.getElementById('cropper-stage');
-    const stageW = stage.clientWidth;
-    cropBaseScale = Math.max(stageW / cropImg.naturalWidth, stageW / cropImg.naturalHeight);
-    cropX = 0; cropY = 0; cropScale = 1;
-    document.getElementById('cropper-zoom').value = 1;
-    applyCropTransform();
-    overlay.classList.add('show');
+    imgEl.src = dataUrl;
+
+    // ── 3. Double rAF: 1st = layout commit, 2nd = paint ──
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const stage  = document.getElementById('cropper-stage');
+        const stageW = stage.clientWidth || stage.offsetWidth;
+
+        // Scale so the image fully covers the circular crop area
+        cropBaseScale = Math.max(
+          stageW / cropImg.naturalWidth,
+          stageW / cropImg.naturalHeight
+        );
+        cropX = 0; cropY = 0; cropScale = 1;
+        document.getElementById('cropper-zoom').value = 1;
+        applyCropTransform();
+
+        // ── 4. Reveal image only after position is correct ──
+        imgEl.classList.add('ready');
+      });
+    });
   };
   cropImg.src = dataUrl;
 }
 
 function applyCropTransform() {
-  const img = document.getElementById('cropper-img');
+  const imgEl = document.getElementById('cropper-img');
   if(!cropImg) return;
   const totalScale = cropBaseScale * cropScale;
-  const w = cropImg.naturalWidth * totalScale;
+  const w = cropImg.naturalWidth  * totalScale;
   const h = cropImg.naturalHeight * totalScale;
-  img.style.width = w + 'px';
-  img.style.height = h + 'px';
-  img.style.transform = `translate(calc(-50% + ${cropX}px), calc(-50% + ${cropY}px))`;
+  imgEl.style.width  = w + 'px';
+  imgEl.style.height = h + 'px';
+  imgEl.style.transform = `translate(calc(-50% + ${cropX}px), calc(-50% + ${cropY}px))`;
 }
 
 function constrainCrop() {
-  // Optional: prevent image from showing edges outside circle
-  const stage = document.getElementById('cropper-stage');
+  const stage  = document.getElementById('cropper-stage');
   const stageW = stage.clientWidth;
   const totalScale = cropBaseScale * cropScale;
-  const w = cropImg.naturalWidth * totalScale;
+  const w = cropImg.naturalWidth  * totalScale;
   const h = cropImg.naturalHeight * totalScale;
   const maxX = (w - stageW) / 2;
   const maxY = (h - stageW) / 2;
@@ -1310,55 +1347,58 @@ function resetCropper() {
 }
 function cancelCropper() {
   document.getElementById('cropper-overlay').classList.remove('show');
+  document.getElementById('cropper-img').classList.remove('ready');
   cropImg = null;
 }
+
 async function applyCropper() {
   if(!cropImg) return;
   const btn = document.getElementById('cropper-apply-btn');
   btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
-  
+
   try {
-    const stage = document.getElementById('cropper-stage');
+    const stage  = document.getElementById('cropper-stage');
     const stageW = stage.clientWidth;
     const OUTPUT_SIZE = 400;
-    
+
     const canvas = document.createElement('canvas');
-    canvas.width = OUTPUT_SIZE;
+    canvas.width  = OUTPUT_SIZE;
     canvas.height = OUTPUT_SIZE;
     const ctx = canvas.getContext('2d');
-    
-    // Compute the source rectangle in the original image
+
     const totalScale = cropBaseScale * cropScale;
-    const displayW = cropImg.naturalWidth * totalScale;
-    const displayH = cropImg.naturalHeight * totalScale;
-    const imgLeft = stageW/2 - displayW/2 + cropX;
-    const imgTop = stageW/2 - displayH/2 + cropY;
-    
+    const displayW   = cropImg.naturalWidth  * totalScale;
+    const displayH   = cropImg.naturalHeight * totalScale;
+
+    // Top-left corner of the displayed image in stage coordinates
+    const imgLeft = stageW / 2 - displayW / 2 + cropX;
+    const imgTop  = stageW / 2 - displayH / 2 + cropY;
+
+    // Map the visible stage area back to source pixels
     const sx = -imgLeft / totalScale;
-    const sy = -imgTop / totalScale;
-    const sw = stageW / totalScale;
-    const sh = stageW / totalScale;
-    
-    // Apply circular clip
+    const sy = -imgTop  / totalScale;
+    const sw = stageW   / totalScale;
+    const sh = stageW   / totalScale;
+
+    // Circular clip
     ctx.save();
     ctx.beginPath();
-    ctx.arc(OUTPUT_SIZE/2, OUTPUT_SIZE/2, OUTPUT_SIZE/2, 0, Math.PI*2);
+    ctx.arc(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, 0, Math.PI * 2);
     ctx.clip();
     ctx.drawImage(cropImg, sx, sy, sw, sh, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
     ctx.restore();
-    
+
     const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-    
-    // Save to database
+
     await supaClient.from('users').update({photo: dataUrl}).eq('id', currentUser.id);
     currentUser.photo = dataUrl;
     const u = USERS.find(x => x.id === currentUser.id);
     if(u) u.photo = dataUrl;
-    
+
     await logActivity('update', 'เปลี่ยนรูปโปรไฟล์', currentUser.id, 'user');
     updateAvatar();
     showToast('✅ เปลี่ยนรูปโปรไฟล์สำเร็จ!');
-    
+
     cancelCropper();
     btn.innerHTML = 'ใช้';
     btn.disabled = false;

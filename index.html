@@ -1018,56 +1018,65 @@ function cancelCropper(){document.getElementById('cropper-overlay').classList.re
 
 async function applyCropper(){
   if(!cropImg){showToast('❌ ไม่พบรูปภาพ');return;}
-  const btn=document.getElementById('cropper-apply-btn');
-  btn.innerHTML='<span class="spinner"></span> กำลังบันทึก...';btn.disabled=true;
-  try{
-    const stage=document.getElementById('cropper-stage');
-    const stageW=stage.clientWidth;
-    if(!stageW||!cropImg.naturalWidth)throw new Error('ขนาดยังไม่พร้อม');
+  const btn = document.getElementById('cropper-apply-btn');
+  btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
 
-    // ── ใช้ state ของเราเอง ไม่อ่าน DOM ──
-    const ts=cropBaseScale*cropScale;
-    const dW=cropImg.naturalWidth*ts;
-    const dH=cropImg.naturalHeight*ts;
-    const imgLeft=stageW/2-dW/2+cropX;
-    const imgTop=stageW/2-dH/2+cropY;
+  try {
+    const stage = document.getElementById('cropper-stage');
+    const stageW = stage.clientWidth;
+    if(!stageW || !cropImg.naturalWidth) throw new Error('ขนาดยังไม่พร้อม');
 
-    console.log('[Crop]',{stageW,natW:cropImg.naturalWidth,natH:cropImg.naturalHeight,ts,dW,dH,imgLeft,imgTop,cropX,cropY});
+    // 1. คำนวณ Scale ปัจจุบันเทียบกับรูปจริง
+    const currentScale = cropBaseScale * cropScale;
 
-    const OUTPUT=400;
-    const k=OUTPUT/stageW;
-    const canvas=document.createElement('canvas');
-    canvas.width=OUTPUT;canvas.height=OUTPUT;
-    const ctx=canvas.getContext('2d');
+    // 2. หาจุดกึ่งกลางของพื้นที่ที่จะ Crop บนรูปจริง (Natural Pixels)
+    // เลื่อนจากจุดกึ่งกลางรูป ไปตามค่าการลาก (cropX, cropY) ที่เราขยับ
+    const centerX = (cropImg.naturalWidth / 2) - (cropX / currentScale);
+    const centerY = (cropImg.naturalHeight / 2) - (cropY / currentScale);
 
-    // พื้นขาว — ป้องกันรูปเป็นดำถ้าคำนวณพลาด
-    ctx.fillStyle='#ffffff';
-    ctx.fillRect(0,0,OUTPUT,OUTPUT);
+    // 3. หารัศมีของวงกลมที่จะตัดบนรูปจริง
+    // เนื่องจากวงกลมกว้างเท่ากับ StageW รัศมีบนหน้าจอคือ StageW / 2
+    const naturalRadius = (stageW / 2) / currentScale;
 
-    // วาดภาพตรงๆ ไม่ต้อง clip — CSS จะตัดเป็นวงกลมให้เอง
-    ctx.drawImage(cropImg,
-      0,0,cropImg.naturalWidth,cropImg.naturalHeight,
-      imgLeft*k,imgTop*k,dW*k,dH*k);
+    // 4. เตรียม Canvas สำหรับ Output 400x400
+    const OUTPUT = 400;
+    const canvas = document.createElement('canvas');
+    canvas.width = OUTPUT; canvas.height = OUTPUT;
+    const ctx = canvas.getContext('2d');
 
-    const dataUrl=canvas.toDataURL('image/jpeg',0.9);
-    console.log('[Crop] dataUrl length:',dataUrl.length);
-    if(!dataUrl||dataUrl.length<3000)throw new Error('รูปที่ตัดออกมาว่างเปล่า');
+    // พื้นหลังสีขาว
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, OUTPUT, OUTPUT);
 
-    const{error}=await supaClient.from('users').update({photo:dataUrl}).eq('id',currentUser.id);
-    if(error)throw error;
+    // 5. วาดรูปจากจุดกึ่งกลางที่เราคำนวณได้
+    ctx.drawImage(
+      cropImg,
+      centerX - naturalRadius, centerY - naturalRadius, // จุดเริ่มต้นตัดบนรูปจริง (x, y)
+      naturalRadius * 2, naturalRadius * 2,           // ขนาดกว้าง x สูง ที่จะดึงมาจากรูปจริง
+      0, 0,                                          // วางที่พิกเซล 0,0 ของ Canvas
+      OUTPUT, OUTPUT                                 // ยืดรูปให้เต็มขนาด 400x400
+    );
 
-    currentUser.photo=dataUrl;
-    const u=USERS.find(x=>x.id===currentUser.id);if(u)u.photo=dataUrl;
-    await logActivity('update','เปลี่ยนรูปโปรไฟล์',currentUser.id,'user');
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+    // ส่งขึ้น Supabase
+    const { error } = await supaClient.from('users').update({ photo: dataUrl }).eq('id', currentUser.id);
+    if(error) throw error;
+
+    // อัปเดตข้อมูลในแอป
+    currentUser.photo = dataUrl;
+    const u = USERS.find(x => x.id === currentUser.id); if(u) u.photo = dataUrl;
+    
+    await logActivity('update', 'เปลี่ยนรูปโปรไฟล์', currentUser.id, 'user');
     updateAvatar();
     showToast('✅ เปลี่ยนรูปโปรไฟล์สำเร็จ!');
     cancelCropper();
-    btn.innerHTML='ใช้';btn.disabled=false;
     renderApp(currentPage);
-  }catch(e){
-    console.error('Crop error:',e);
-    showToast('❌ '+e.message);
-    btn.innerHTML='ใช้';btn.disabled=false;
+  } catch(e) {
+    console.error('Crop error:', e);
+    showToast('❌ ' + e.message);
+  } finally {
+    btn.innerHTML = 'ใช้'; btn.disabled = false;
   }
 }
 

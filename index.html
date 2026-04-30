@@ -45,7 +45,7 @@
   .pin-box.filled {border-color:var(--lime)}
   .topbar {display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--dark);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
   .topbar-logo {font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--lime)}
-  .avatar {width:36px;height:36px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);cursor:pointer;background-size:cover;background-position:center}
+  .avatar {width: 36px;height: 36px;border-radius: 50%;background: var(--lime);display: flex;align-items: center;justify-content: center;font-weight: 700;color: var(--black);cursor: pointer;background-size: cover;       /* เพิ่มบรรทัดนี้ */background-position: center;    /* เพิ่มบรรทัดนี้ */background-repeat: no-repeat; /* เพิ่มบรรทัดนี้ */}
   .avatar.admin {background:var(--blue);color:white}
   .avatar.master {background:var(--gold);color:var(--black)}
   .role-badge {font-size:9px;padding:3px 8px;border-radius:10px;font-weight:700;text-transform:uppercase;background:rgba(200,240,0,.15);color:var(--lime);border:1px solid rgba(200,240,0,.3)}
@@ -159,7 +159,7 @@
   .toast {position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--lime);color:var(--black);padding:12px 24px;border-radius:30px;font-weight:600;font-size:14px;opacity:0;transition:all .3s ease;z-index:9999;white-space:nowrap;max-width:88vw;text-align:center;pointer-events:none}
   .toast.show {opacity:1;transform:translateX(-50%) translateY(0)}
   .profile-header {display:flex;align-items:center;gap:16px;margin-bottom:24px}
-  .profile-avatar-lg {width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:var(--black);flex-shrink:0;background-size:cover;background-position:center;position:relative;overflow:hidden;cursor:pointer;border:3px solid var(--border)}
+  .profile-avatar-lg {width: 80px;height: 80px;border-radius: 50%;background: linear-gradient(135deg,var(--lime),var(--teal));display: flex;align-items: center;justify-content: center;font-size: 32px;font-weight: 700;color: var(--black);flex-shrink: 0;background-size: cover;       /* เพิ่มบรรทัดนี้ */background-position: center;    /* เพิ่มบรรทัดนี้ */background-repeat: no-repeat; /* เพิ่มบรรทัดนี้ */position: relative;overflow: hidden;cursor: pointer;border: 3px solid var(--border);}
   .profile-avatar-lg.admin {background:linear-gradient(135deg,var(--blue),var(--purple));color:white}
   .profile-avatar-lg.master {background:linear-gradient(135deg,var(--gold),var(--orange));color:var(--black)}
   .profile-avatar-lg .photo-edit-overlay {position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:18px;color:white}
@@ -1016,30 +1016,7 @@ document.getElementById('cropper-zoom').addEventListener('input',e=>{cropScale=p
 function resetCropper(){cropX=0;cropY=0;cropScale=1;document.getElementById('cropper-zoom').value=1;applyCropTransform();}
 function cancelCropper(){document.getElementById('cropper-overlay').classList.remove('show');document.getElementById('cropper-img').classList.remove('ready');cropImg=null;}
 
-async function applyCropper(){
-  if(!cropImg){showToast('❌ ไม่พบรูปภาพ');return;}
-  const btn = document.getElementById('cropper-apply-btn');
-  btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
-
-  try {
-    const stage = document.getElementById('cropper-stage');
-    const stageW = stage.clientWidth;
-    if(!stageW || !cropImg.naturalWidth) throw new Error('ขนาดยังไม่พร้อม');
-
-    // 1. คำนวณ Scale ปัจจุบันเทียบกับรูปจริง
-    const currentScale = cropBaseScale * cropScale;
-
-    // 2. หาจุดกึ่งกลางของพื้นที่ที่จะ Crop บนรูปจริง (Natural Pixels)
-    // เลื่อนจากจุดกึ่งกลางรูป ไปตามค่าการลาก (cropX, cropY) ที่เราขยับ
-    const centerX = (cropImg.naturalWidth / 2) - (cropX / currentScale);
-    const centerY = (cropImg.naturalHeight / 2) - (cropY / currentScale);
-
-    // 3. หารัศมีของวงกลมที่จะตัดบนรูปจริง
-    // เนื่องจากวงกลมกว้างเท่ากับ StageW รัศมีบนหน้าจอคือ StageW / 2
-    const naturalRadius = (stageW / 2) / currentScale;
-
-    // 4. เตรียม Canvas สำหรับ Output 400x400
-    const OUTPUT = 400;
+;
     const canvas = document.createElement('canvas');
     canvas.width = OUTPUT; canvas.height = OUTPUT;
     const ctx = canvas.getContext('2d');
@@ -1047,36 +1024,71 @@ async function applyCropper(){
     // พื้นหลังสีขาว
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, OUTPUT, OUTPUT);
+async function applyCropper(){
+  if(!cropImg){showToast('❌ ไม่พบรูปภาพ');return;}
+  const btn = document.getElementById('cropper-apply-btn');
+  btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
 
-    // 5. วาดรูปจากจุดกึ่งกลางที่เราคำนวณได้
-    ctx.drawImage(
-      cropImg,
-      centerX - naturalRadius, centerY - naturalRadius, // จุดเริ่มต้นตัดบนรูปจริง (x, y)
-      naturalRadius * 2, naturalRadius * 2,           // ขนาดกว้าง x สูง ที่จะดึงมาจากรูปจริง
-      0, 0,                                          // วางที่พิกเซล 0,0 ของ Canvas
-      OUTPUT, OUTPUT                                 // ยืดรูปให้เต็มขนาด 400x400
-    );
+  try {
+    const stage = document.getElementById('cropper-stage');
+    const imgEl = document.getElementById('cropper-img');
+    
+    const stageW = stage.clientWidth;
+    const rect = imgEl.getBoundingClientRect();       // หาตำแหน่งและขนาดรูปที่ปรากฏบนจอจริงๆ
+    const stageRect = stage.getBoundingClientRect();   // หาตำแหน่งของกรอบครอบบนจอจริงๆ
 
+    // 1. คำนวณระยะห่างของรูปจากขอบกรอบ (บนหน้าจอ)
+    const relativeX = rect.left - stageRect.left;
+    const relativeY = rect.top - stageRect.top;
+    
+    // 2. ตั้งค่าขนาดไฟล์ Output
+    const OUTPUT = 400; 
+    const ratio = OUTPUT / stageW; // อัตราส่วนขยายจากหน้าจอไปเป็นขนาดไฟล์จริง
+
+    // 3. สร้าง Canvas สำหรับวาดรูป
+    const canvas = document.createElement('canvas');
+    canvas.width = OUTPUT; 
+    canvas.height = OUTPUT;
+    const ctx = canvas.getContext('2d');
+
+    // ใส่พื้นหลังสีขาวกันพลาด
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, OUTPUT, OUTPUT);
+
+    // 4. คำนวณตำแหน่งและขนาดที่จะวาดลงบน Canvas 400x400
+    // โดยขยายทุกอย่างจากหน้าจอด้วย ratio
+    const finalDrawX = relativeX * ratio;
+    const finalDrawY = relativeY * ratio;
+    const finalDrawW = rect.width * ratio;
+    const finalDrawH = rect.height * ratio;
+
+    // 5. วาดภาพลงบน Canvas
+    ctx.drawImage(cropImg, finalDrawX, finalDrawY, finalDrawW, finalDrawH);
+
+    // 6. แปลงเป็น Data URL (JPEG)
     const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
 
-    // ส่งขึ้น Supabase
+    // 7. อัปเดตลงฐานข้อมูล Supabase
     const { error } = await supaClient.from('users').update({ photo: dataUrl }).eq('id', currentUser.id);
     if(error) throw error;
 
-    // อัปเดตข้อมูลในแอป
+    // 8. อัปเดตข้อมูลในตัวแปรและหน้าแอปทันที
     currentUser.photo = dataUrl;
-    const u = USERS.find(x => x.id === currentUser.id); if(u) u.photo = dataUrl;
+    const u = USERS.find(x => x.id === currentUser.id); 
+    if(u) u.photo = dataUrl;
     
     await logActivity('update', 'เปลี่ยนรูปโปรไฟล์', currentUser.id, 'user');
     updateAvatar();
     showToast('✅ เปลี่ยนรูปโปรไฟล์สำเร็จ!');
     cancelCropper();
     renderApp(currentPage);
+    
   } catch(e) {
     console.error('Crop error:', e);
     showToast('❌ ' + e.message);
   } finally {
-    btn.innerHTML = 'ใช้'; btn.disabled = false;
+    btn.innerHTML = 'ใช้'; 
+    btn.disabled = false;
   }
 }
 

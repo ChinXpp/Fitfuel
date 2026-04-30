@@ -651,15 +651,48 @@ function stopReminderTimer(){if(reminderInterval){clearInterval(reminderInterval
 function initReminders(){const s=getReminderSettings();if(s.enabled&&'Notification' in window&&Notification.permission==='granted')startReminderTimer();}
 async function toggleReminder(){
   const s=getReminderSettings();
-  if(s.enabled)disableReminder();
-  else{const time=document.getElementById('reminder-time')?.value||s.time||'20:00';await enableReminder(time);}
+  if(s.enabled){
+    disableReminder();
+  } else {
+    const time=document.getElementById('reminder-time')?.value||s.time||'20:00';
+    await enableReminder(time);
+    
+    // โค้ดส่วนที่เพิ่มมา: อัปเดตเวลาลง Supabase ทันทีที่กดเปิด
+    const fullTime = time + ":00";
+    try {
+        await supaClient
+            .from('users')
+            .update({ reminder_time: fullTime })
+            .eq('id', currentUser.id);
+    } catch(err) {
+        console.error("Failed to update reminder_time", err);
+    }
+  }
   renderApp(currentPage);
 }
-function changeReminderTime(){
+async function changeReminderTime(){
   const time=document.getElementById('reminder-time').value;
   const s=getReminderSettings();
   saveReminderSettings({...s,time});
-  if(s.enabled){startReminderTimer();showToast('✅ บันทึกเวลาใหม่: '+time);}
+  
+  if(s.enabled){
+    startReminderTimer();
+  }
+  
+  // อัปเดตเวลาลง Supabase
+  const fullTime = time + ":00";
+  try {
+    const { error } = await supaClient
+        .from('users')
+        .update({ reminder_time: fullTime })
+        .eq('id', currentUser.id);
+        
+    if(error) throw error;
+    showToast('✅ บันทึกเวลาใหม่: '+time);
+  } catch(err) {
+    console.error(err);
+    showToast('❌ เกิดข้อผิดพลาดในการบันทึกเวลา');
+  }
 }
 async function testReminder(){
   if(!('Notification' in window)){showToast('❌ เบราว์เซอร์ไม่รองรับ');return;}
@@ -988,45 +1021,41 @@ async function applyCropper(){
   const btn=document.getElementById('cropper-apply-btn');
   btn.innerHTML='<span class="spinner"></span> กำลังบันทึก...';btn.disabled=true;
   try{
-    // ─── BULLETPROOF: read actual DOM rectangles ───
-    const stageEl=document.getElementById('cropper-stage');
-    const imgEl=document.getElementById('cropper-img');
-    const stageR=stageEl.getBoundingClientRect();
-    const imgR=imgEl.getBoundingClientRect();
+    const stage=document.getElementById('cropper-stage');
+    const stageW=stage.clientWidth;
+    if(!stageW||!cropImg.naturalWidth)throw new Error('ขนาดยังไม่พร้อม');
 
-    if(!stageR.width||!imgR.width){throw new Error('Stage or image not measured yet');}
+    // ── ใช้ state ของเราเอง ไม่อ่าน DOM ──
+    const ts=cropBaseScale*cropScale;
+    const dW=cropImg.naturalWidth*ts;
+    const dH=cropImg.naturalHeight*ts;
+    const imgLeft=stageW/2-dW/2+cropX;
+    const imgTop=stageW/2-dH/2+cropY;
 
-    // Image's actual displayed pixel size → natural pixel ratio
-    const scale=imgR.width/cropImg.naturalWidth;
-
-    // The visible region of the image in screen-pixel coordinates
-    // (positive sx means we crop from the left side of the natural image)
-    const sx=(stageR.left-imgR.left)/scale;
-    const sy=(stageR.top-imgR.top)/scale;
-    const sw=stageR.width/scale;
-    const sh=stageR.height/scale;
+    console.log('[Crop]',{stageW,natW:cropImg.naturalWidth,natH:cropImg.naturalHeight,ts,dW,dH,imgLeft,imgTop,cropX,cropY});
 
     const OUTPUT=400;
+    const k=OUTPUT/stageW;
     const canvas=document.createElement('canvas');
     canvas.width=OUTPUT;canvas.height=OUTPUT;
     const ctx=canvas.getContext('2d');
 
-    // ─── NO background fill (causes the "dark border" bug) ───
-    // Just clip to a circle and draw the image directly
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(OUTPUT/2,OUTPUT/2,OUTPUT/2,0,Math.PI*2);
-    ctx.clip();
-    ctx.drawImage(cropImg,sx,sy,sw,sh,0,0,OUTPUT,OUTPUT);
-    ctx.restore();
+    // พื้นขาว — ป้องกันรูปเป็นดำถ้าคำนวณพลาด
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(0,0,OUTPUT,OUTPUT);
 
-    // PNG preserves transparency — no fill artifact
-    const dataUrl=canvas.toDataURL('image/png');
+    // วาดภาพตรงๆ ไม่ต้อง clip — CSS จะตัดเป็นวงกลมให้เอง
+    ctx.drawImage(cropImg,
+      0,0,cropImg.naturalWidth,cropImg.naturalHeight,
+      imgLeft*k,imgTop*k,dW*k,dH*k);
 
-    // Sanity check: PNG should be at least a few KB
-    if(dataUrl.length<2000){throw new Error('Cropped image is empty');}
+    const dataUrl=canvas.toDataURL('image/jpeg',0.9);
+    console.log('[Crop] dataUrl length:',dataUrl.length);
+    if(!dataUrl||dataUrl.length<3000)throw new Error('รูปที่ตัดออกมาว่างเปล่า');
 
-    await supaClient.from('users').update({photo:dataUrl}).eq('id',currentUser.id);
+    const{error}=await supaClient.from('users').update({photo:dataUrl}).eq('id',currentUser.id);
+    if(error)throw error;
+
     currentUser.photo=dataUrl;
     const u=USERS.find(x=>x.id===currentUser.id);if(u)u.photo=dataUrl;
     await logActivity('update','เปลี่ยนรูปโปรไฟล์',currentUser.id,'user');
@@ -1037,7 +1066,7 @@ async function applyCropper(){
     renderApp(currentPage);
   }catch(e){
     console.error('Crop error:',e);
-    showToast('❌ เกิดข้อผิดพลาด: '+e.message);
+    showToast('❌ '+e.message);
     btn.innerHTML='ใช้';btn.disabled=false;
   }
 }

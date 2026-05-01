@@ -711,7 +711,7 @@ async function submitOnboarding(){
   if(error){err.textContent=error.code==='23505'&&error.message.includes('username')?'Username นี้ถูกใช้แล้ว':'เกิดข้อผิดพลาด: '+error.message;btn.innerHTML='บันทึกและเริ่มใช้งาน';btn.disabled=false;return;}
   CU=mU(data);await loadAll();
   await logAct('create',`สร้างบัญชี: ${CU.name} (${role})`,CU.id,'user');
-  showToast('ยินดีต้อนรับ '+CU.name.split(' ')[0]);enterApp();
+  showToast(`ยินดีต้อนรับ ${dispName()}`);enterApp();
 }
 async function logout(){
   document.getElementById('global-loader').style.display='flex';
@@ -765,7 +765,16 @@ function subScores(log,user){
   };
 }
 function sLevel(s){if(s>=90)return{l:'EXCELLENT',c:'#C8F000'};if(s>=80)return{l:'GREAT',c:'#C8F000'};if(s>=70)return{l:'GOOD',c:'#C8F000'};if(s>=50)return{l:'FAIR',c:'#FF8C42'};return{l:'LOW',c:'#FF4757'};}
-function greeting(){const h=new Date().getHours();if(h<12)return'Good morning';if(h<17)return'Good afternoon';return'Good evening';}
+function greeting(){
+  const h=new Date().getHours();
+  if(h>=5 && h<12) return 'Good Morning';
+  if(h>=12 && h<17) return 'Good Afternoon';
+  if(h>=17 && h<21) return 'Good Evening';
+  return 'Good Night';
+}
+function dispName(){
+  return (CU.username || CU.name.split(' ')[0] || 'User').toUpperCase();
+}
 function thDay(){const d=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];const n=new Date();return `${d[n.getDay()]}ที่ ${n.getDate()} ${['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'][n.getMonth()]}`;}
 function now12(){const n=new Date();let h=n.getHours(),m=n.getMinutes(),ap=h>=12?'PM':'AM';h=h%12||12;return `${h}:${m.toString().padStart(2,'0')} ${ap}`;}
 function delta(logs,field){if(logs.length<2)return null;const c=logs[0][field],p=logs[1][field];if(c==null||p==null)return null;return c-p;}
@@ -1080,7 +1089,7 @@ function modeBanner(){
 function renderHome(){
   const logs=LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>b.date.localeCompare(a.date));
   const lt=logs[0];
-  if(!lt)return`<div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:3px">${greeting()},</div><div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;color:var(--lime);line-height:1;margin-bottom:20px">${CU.name.split(' ')[0].toUpperCase()}</div>
+  if(!lt)return`<div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:3px">${greeting()},</div><div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;color:var(--lime);line-height:1;margin-bottom:20px">${dispName()}</div>
     <div class="empty-s">${IC.plus}<div class="empty-t">ยังไม่มีข้อมูล</div><div class="empty-d">กดปุ่ม Log เพื่อเริ่มบันทึก</div></div>`;
 
   const B=bmi(lt.weight,CU.height);const cat=bmiCat(B);const score=hScore(lt,CU);
@@ -1131,7 +1140,7 @@ function renderHome(){
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
     <div>
       <div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:2px">${greeting()},</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--lime);line-height:1">${CU.name.split(' ')[0].toUpperCase()}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--lime);line-height:1">${dispName()}</div>
       <div style="font-size:9px;color:var(--tx3);font-family:'JetBrains Mono',monospace;margin-top:2px">${thDay()} · ${now12()}</div>
     </div>
     <button onclick="openQuickLog()" style="background:var(--lime);color:var(--bk);border:none;border-radius:var(--rs);padding:9px 13px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;margin-top:4px">

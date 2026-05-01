@@ -21,12 +21,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bk);color:var(--tx);min-h
 .screen.active{display:flex;animation:sIn .2s ease}
 @keyframes sIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-/* แก้ไขให้รองรับการ Scroll บน Mobile/iOS ได้ดีขึ้น */
-#screen-main { height: 100vh; overflow: hidden; }
-
-/* ควบคุมขนาด SVG ในปุ่มทั้งหมด */
-button svg { width: 14px; height: 14px; }
-
 /* TOPBAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--dark);border-bottom:1px solid var(--br);position:sticky;top:0;z-index:100}
 .tb-brand{display:flex;align-items:center;gap:9px}
@@ -42,7 +36,7 @@ button svg { width: 14px; height: 14px; }
 .rb.master{background:rgba(255,215,0,.1);color:var(--gold);border-color:rgba(255,215,0,.22)}
 
 /* LAYOUT */
-.content{flex:1;overflow-y:auto;padding:18px 18px 96px;-webkit-overflow-scrolling:touch}
+.content{flex:1;overflow-y:auto;padding:18px 18px 96px}
 .bnav{position:fixed;bottom:0;left:0;right:0;background:var(--dark);border-top:1px solid var(--br);display:flex;padding:6px 0 18px;z-index:100}
 .ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:5px 2px;color:var(--tx3);font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;background:none;border:none;transition:color .18s}
 .ni.active{color:var(--lime)}
@@ -157,11 +151,15 @@ button svg { width: 14px; height: 14px; }
 .st-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
 .st-btn{width:36px;height:36px;border-radius:9px;background:var(--card2);border:1px solid var(--br2);color:var(--tx);font-size:20px;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .14s;user-select:none;-webkit-user-select:none;line-height:1}
 .st-btn:active{background:var(--ld);border-color:var(--lime);color:var(--lime)}
-.st-disp{flex:1;text-align:center}
+.st-disp{flex:1;text-align:center;display:flex;justify-content:center;align-items:baseline}
+.st-val-input{background:transparent;border:none;color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:40px;text-align:center;width:auto;min-width:40px;max-width:120px;outline:none;padding:0;line-height:1}
+.st-val-input::-webkit-inner-spin-button,.st-val-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .st-val{font-family:'Bebas Neue',sans-serif;font-size:40px;line-height:1;display:inline}
 .st-unit{font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.8px;margin-left:2px}
-.pb{height:4px;background:var(--br);border-radius:2px;overflow:hidden}
-.pf{height:100%;border-radius:2px;transition:width .25s ease}
+.pb-wrap{position:relative;height:12px;display:flex;align-items:center;cursor:pointer;margin:4px 0}
+.pb-range{position:absolute;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;margin:0;padding:0;-webkit-appearance:none;appearance:none}
+.pb{height:6px;background:var(--br);border-radius:3px;overflow:hidden;width:100%;position:relative;z-index:1}
+.pf{height:100%;border-radius:3px;transition:width .15s ease}
 .pf-l{background:var(--lime)}.pf-o{background:var(--og)}.pf-b{background:var(--bl)}.pf-p{background:var(--pu)}
 
 /* WATER GLASSES */
@@ -179,7 +177,8 @@ button svg { width: 14px; height: 14px; }
 /* ENERGY SLIDER */
 .e-wrap{margin-top:12px}
 .e-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
-.e-title{font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);font-weight:600}
+.e-title{display:flex;align-items:center;gap:5px;font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);font-weight:600}
+.e-title svg{width:13px;height:13px;color:var(--tx3)}
 .e-disp{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px}
 .e-sl{width:100%;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--red) 0%,var(--og) 30%,var(--lime) 60%,var(--tl) 100%);outline:none;cursor:pointer;margin:4px 0}
 .e-sl::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--tx);cursor:pointer;border:3px solid var(--card);box-shadow:0 0 0 1px var(--br2)}
@@ -408,42 +407,6 @@ select.fi option{background:var(--card2)}
 .cr-ba{background:var(--lime);color:var(--bk)}
 .cr-rst{width:100%;text-align:center;font-size:9px;color:var(--tx3);background:none;border:none;cursor:pointer;padding:4px;text-decoration:underline;margin-top:2px}
 @media(max-width:400px){.fr,.mg,.sw-opts,.pr-grid,.admin-m{grid-template-columns:1fr}.pw .pb-pin{width:36px;height:46px;font-size:17px}.content{padding:14px 14px 96px}}
-.st-val-input {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 40px;
-  line-height: 1;
-  display: inline-block;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--tx);
-  text-align: center;
-  width: 90px;
-  outline: none;
-  transition: all 0.2s ease;
-  -moz-appearance: textfield;
-  padding: 0;
-}
-.st-val-input:focus {
-  border-bottom-color: var(--lime); /* ขีดเส้นใต้สีเขียวเวลาคลิกพิมพ์ */
-}
-.st-val-input::-webkit-outer-spin-button,
-.st-val-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-/* แถบ Slider ซ่อนทับบน Progress Bar */
-.pb-wrap { position: relative; }
-.pb-range {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0; /* ซ่อนรูปลักษณ์เดิมแต่ยังกด/เลื่อนได้ */
-  cursor: ew-resize;
-  margin: 0;
-  z-index: 2;
-}
 </style>
 </head>
 <body>
@@ -524,7 +487,7 @@ select.fi option{background:var(--card2)}
       <div><div class="tb-name">FITFUEL</div><div class="tb-sub">Health · OS</div></div>
     </div>
     <div class="tb-right">
-      <span class="rb" id="topbar-role" onclick="cycleRole()" style="cursor:pointer" title="กดเพื่อสลับโหมด">USER</span>
+      <span class="rb" id="topbar-role">USER</span>
       <div class="av" id="user-avatar">U</div>
     </div>
   </div>
@@ -686,8 +649,8 @@ async function logout(){
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');}
 function enterApp(){
   updAv();
-  document.getElementById('topbar-role').className='rb '+CV;
-  document.getElementById('topbar-role').textContent=CV.toUpperCase();
+  document.getElementById('topbar-role').className='rb '+CU.role;
+  document.getElementById('topbar-role').textContent=CU.role.toUpperCase();
   initReminder();renderApp('home');showScreen('main');
 }
 function updAv(){
@@ -700,26 +663,6 @@ async function logAct(type,msg,userId=null,target='log'){
   if(!supa||!CU)return;
   const{data}=await supa.from('activities').insert([{type,target,user_id:userId,actor_id:CU.id,actor_name:CU.name,msg}]).select().single();
   if(data)ACTS.unshift(mA(data));
-}
-
-// ═══ CYCLE ROLE FUNCTION ═══
-function cycleRole() {
-  if(!CU) return;
-  const roles = ['user'];
-  if(CU.role === 'admin' || CU.role === 'master') roles.push('admin');
-  if(CU.role === 'master') roles.push('master');
-  
-  if(roles.length <= 1) {
-    showToast('คุณมีสิทธิ์เข้าถึงแค่โหมด USER เท่านั้น');
-    return;
-  }
-  
-  let currIdx = roles.indexOf(CV);
-  let nextIdx = (currIdx + 1) % roles.length;
-  let nextView = roles[nextIdx];
-  
-  switchView(nextView);
-  showToast('สลับเป็นโหมด ' + nextView.toUpperCase());
 }
 
 // ═══ CALCULATIONS ═══
@@ -995,22 +938,20 @@ function renderNav(){
   nav.innerHTML=items.map((it,i)=>`<button class="ni${i===ai?' active':''}" onclick="navTo('${it.p}',this)"><span>${it.i}</span>${it.l}</button>`).join('');
 }
 function navTo(p,el){document.querySelectorAll('.bnav .ni').forEach(n=>n.classList.remove('active'));if(el)el.classList.add('active');renderApp(p);}
-function switchView(v){
-  CV=v;
-  const tb = document.getElementById('topbar-role');
-  if(tb){
-    tb.className='rb '+v;
-    tb.textContent=v.toUpperCase();
-  }
-  renderApp({user:'home',admin:'dashboard',master:'control'}[v]);
+function switchView(v){CV=v;renderApp({user:'home',admin:'dashboard',master:'control'}[v]);}
+function modeBanner(){
+  if(CV!=='user')return'';
+  if(CU.role==='admin')return`<div class="mode-banner"><div class="mb-l"><div class="mb-t">โหมดปัจจุบัน</div><div class="mb-n">User Mode</div></div><button class="mb-btn mb-ba" onclick="switchView('admin')">Admin Panel</button></div>`;
+  if(CU.role==='master')return`<div class="mode-banner"><div class="mb-l"><div class="mb-t">โหมดปัจจุบัน</div><div class="mb-n">User Mode</div></div><div class="mb-btns"><button class="mb-btn mb-ba" onclick="switchView('admin')">Admin</button><button class="mb-btn mb-bm" onclick="switchView('master')">Master</button></div></div>`;
+  return'';
 }
 
 // ═══ HOME PAGE ═══
 function renderHome(){
   const logs=LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>b.date.localeCompare(a.date));
   const lt=logs[0];
-  
-  if(!lt)return`<div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:3px">${greeting()},</div><div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;color:var(--lime);line-height:1;margin-bottom:20px">${CU.name.split(' ')[0].toUpperCase()}</div>
+  const banner=modeBanner();
+  if(!lt)return`${banner}<div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:3px">${greeting()},</div><div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;color:var(--lime);line-height:1;margin-bottom:20px">${CU.name.split(' ')[0].toUpperCase()}</div>
     <div class="empty-s">${IC.plus}<div class="empty-t">ยังไม่มีข้อมูล</div><div class="empty-d">กดปุ่ม Log เพื่อเริ่มบันทึก</div></div>`;
 
   const B=bmi(lt.weight,CU.height);const cat=bmiCat(B);const score=hScore(lt,CU);
@@ -1042,7 +983,7 @@ function renderHome(){
     </div>
   </div>`:'';
 
-  return`
+  return`${banner}
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
     <div>
       <div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:2px">${greeting()},</div>
@@ -1121,70 +1062,118 @@ function renderHome(){
 }
 
 // ═══ LOG PAGE ═══
-function renderLog(){
-  const today=new Date().toISOString().split('T')[0];
-  const n=new Date();const dy=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'][n.getDay()];
-  const mn=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'][n.getMonth()];
-  const ts=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
-  logState={weight:70,sleep:7.5,water:0,exercise:0,energy:5,actType:null,mood:null,notes:''};
-  const lastL=LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>b.date.localeCompare(a.date))[0];
-  if(lastL){logState.weight=lastL.weight;logState.sleep=lastL.sleep;logState.water=lastL.water;logState.exercise=lastL.exercise;}
-  return`
+// ฟังก์ชันสำหรับ Set และบันทึก Draft ของ Log
+function setLog(f, val) {
+  const cfg = { weight: [20, 300], sleep: [0, 24], water: [0, 20], exercise: [0, 600] };
+  const [mn, mx] = cfg[f] || [0, 999];
+  let v = parseFloat(val);
+  if (isNaN(v)) v = mn;
+  
+  // ปัดเศษให้ตรงประเภท
+  logState[f] = Math.max(mn, Math.min(mx, parseFloat(v.toFixed(2))));
+
+  // อัปเดตตัวเลขใน Input
+  const el = document.getElementById('st-val-' + f);
+  if (el && el.tagName === 'INPUT') el.value = logState[f];
+  else if (el) el.textContent = logState[f];
+
+  // อัปเดตตำแหน่ง Slider
+  const rangeEl = document.getElementById('range-' + f);
+  if (rangeEl) rangeEl.value = logState[f];
+
+  // อัปเดตแถบสี
+  updLogProg(f);
+  if (f === 'water') updGlasses();
+
+  // เซฟ Draft ลงเครื่อง (จำค่าล่าสุดที่กำลังกรอกค้างไว้)
+  const today = new Date().toISOString().split('T')[0];
+  localStorage.setItem('fitfuel_draft_' + CU.id, JSON.stringify({ date: today, state: logState }));
+}
+
+function adjLog(f, d) {
+  setLog(f, logState[f] + d);
+}
+
+// ------------------------------------------
+
+function renderLog() {
+  const today = new Date().toISOString().split('T')[0];
+  const n = new Date(); const dy = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'][n.getDay()];
+  const mn = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'][n.getMonth()];
+  const ts = `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+  
+  logState = {weight:70, sleep:7.5, water:0, exercise:0, energy:5, actType:null, mood:null, notes:''};
+  
+  // 1. ดึงประวัติล่าสุดจากฐานข้อมูล (ของวันก่อนๆ)
+  const lastL = LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  if(lastL) { logState.weight=lastL.weight; logState.sleep=lastL.sleep; logState.water=lastL.water; logState.exercise=lastL.exercise; }
+
+  // 2. ดึง Draft ล่าสุดที่พิมพ์ค้างไว้ (ของวันนี้) ถ้ามี
+  try {
+    const draftStr = localStorage.getItem('fitfuel_draft_' + CU.id);
+    if (draftStr) {
+      const draft = JSON.parse(draftStr);
+      if (draft.date === today) logState = { ...logState, ...draft.state };
+    }
+  } catch(e) {}
+
+  return `
   <div class="log-header">
     <div class="log-date-line">Daily Log · ${today} · ${ts}</div>
     <div class="log-title">LOG TODAY.</div>
     <div class="log-sub">บันทึกข้อมูลสุขภาพของคุณ · ${dy}ที่ ${n.getDate()} ${mn}</div>
   </div>
   <input type="hidden" id="log-date" value="${today}">
+  
   <!-- Weight -->
   <div class="st-card">
-    <div class="st-head">
-      <div class="st-lbl">${IC.weight}<span>WEIGHT · น้ำหนัก</span></div>
-      <div class="st-tgt">เป้าหมาย ${CU.targetWeight||'--'} kg</div>
-    </div>
+    <div class="st-head"><div class="st-lbl">${IC.weight}<span>WEIGHT · น้ำหนัก</span></div><div class="st-tgt">เป้าหมาย ${CU.targetWeight||'--'} kg</div></div>
     <div class="st-row">
       <button class="st-btn" onclick="adjLog('weight',-0.1)">−</button>
-      <div class="st-disp"><span class="st-val" id="st-val-weight">${logState.weight}</span><span class="st-unit">kg</span></div>
+      <div class="st-disp"><input type="number" class="st-val-input" id="st-val-weight" value="${logState.weight}" onchange="setLog('weight', this.value)"><span class="st-unit">kg</span></div>
       <button class="st-btn" onclick="adjLog('weight',0.1)">+</button>
     </div>
-    <div class="pb"><div class="pf pf-l" id="lpf-weight" style="width:0%"></div></div>
+    <div class="pb pb-wrap">
+      <input type="range" class="pb-range" id="range-weight" min="30" max="250" step="0.1" value="${logState.weight}" oninput="setLog('weight', this.value)">
+      <div class="pf pf-l" id="lpf-weight" style="width:0%"></div>
+    </div>
   </div>
+
   <!-- Sleep -->
   <div class="st-card">
-    <div class="st-head">
-      <div class="st-lbl">${IC.moon}<span>SLEEP · นอนหลับ</span></div>
-      <div class="st-tgt">เป้าหมาย ${CU.sleepTarget||7.5} hrs</div>
-    </div>
+    <div class="st-head"><div class="st-lbl">${IC.moon}<span>SLEEP · นอนหลับ</span></div><div class="st-tgt">เป้าหมาย ${CU.sleepTarget||7.5} hrs</div></div>
     <div class="st-row">
       <button class="st-btn" onclick="adjLog('sleep',-0.5)">−</button>
-      <div class="st-disp"><span class="st-val" id="st-val-sleep">${logState.sleep}</span><span class="st-unit">hrs</span></div>
+      <div class="st-disp"><input type="number" class="st-val-input" id="st-val-sleep" value="${logState.sleep}" onchange="setLog('sleep', this.value)"><span class="st-unit">hrs</span></div>
       <button class="st-btn" onclick="adjLog('sleep',0.5)">+</button>
     </div>
-    <div class="pb"><div class="pf pf-o" id="lpf-sleep" style="width:0%"></div></div>
+    <div class="pb pb-wrap">
+      <input type="range" class="pb-range" id="range-sleep" min="0" max="24" step="0.5" value="${logState.sleep}" oninput="setLog('sleep', this.value)">
+      <div class="pf pf-o" id="lpf-sleep" style="width:0%"></div>
+    </div>
   </div>
+
   <!-- Water -->
   <div class="st-card">
-    <div class="st-head">
-      <div class="st-lbl">${IC.droplet}<span>WATER · ดื่มน้ำ</span></div>
-      <div class="st-tgt">เป้าหมาย 2.5 L</div>
-    </div>
+    <div class="st-head"><div class="st-lbl">${IC.droplet}<span>WATER · ดื่มน้ำ</span></div><div class="st-tgt">เป้าหมาย 2.5 L</div></div>
     <div class="st-row">
       <button class="st-btn" onclick="adjLog('water',-0.25)">−</button>
-      <div class="st-disp"><span class="st-val" id="st-val-water">${logState.water}</span><span class="st-unit">L</span></div>
+      <div class="st-disp"><input type="number" class="st-val-input" id="st-val-water" value="${logState.water}" onchange="setLog('water', this.value)"><span class="st-unit">L</span></div>
       <button class="st-btn" onclick="adjLog('water',0.25)">+</button>
     </div>
     <div class="wg-row" id="wg-row">${Array.from({length:10}).map((_,i)=>`<div class="wg" id="wg-${i}" onclick="setGlass(${i})"><div class="wg-in" style="height:0%"></div></div>`).join('')}</div>
-    <div class="pb" style="margin-top:7px"><div class="pf pf-b" id="lpf-water" style="width:0%"></div></div>
+    <div class="pb pb-wrap" style="margin-top:7px">
+      <input type="range" class="pb-range" id="range-water" min="0" max="8" step="0.25" value="${logState.water}" oninput="setLog('water', this.value)">
+      <div class="pf pf-b" id="lpf-water" style="width:0%"></div>
+    </div>
   </div>
+
   <!-- Exercise -->
   <div class="st-card">
-    <div class="st-head">
-      <div class="st-lbl">${IC.run}<span>EXERCISE · ออกกำลังกาย</span></div>
-      <div class="st-tgt">เป้า ${Math.round((CU.weeklyExerciseTarget||150)/7)} min/วัน</div>
-    </div>
+    <div class="st-head"><div class="st-lbl">${IC.run}<span>EXERCISE · ออกกำลังกาย</span></div><div class="st-tgt">เป้า ${Math.round((CU.weeklyExerciseTarget||150)/7)} min/วัน</div></div>
     <div class="st-row">
       <button class="st-btn" onclick="adjLog('exercise',-5)">−</button>
-      <div class="st-disp"><span class="st-val" id="st-val-exercise">${logState.exercise}</span><span class="st-unit">min</span></div>
+      <div class="st-disp"><input type="number" class="st-val-input" id="st-val-exercise" value="${logState.exercise}" onchange="setLog('exercise', this.value)"><span class="st-unit">min</span></div>
       <button class="st-btn" onclick="adjLog('exercise',5)">+</button>
     </div>
     <div class="ap-row">
@@ -1194,35 +1183,37 @@ function renderLog(){
       <div class="ap" data-t="cycle" onclick="setAct('cycle')">${IC.cycle}<span>Cycle</span></div>
       <div class="ap" data-t="swim" onclick="setAct('swim')">${IC.swim}<span>Swim</span></div>
     </div>
-    <div class="pb" style="margin-top:9px"><div class="pf pf-p" id="lpf-exercise" style="width:0%"></div></div>
+    <div class="pb pb-wrap" style="margin-top:9px">
+      <input type="range" class="pb-range" id="range-exercise" min="0" max="300" step="5" value="${logState.exercise}" oninput="setLog('exercise', this.value)">
+      <div class="pf pf-p" id="lpf-exercise" style="width:0%"></div>
+    </div>
   </div>
+
   <!-- Energy -->
   <div class="st-card">
     <div class="e-wrap">
       <div class="e-head">
         <div class="e-title">${IC.zap} ENERGY LEVEL · ระดับพลังงาน</div>
-        <div class="e-disp" id="e-disp" style="color:var(--og)">5 / 10</div>
+        <div class="e-disp" id="e-disp" style="color:var(--og)">${logState.energy} / 10</div>
       </div>
-      <input type="range" id="e-slider" class="e-sl" min="1" max="10" step="1" value="5" oninput="updEnergy(this.value)">
+      <input type="range" id="e-slider" class="e-sl" min="1" max="10" step="1" value="${logState.energy}" oninput="updEnergy(this.value); setLog('energy', this.value);">
       <div class="e-marks"><span>1 · drained</span><span>5 · neutral</span><span>10 · peak</span></div>
       <div class="e-tip" id="e-tip">พลังงานปกติ ลองเพิ่มกิจกรรมเบาๆ</div>
     </div>
   </div>
-  <!-- Mood -->
+
+  <!-- Mood & Notes Section (เหมือนเดิม) -->
   <div class="st-card">
     <div class="sh">MOOD · อารมณ์วันนี้</div>
     <div class="mood-row">
-      ${[['bad','อ่อนล้า'],['meh','เฉยๆ'],['ok','โอเค'],['good','ดีเลย'],['great','เยี่ยม']].map(([m,l])=>`<div class="mood-op" data-m="${m}" onclick="setMood('${m}')">
+      ${[['bad','อ่อนล้า'],['meh','เฉยๆ'],['ok','โอเค'],['good','ดีเลย'],['great','เยี่ยม']].map(([m,l])=>`<div class="mood-op ${logState.mood===m?'sel':''}" data-m="${m}" onclick="setMood('${m}')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="20" height="20"><circle cx="12" cy="12" r="10"/>${m==='bad'?'<path d="M8 15s1.5-2 4-2 4 2 4 2M9 9h.01M15 9h.01"/>':(m==='meh'?'<path d="M8 14h8M9 9h.01M15 9h.01"/>':(m==='ok'?'<path d="M9 13.5s1 1.5 3 1.5 3-1.5 3-1.5M9 9h.01M15 9h.01"/>':(m==='good'?'<path d="M8 13s1.5 2.5 4 2.5 4-2.5 4-2.5M9 9h.01M15 9h.01"/>':'<path d="M8 13s1.5 3 4 3 4-3 4-3M9 9h.01M15 9h.01"/>')))}
-        </svg>
-        <div class="mood-op-l">${l}</div>
-      </div>`).join('')}
+        </svg><div class="mood-op-l">${l}</div></div>`).join('')}
     </div>
   </div>
-  <!-- Notes -->
   <div class="st-card">
     <div class="sh">NOTES · บันทึกเพิ่มเติม</div>
-    <textarea class="note-ta" id="log-notes" placeholder="บันทึกความรู้สึก หรือสิ่งที่เกิดขึ้นวันนี้..." rows="3"></textarea>
+    <textarea class="note-ta" id="log-notes" placeholder="บันทึกความรู้สึก หรือสิ่งที่เกิดขึ้นวันนี้..." rows="3" oninput="logState.notes=this.value; localStorage.setItem('fitfuel_draft_' + CU.id, JSON.stringify({date: document.getElementById('log-date').value, state: logState}));">${logState.notes}</textarea>
   </div>
   <p class="em" id="log-error"></p>
   <button class="save-btn" id="log-btn" onclick="submitLog()">${IC.check}<span>Save log · บันทึกข้อมูล</span></button>
@@ -1235,12 +1226,125 @@ function initLogUI(){
     updGlasses();updEnergy(logState.energy);
   },50);
 }
-function adjLog(f,d){
-  const cfg={weight:[20,300,.1],sleep:[0,24,.5],water:[0,20,.25],exercise:[0,600,5]};
-  const[mn,mx]=cfg[f]||[0,999,1];
-  logState[f]=Math.max(mn,Math.min(mx,parseFloat((logState[f]+d).toFixed(2))));
-  const el=document.getElementById('st-val-'+f);if(el)el.textContent=logState[f];
-  updLogProg(f);if(f==='water')updGlasses();
+
+function openQuickLog(){
+  const logEl=document.getElementById('ql-content');
+  const today = new Date().toISOString().split('T')[0];
+  logState={weight:70,sleep:7.5,water:0,exercise:0,energy:5,actType:null,mood:null,notes:''};
+  
+  const lastL=LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  if(lastL){logState.weight=lastL.weight;logState.sleep=lastL.sleep;logState.water=lastL.water;logState.exercise=lastL.exercise;}
+
+  try {
+    const draftStr = localStorage.getItem('fitfuel_draft_' + CU.id);
+    if (draftStr) {
+      const draft = JSON.parse(draftStr);
+      if (draft.date === today) logState = { ...logState, ...draft.state };
+    }
+  } catch(e) {}
+
+  logEl.innerHTML=`
+    <div style="margin-bottom:15px">
+      <div class="sh">WEIGHT · น้ำหนัก (kg)</div>
+      <div class="st-row">
+        <button class="st-btn" onclick="adjLog('weight',-0.1)">−</button>
+        <div class="st-disp"><input type="number" class="st-val-input" id="st-val-weight" style="font-size:32px" value="${logState.weight}" onchange="setLog('weight', this.value)"></div>
+        <button class="st-btn" onclick="adjLog('weight',0.1)">+</button>
+      </div>
+      <div class="pb-wrap"><input type="range" class="pb-range" id="range-weight" min="30" max="250" step="0.1" value="${logState.weight}" oninput="setLog('weight', this.value)"><div class="pb"><div class="pf pf-l" id="lpf-weight" style="width:0%"></div></div></div>
+    </div>
+
+    <div style="margin-bottom:15px">
+      <div class="sh">EXERCISE · ออกกำลัง (นาที)</div>
+      <div class="st-row">
+        <button class="st-btn" onclick="adjLog('exercise',-5)">−</button>
+        <div class="st-disp"><input type="number" class="st-val-input" id="st-val-exercise" style="font-size:32px" value="${logState.exercise}" onchange="setLog('exercise', this.value)"></div>
+        <button class="st-btn" onclick="adjLog('exercise',5)">+</button>
+      </div>
+      <div class="pb-wrap"><input type="range" class="pb-range" id="range-exercise" min="0" max="300" step="5" value="${logState.exercise}" oninput="setLog('exercise', this.value)"><div class="pb"><div class="pf pf-p" id="lpf-exercise" style="width:0%"></div></div></div>
+    </div>
+
+    <div class="fr" style="margin-bottom:15px;gap:15px">
+      <div style="flex:1">
+        <div class="sh">SLEEP · นอน (ชม.)</div>
+        <div class="st-row" style="gap:5px">
+          <button class="st-btn" style="width:30px;height:30px" onclick="adjLog('sleep',-0.5)">−</button>
+          <div class="st-disp"><input type="number" class="st-val-input" id="st-val-sleep" style="font-size:24px" value="${logState.sleep}" onchange="setLog('sleep', this.value)"></div>
+          <button class="st-btn" style="width:30px;height:30px" onclick="adjLog('sleep',0.5)">+</button>
+        </div>
+      </div>
+      <div style="flex:1">
+        <div class="sh">WATER · น้ำ (L)</div>
+        <div class="st-row" style="gap:5px">
+          <button class="st-btn" style="width:30px;height:30px" onclick="adjLog('water',-0.25)">−</button>
+          <div class="st-disp"><input type="number" class="st-val-input" id="st-val-water" style="font-size:24px" value="${logState.water}" onchange="setLog('water', this.value)"></div>
+          <button class="st-btn" style="width:30px;height:30px" onclick="adjLog('water',0.25)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:15px">
+      <div class="sh">ENERGY LEVEL (${logState.energy}/10)</div>
+      <input type="range" id="e-slider" class="e-sl" min="1" max="10" step="1" value="${logState.energy}" oninput="adjLogE(this.value); setLog('energy', this.value);">
+    </div>
+    
+    <p class="em" id="ql-error"></p>
+    <div style="display:flex;gap:7px">
+      <button class="cr-b cr-bc" style="flex:1" onclick="closeQuickLog()">ยกเลิก</button>
+      <button class="save-btn" style="flex:2;margin-top:0;padding:12px" id="ql-btn" onclick="submitQuickLog()">บันทึกด่วน</button>
+    </div>
+  `;
+  document.getElementById('ql-overlay').classList.add('show');
+  document.getElementById('ql-overlay').onclick=e=>{if(e.target===document.getElementById('ql-overlay'))closeQuickLog();};
+  
+  // Trigger initial progress updates
+  setTimeout(() => {
+    ['weight','sleep','water','exercise'].forEach(f => updLogProg(f));
+  }, 50);
+}
+
+// ------------------------------------------
+
+// ลบ Draft ทิ้งหลังจาก Save สำเร็จ
+async function submitLog(){
+  if(!supa){alert("ไม่สามารถเชื่อมต่อได้");return;}
+  const date=document.getElementById('log-date').value;
+  logState.notes=document.getElementById('log-notes')?.value||'';
+  const err=document.getElementById('log-error');const btn=document.getElementById('log-btn');
+  if(logState.weight<20||logState.weight>300){err.textContent='น้ำหนักไม่ถูกต้อง (20-300 kg)';return;}
+  if(logState.sleep<0||logState.sleep>24){err.textContent='ชั่วโมงนอนไม่ถูกต้อง';return;}
+  
+  err.textContent='';btn.innerHTML='<span class="sp2"></span> กำลังบันทึก...';btn.disabled=true;
+  const{data:logData,error}=await supa.from('daily_logs').insert([{user_id:CU.id,date,weight:logState.weight,sleep_hours:logState.sleep,water_liters:logState.water,exercise_minute:logState.exercise,energy_level:logState.energy}]).select().single();
+  if(error){err.textContent='เกิดข้อผิดพลาด: '+error.message;btn.innerHTML=`${IC.check} Save log · บันทึกข้อมูล`;btn.disabled=false;return;}
+  
+  const ml=mL(logData);LOGS.push(ml);
+  await logAct('create',`บันทึก Log: ${date} (${logState.weight}kg, energy ${logState.energy}/10)`,CU.id,'log');
+  
+  // ล้าง Draft
+  localStorage.removeItem('fitfuel_draft_' + CU.id);
+  
+  showToast('บันทึกข้อมูลสำเร็จ!');
+  setTimeout(()=>navTo('home',document.querySelectorAll('.bnav .ni')[0]),600);
+}
+
+async function submitQuickLog(){
+  const date=new Date().toISOString().split('T')[0];
+  const btn=document.getElementById('ql-btn');const err=document.getElementById('ql-error');
+  if(logState.weight<20||logState.weight>300){err.textContent='น้ำหนักไม่ถูกต้อง';return;}
+  
+  err.textContent='';btn.innerHTML='<span class="sp2"></span>';btn.disabled=true;
+  const{data:logData,error}=await supa.from('daily_logs').insert([{user_id:CU.id,date,weight:logState.weight,sleep_hours:logState.sleep,water_liters:logState.water,exercise_minute:logState.exercise,energy_level:logState.energy}]).select().single();
+  if(error){err.textContent='เกิดข้อผิดพลาด';btn.innerHTML='บันทึกด่วน';btn.disabled=false;return;}
+  
+  const ml=mL(logData);LOGS.push(ml);
+  await logAct('create',`Quick Log: ${date} (${logState.weight}kg)`,CU.id,'log');
+  
+  // ล้าง Draft
+  localStorage.removeItem('fitfuel_draft_' + CU.id);
+  
+  closeQuickLog();showToast('บันทึกสำเร็จ!');
+  renderApp('home');
 }
 function updLogProg(f){
   const goals={weight:CU.targetWeight||80,sleep:CU.sleepTarget||7.5,water:2.5,exercise:(CU.weeklyExerciseTarget||150)/7};
@@ -1261,72 +1365,8 @@ function updEnergy(v){
 }
 
 // ═══ QUICK LOG MODAL ═══
-function openQuickLog(){
-  const logEl=document.getElementById('ql-content');
-  logState={weight:70,sleep:7.5,water:0,exercise:0,energy:5,actType:null,mood:null,notes:''};
-  const lastL=LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>b.date.localeCompare(a.date))[0];
-  if(lastL){logState.weight=lastL.weight;logState.sleep=lastL.sleep;}
-  logEl.innerHTML=`
-    <div class="fr" style="margin-bottom:10px">
-      <div><div class="sh">น้ำหนัก (kg)</div><div class="st-row"><button class="st-btn" onclick="adjLog('weight',-0.1)">−</button><div class="st-disp"><span class="st-val" id="st-val-weight" style="font-size:30px">${logState.weight}</span></div><button class="st-btn" onclick="adjLog('weight',0.1)">+</button></div></div>
-      <div><div class="sh">ออกกำลัง (นาที)</div><div class="st-row"><button class="st-btn" onclick="adjLog('exercise',-5)">−</button><div class="st-disp"><span class="st-val" id="st-val-exercise" style="font-size:30px">${logState.exercise}</span></div><button class="st-btn" onclick="adjLog('exercise',5)">+</button></div></div>
-    </div>
-    <div class="fr" style="margin-bottom:10px">
-      <div><div class="sh">นอนหลับ (ชม.)</div><div class="st-row"><button class="st-btn" onclick="adjLog('sleep',-0.5)">−</button><div class="st-disp"><span class="st-val" id="st-val-sleep" style="font-size:30px">${logState.sleep}</span></div><button class="st-btn" onclick="adjLog('sleep',0.5)">+</button></div></div>
-      <div><div class="sh">ดื่มน้ำ (L)</div><div class="st-row"><button class="st-btn" onclick="adjLog('water',-0.25)">−</button><div class="st-disp"><span class="st-val" id="st-val-water" style="font-size:30px">${logState.water}</span></div><button class="st-btn" onclick="adjLog('water',0.25)">+</button></div></div>
-    </div>
-    <div style="margin-bottom:10px">
-      <div class="sh">ระดับพลังงาน (${logState.energy}/10)</div>
-      <input type="range" id="e-slider" class="e-sl" min="1" max="10" step="1" value="${logState.energy}" oninput="adjLogE(this.value)">
-    </div>
-    <p class="em" id="ql-error"></p>
-    <div style="display:flex;gap:7px">
-      <button class="cr-b cr-bc" style="flex:1" onclick="closeQuickLog()">ยกเลิก</button>
-      <button class="save-btn" style="flex:2;margin-top:0;padding:12px" id="ql-btn" onclick="submitQuickLog()">บันทึกด่วน</button>
-    </div>
-  `;
-  document.getElementById('ql-overlay').classList.add('show');
-  document.getElementById('ql-overlay').onclick=e=>{if(e.target===document.getElementById('ql-overlay'))closeQuickLog();};
-}
 function closeQuickLog(){document.getElementById('ql-overlay').classList.remove('show');}
 function adjLogE(v){logState.energy=parseInt(v);}
-async function submitQuickLog(){
-  const date=new Date().toISOString().split('T')[0];
-  const btn=document.getElementById('ql-btn');const err=document.getElementById('ql-error');
-  if(logState.weight<20||logState.weight>300){err.textContent='น้ำหนักไม่ถูกต้อง';return;}
-  err.textContent='';btn.innerHTML='<span class="sp2"></span>';btn.disabled=true;
-  const{data:logData,error}=await supa.from('daily_logs').insert([{user_id:CU.id,date,weight:logState.weight,sleep_hours:logState.sleep,water_liters:logState.water,exercise_minute:logState.exercise,energy_level:logState.energy}]).select().single();
-  if(error){err.textContent='เกิดข้อผิดพลาด';btn.innerHTML='บันทึกด่วน';btn.disabled=false;return;}
-  const ml=mL(logData);LOGS.push(ml);
-  await logAct('create',`Quick Log: ${date} (${logState.weight}kg)`,CU.id,'log');
-  const rs=genRecs(ml,CU,LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>b.date.localeCompare(a.date)));
-  const dr=rs.map(r=>({log_id:logData.id,rectype:r.title,severity:r.sev,message:r.msg,action:r.act,icon:''}));
-  const{data:rd}=await supa.from('recommendations').insert(dr).select();
-  if(rd)rd.forEach(r=>RECS.push(mR(r)));
-  closeQuickLog();showToast('บันทึกสำเร็จ!');
-  renderApp('home');
-}
-
-async function submitLog(){
-  if(!supa){alert("ไม่สามารถเชื่อมต่อได้");return;}
-  const date=document.getElementById('log-date').value;
-  const notes=document.getElementById('log-notes')?.value||'';
-  logState.notes=notes;
-  const err=document.getElementById('log-error');const btn=document.getElementById('log-btn');
-  if(logState.weight<20||logState.weight>300){err.textContent='น้ำหนักไม่ถูกต้อง (20-300 kg)';return;}
-  if(logState.sleep<0||logState.sleep>24){err.textContent='ชั่วโมงนอนไม่ถูกต้อง';return;}
-  err.textContent='';btn.innerHTML='<span class="sp2"></span> กำลังบันทึก...';btn.disabled=true;
-  const{data:logData,error}=await supa.from('daily_logs').insert([{user_id:CU.id,date,weight:logState.weight,sleep_hours:logState.sleep,water_liters:logState.water,exercise_minute:logState.exercise,energy_level:logState.energy}]).select().single();
-  if(error){err.textContent='เกิดข้อผิดพลาด: '+error.message;btn.innerHTML=`${IC.check} Save log · บันทึกข้อมูล`;btn.disabled=false;return;}
-  const ml=mL(logData);LOGS.push(ml);
-  await logAct('create',`บันทึก Log: ${date} (${logState.weight}kg, energy ${logState.energy}/10)`,CU.id,'log');
-  const rs=genRecs(ml,CU,LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>b.date.localeCompare(a.date)));
-  const dr=rs.map(r=>({log_id:logData.id,rectype:r.title,severity:r.sev,message:r.msg,action:r.act,icon:''}));
-  const{data:rd}=await supa.from('recommendations').insert(dr).select();
-  if(rd)rd.forEach(r=>RECS.push(mR(r)));
-  showToast('บันทึกข้อมูลสำเร็จ!');
-  setTimeout(()=>navTo('home',document.querySelectorAll('.bnav .ni')[0]),600);
-}
 
 // ═══ PROGRESS PAGE ═══
 let progDays=30;
@@ -1588,11 +1628,12 @@ async function applyCropper(){
 }
 
 // ═══ ADMIN VIEW ═══
+function aBk(){return`<div class="mode-banner"><div class="mb-l"><div class="mb-t">Admin Panel</div><div class="mb-n">${CU.name}</div></div><button class="mb-btn mb-bg" onclick="switchView('user')">← User</button></div>`;}
 function renderADash(){
   const tu=USERS.filter(u=>u.role==='user').length,hr=LOGS.filter(l=>{const u=USERS.find(x=>x.id===l.userId);return u&&hScore(l,u)<50;}).length;
   const avg=LOGS.reduce((s,l)=>{const u=USERS.find(x=>x.id===l.userId);return s+(u?hScore(l,u):0);},0)/(LOGS.length||1);
   const sc=s=>s>=80?'var(--lime)':s>=50?'var(--og)':'var(--red)';
-  return`<div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--lime);margin-bottom:12px">Dashboard</div>
+  return`${aBk()}<div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--lime);margin-bottom:12px">Dashboard</div>
   <div class="admin-m"><div class="amc"><div class="amc-l">Users</div><div class="amc-v">${tu}</div></div><div class="amc"><div class="amc-l">Logs</div><div class="amc-v">${LOGS.length}</div></div><div class="amc"><div class="amc-l">High Risk</div><div class="amc-v" style="color:var(--red)">${hr}</div></div><div class="amc"><div class="amc-l">Avg Score</div><div class="amc-v" style="color:${sc(avg)}">${avg.toFixed(0)}</div></div></div>
   <div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:8px">กิจกรรมล่าสุด</div>
   ${ACTS.slice(0,5).map(a=>acItem(a)).join('')}
@@ -1602,14 +1643,14 @@ function renderADash(){
   }).join('')}`;
 }
 function renderAUsers(){
-  return`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Users</div><button onclick="expAllUsers()" class="be">Export</button></div>
+  return`${aBk()}<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Users</div><button onclick="expAllUsers()" class="be">Export</button></div>
   ${USERS.filter(u=>u.role!=='master').map(u=>{const cnt=LOGS.filter(l=>l.userId===u.id).length;const ul=LOGS.filter(l=>l.userId===u.id);const avg=ul.reduce((s,l)=>s+hScore(l,u),0)/(ul.length||1);const pb=u.photo?`background-image:url('${u.photo}')`:'';const sc=avg>=80?'var(--lime)':avg>=50?'var(--og)':'var(--red)';
     return`<div class="li"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--tl));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--bk);flex-shrink:0;font-size:12px;background-size:cover;background-position:center;${pb}">${!u.photo?u.name[0]:''}</div><div style="min-width:0;flex:1"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-weight:600;font-size:12px">${u.name}</span><span class="rb ${u.role}">${u.role.toUpperCase()}</span></div><div style="font-size:9px;color:var(--tx2)">${u.gender}·${u.age}y·${u.height}cm</div></div></div><div style="text-align:right;flex-shrink:0"><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${sc}">${avg.toFixed(0)}</div><div style="font-size:8px;color:var(--tx3)">${cnt} logs</div></div></div><div style="font-size:9px;color:var(--tx3);margin-top:5px">${u.goalType}</div></div>`;
   }).join('')}`;
 }
 function renderALogs(){
   const all=[...LOGS].sort((a,b)=>b.date.localeCompare(a.date));
-  return`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Logs</div><button onclick="expAllLogs()" class="be">Export</button></div>
+  return`${aBk()}<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Logs</div><button onclick="expAllLogs()" class="be">Export</button></div>
   ${all.map(l=>{const u=USERS.find(x=>x.id===l.userId);if(!u)return'';const s=hScore(l,u);const rc=s>=80?'rl':s>=50?'rm':'rh';
     return`<div class="li"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-weight:600;font-size:11px">${u.name}</span><span class="rib ${rc}">${s}pts</span></div><div style="font-size:9px;color:var(--tx3);font-family:'JetBrains Mono',monospace;margin-bottom:5px">${l.date}</div><div class="ls"><div class="ls-i">W <span>${l.weight}kg</span></div><div class="ls-i">BMI <span>${bmi(l.weight,u.height).toFixed(1)}</span></div><div class="ls-i">Sleep <span>${l.sleep}h</span></div><div class="ls-i">Water <span>${l.water}L</span></div><div class="ls-i">Ex <span>${l.exercise}m</span></div>${l.energyLevel?`<div class="ls-i">E <span>${l.energyLevel}/10</span></div>`:''}</div></div>`;
   }).join('')}`;
@@ -1620,33 +1661,35 @@ function acItem(a){
   return`<div class="ac-i"><div class="ac-ic">${ics[a.type]||IC.bolt}</div><div style="flex:1;min-width:0"><div style="font-size:11px;line-height:1.5;word-break:break-word">${a.msg}</div><div class="ac-ti">${t} · ${a.actorName||'system'}</div></div></div>`;
 }
 function renderActivity(){
-  return`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Activity Log</div><button onclick="expActs()" class="be">Export</button></div>
+  const bk=CV==='master'?mBk():aBk();
+  return`${bk}<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Activity Log</div><button onclick="expActs()" class="be">Export</button></div>
   ${ACTS.length===0?`<div class="empty-s">${IC.zap}<div class="empty-t">ยังไม่มีกิจกรรม</div></div>`:ACTS.map(a=>acItem(a)).join('')}`;
 }
 function renderAlerts(){
   const al=LOGS.map(l=>{const u=USERS.find(x=>x.id===l.userId);if(!u||u.role!=='user')return null;const s=hScore(l,u);const rl=LOGS.filter(x=>x.userId===u.id).sort((a,b)=>b.date.localeCompare(a.date));const rs=genRecs(l,u,rl).filter(r=>r.sev==='high');return{l,u,s,rs};}).filter(x=>x&&x.s<70).sort((a,b)=>a.s-b.s);
-  if(!al.length)return`<div class="empty-s">${IC.check}<div class="empty-t">ไม่มีการแจ้งเตือน</div><div class="empty-d">ผู้ใช้ทุกคนอยู่ในเกณฑ์ดี</div></div>`;
-  return`<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--red);margin-bottom:4px">Alerts</div><div style="font-size:10px;color:var(--tx3);margin-bottom:12px">พบ ${al.length} รายการ</div>
+  if(!al.length)return`${aBk()}<div class="empty-s">${IC.check}<div class="empty-t">ไม่มีการแจ้งเตือน</div><div class="empty-d">ผู้ใช้ทุกคนอยู่ในเกณฑ์ดี</div></div>`;
+  return`${aBk()}<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--red);margin-bottom:4px">Alerts</div><div style="font-size:10px;color:var(--tx3);margin-bottom:12px">พบ ${al.length} รายการ</div>
   ${al.map(a=>`<div class="card" style="margin-bottom:8px;border-color:${a.s<50?'rgba(255,71,87,.3)':'rgba(255,140,66,.3)'}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px"><div><div style="font-weight:600;font-size:12px">${a.u.name}</div><div style="font-size:9px;color:var(--tx3);font-family:'JetBrains Mono',monospace">${a.l.date}</div></div><span class="rib ${a.s<50?'rh':'rm'}">Score ${a.s}</span></div>${a.rs.map(r=>`<div class="rec-c high"><div class="rec-ic">${IC.alert}</div><div class="rec-bd" style="flex:1;min-width:0"><div class="rec-tag">${r.title}</div><div class="rec-tx">${r.msg}</div>${r.act?`<div class="rec-act">${r.act}</div>`:''}</div></div>`).join('')}</div>`).join('')}`;
 }
 
 // ═══ MASTER VIEW ═══
+function mBk(){return`<div class="mode-banner"><div class="mb-l"><div class="mb-t">Master Control</div><div class="mb-n" style="color:var(--gold)">${CU.name}</div></div><div class="mb-btns"><button class="mb-btn mb-bg" onclick="switchView('user')">← User</button><button class="mb-btn mb-ba" onclick="switchView('admin')">Admin</button></div></div>`;}
 function renderMCtrl(){
   const tu=USERS.filter(u=>u.role==='user').length,ta=USERS.filter(u=>u.role==='admin').length;
-  return`<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold);margin-bottom:12px">Master Control</div>
+  return`${mBk()}<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold);margin-bottom:12px">Master Control</div>
   <div class="admin-m"><div class="amc"><div class="amc-l">Users</div><div class="amc-v">${tu}</div></div><div class="amc"><div class="amc-l">Admins</div><div class="amc-v" style="color:var(--bl)">${ta}</div></div><div class="amc"><div class="amc-l">Logs</div><div class="amc-v">${LOGS.length}</div></div><div class="amc"><div class="amc-l">Activities</div><div class="amc-v" style="color:var(--gold)">${ACTS.length}</div></div></div>
   <div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:8px">กิจกรรมล่าสุด</div>
   ${ACTS.slice(0,8).map(a=>acItem(a)).join('')}`;
 }
 function renderMRoles(){
   const ru=USERS.filter(u=>u.id!==CU.id);
-  return`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold)">จัดการ Roles</div><button onclick="expAllUsers()" class="be">Export</button></div>
+  return`${mBk()}<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold)">จัดการ Roles</div><button onclick="expAllUsers()" class="be">Export</button></div>
   ${ru.length===0?`<div class="empty-s">${IC.users}<div class="empty-t">ยังไม่มีผู้ใช้งานคนอื่น</div></div>`:ru.map(u=>{const cnt=LOGS.filter(l=>l.userId===u.id).length;const pb=u.photo?`background-image:url('${u.photo}')`:'';
     return`<div class="card" style="margin-bottom:8px;padding:12px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--tl));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--bk);flex-shrink:0;background-size:cover;background-position:center;font-size:13px;${pb}">${!u.photo?u.name[0]:''}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">${u.name}</div><div style="font-size:9px;color:var(--tx2)">${cnt} logs</div></div><span class="rb ${u.role}">${u.role.toUpperCase()}</span></div><div style="display:flex;gap:5px;flex-wrap:wrap">${u.role!=='user'?`<button class="bs" style="flex:1;min-width:70px;font-size:9px" onclick="setRole('${u.id}','user')">User</button>`:''}${u.role!=='admin'?`<button class="bs" style="flex:1;min-width:70px;font-size:9px;background:var(--bl);color:#fff" onclick="setRole('${u.id}','admin')">Admin</button>`:''}${u.role!=='master'?`<button class="bs" style="flex:1;min-width:70px;font-size:9px;background:var(--gold)" onclick="setRole('${u.id}','master')">Master</button>`:''}  <button class="bd" style="padding:7px 10px;font-size:9px" onclick="delUser('${u.id}')">Delete</button></div></div>`;
   }).join('')}`;
 }
 function renderMBackup(){
-  return`<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold);margin-bottom:12px">Backup & Export</div>
+  return`${mBk()}<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold);margin-bottom:12px">Backup & Export</div>
   <div class="card" style="margin-bottom:10px">
     <div class="sh">Export ข้อมูล</div>
     <div style="display:grid;gap:7px">

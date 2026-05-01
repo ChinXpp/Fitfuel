@@ -1822,10 +1822,104 @@ function renderADash(){
 function renderAUsers(){
   return`${aBk()}<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Users</div><button onclick="expAllUsers()" class="be">Export</button></div>
   ${USERS.filter(u=>u.role!=='master').map(u=>{const cnt=LOGS.filter(l=>l.userId===u.id).length;const ul=LOGS.filter(l=>l.userId===u.id);const avg=ul.reduce((s,l)=>s+hScore(l,u),0)/(ul.length||1);const pb=u.photo?`background-image:url('${u.photo}')`:'';const sc=avg>=80?'var(--lime)':avg>=50?'var(--og)':'var(--red)';
-    return`<div class="li"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--tl));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--bk);flex-shrink:0;font-size:12px;background-size:cover;background-position:center;${pb}">${!u.photo?u.name[0]:''}</div><div style="min-width:0;flex:1"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-weight:600;font-size:12px">${u.name}</span><span class="rb ${u.role}">${u.role.toUpperCase()}</span></div><div style="font-size:9px;color:var(--tx2)">${u.gender}·${u.age}y·${u.height}cm</div></div></div><div style="text-align:right;flex-shrink:0"><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${sc}">${avg.toFixed(0)}</div><div style="font-size:8px;color:var(--tx3)">${cnt} logs</div></div></div><div style="font-size:9px;color:var(--tx3);margin-top:5px">${u.goalType}</div></div>`;
-  }).join('')}`;
-}
-function renderALogs(){
+    return`<div class="li">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0">
+          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--tl));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--bk);flex-shrink:0;font-size:12px;background-size:cover;background-position:center;${pb}">${!u.photo?u.name[0]:''}</div>
+          <div style="min-width:0;flex:1">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font-weight:600;font-size:12px">${u.name}</span>
+              <span class="rb ${u.role}">${u.role.toUpperCase()}</span>
+            </div>
+            <div style="font-size:9px;color:var(--tx2)">${u.gender}·${u.age}y·${u.height}cm</div>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${sc}">${avg.toFixed(0)}</div>
+          <div style="font-size:8px;color:var(--tx3)">${cnt} logs</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <div style="font-size:9px;color:var(--tx3)">${u.goalType}</div>
+        <button class="bs" style="font-size:9px;padding:4px 8px" onclick="manageUserLogs('${u.id}')">Manage Logs</button>
+      </div>
+    </div>`;
+    }).join('')}`;
+    }
+
+    async function manageUserLogs(userId) {
+    const u = USERS.find(x => x.id === userId);
+    if (!u) return;
+
+    const userLogs = LOGS.filter(l => l.userId === userId).sort((a,b) => b.date.localeCompare(a.date));
+
+    const logListHTML = userLogs.length === 0 ? '<div class="empty-s" style="padding:20px"><div class="empty-t">No logs found</div></div>' : userLogs.map(l => {
+    const s = hScore(l, u);
+    const rc = s >= 80 ? 'rl' : s >= 50 ? 'rm' : 'rh';
+    return `
+      <div class="li" style="margin-bottom:8px;border-color:var(--br2)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--lime)">${l.date}</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="rib ${rc}">${s} pts</span>
+            <button class="bd" style="padding:4px 8px;font-size:9px" onclick="deleteLogAdmin('${l.id}', '${userId}')">Delete</button>
+          </div>
+        </div>
+        <div class="ls">
+          <div class="ls-i">W <span>${l.weight}kg</span></div>
+          <div class="ls-i">Sleep <span>${l.sleep}h</span></div>
+          <div class="ls-i">Water <span>${l.water}L</span></div>
+          <div class="ls-i">Ex <span>${l.exercise}m</span></div>
+        </div>
+      </div>
+    `;
+    }).join('');
+
+    const modalHTML = `
+    <div style="padding:4px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px">
+        <div style="width:30px;height:30px;border-radius:50%;background:var(--lime);color:var(--bk);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;background-size:cover;${u.photo?`background-image:url('${u.photo}')`:''}">${!u.photo?u.name[0]:''}</div>
+        <div>
+          <div style="font-weight:700;font-size:14px">${u.name}</div>
+          <div style="font-size:9px;color:var(--tx3)">ID: ${u.id.substring(0,8)}...</div>
+        </div>
+      </div>
+      <div style="max-height:60vh;overflow-y:auto;margin-bottom:15px">
+        ${logListHTML}
+      </div>
+      <button class="cr-b cr-bc" style="width:100%" onclick="closeQuickLog()">Close</button>
+    </div>
+    `;
+
+    const logEl = document.getElementById('ql-content');
+    const overlay = document.getElementById('ql-overlay');
+    const title = overlay.querySelector('.ql-ti');
+
+    title.textContent = 'Manage User Logs';
+    logEl.innerHTML = modalHTML;
+    overlay.classList.add('show');
+    }
+
+    async function deleteLogAdmin(logId, userId) {
+    if (!confirm('ยืนยันการลบ Log นี้?')) return;
+
+    try {
+    const { error } = await supa.from('daily_logs').delete().eq('id', logId);
+    if (error) throw error;
+
+    // Update local state
+    LOGS = LOGS.filter(l => l.id !== logId);
+
+    await logAct('delete', `Admin deleted log for user ${userId}`, CU.id, 'log');
+    showToast('ลบข้อมูลสำเร็จ');
+
+    // Refresh the management view
+    manageUserLogs(userId);
+    } catch (e) {
+    console.error(e);
+    showToast('ล้มเหลว: ' + e.message);
+    }
+    }function renderALogs(){
   const all=[...LOGS].sort((a,b)=>b.date.localeCompare(a.date));
   return`${aBk()}<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Logs</div><button onclick="expAllLogs()" class="be">Export</button></div>
   ${all.map(l=>{const u=USERS.find(x=>x.id===l.userId);if(!u)return'';const s=hScore(l,u);const rc=s>=80?'rl':s>=50?'rm':'rh';

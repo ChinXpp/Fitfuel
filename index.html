@@ -564,6 +564,10 @@ let USERS=[],LOGS=[],ACTS=[],RECS=[];
 let CU=null,CAU=null,CV='user',CP='home';
 let logState={weight:70,sleep:7.5,water:0,exercise:0,energy:5,actType:null,mood:null,notes:''};
 
+// Global Configuration
+let GCFG = JSON.parse(localStorage.getItem('fitfuel_global_cfg')) || { waterTarget: 2.5 };
+function saveGCFG() { localStorage.setItem('fitfuel_global_cfg', JSON.stringify(GCFG)); }
+
 const mU=u=>!u?null:{id:u.id,name:u.name,username:u.username||'',email:u.email,age:u.age,gender:u.gender,height:u.height,targetWeight:u.target_weight,goalType:u.goal_type,sleepTarget:u.sleep_target,weeklyExerciseTarget:u.weekly_exercise_target,role:u.role,photo:u.photo,createdAt:u.created_at,reminderTime:u.reminder_time,remindersEnabled:u.reminders_enabled};
 const mL=l=>({id:l.id,userId:l.user_id,date:l.date,weight:l.weight,sleep:l.sleep_hours,water:l.water_liters,exercise:l.exercise_minute,energyLevel:l.energy_level,createdAt:l.created_at});
 const mR=r=>({id:r.id,logId:r.log_id,rectype:r.rectype,severity:r.severity,message:r.message,action:r.action,icon:r.icon});
@@ -1058,8 +1062,7 @@ function switchView(v){
 }
 
 function cycleView() {
-  const roles = ['user'];
-  if(CU.role === 'admin' || CU.role === 'master') roles.push('admin');
+  const roles = ['user', 'admin'];
   if(CU.role === 'master') roles.push('master');
   
   let nextIdx = (roles.indexOf(CV) + 1) % roles.length;
@@ -1511,7 +1514,7 @@ async function submitQuickLog(){
   renderApp('home');
 }
 function updLogProg(f){
-  const goals={weight:CU.targetWeight||80,sleep:CU.sleepTarget||7.5,water:2.5,exercise:(CU.weeklyExerciseTarget||150)/7};
+  const goals={weight:CU.targetWeight||80,sleep:CU.sleepTarget||7.5,water:GCFG.waterTarget,exercise:(CU.weeklyExerciseTarget||150)/7};
   const pf=document.getElementById('lpf-'+f);if(!pf)return;
   pf.style.width=Math.min(100,(logState[f]/goals[f])*100)+'%';
 }
@@ -1933,8 +1936,37 @@ function acItem(a){
 }
 function renderActivity(){
   const bk=CV==='master'?mBk():aBk();
-  return`${bk}<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Activity Log</div><button onclick="expActs()" class="be">Export</button></div>
-  ${ACTS.length===0?`<div class="empty-s">${IC.zap}<div class="empty-t">ยังไม่มีกิจกรรม</div></div>`:ACTS.map(a=>acItem(a)).join('')}`;
+  const filterType = document.getElementById('act-filter-type')?.value || 'all';
+  const filterActor = document.getElementById('act-filter-actor')?.value || 'all';
+  
+  let filtered = ACTS;
+  if(filterType !== 'all') filtered = filtered.filter(a => a.type === filterType);
+  if(filterActor !== 'all') filtered = filtered.filter(a => a.actorId === filterActor);
+
+  const actors = [...new Set(ACTS.map(a => JSON.stringify({id:a.actorId, name:a.actorName})))].map(s => JSON.parse(s));
+
+  return `${bk}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Activity Log</div>
+      <button onclick="expActs()" class="be">Export</button>
+    </div>
+    
+    <div style="display:flex;gap:8px;margin-bottom:15px">
+      <select id="act-filter-type" class="pb-pin" style="flex:1;height:36px;font-size:10px;padding:0 8px;width:auto" onchange="renderApp('activity')">
+        <option value="all" ${filterType==='all'?'selected':''}>All Types</option>
+        <option value="create" ${filterType==='create'?'selected':''}>Create</option>
+        <option value="update" ${filterType==='update'?'selected':''}>Update</option>
+        <option value="delete" ${filterType==='delete'?'selected':''}>Delete</option>
+        <option value="role" ${filterType==='role'?'selected':''}>Role</option>
+        <option value="log" ${filterType==='log'?'selected':''}>System</option>
+      </select>
+      <select id="act-filter-actor" class="pb-pin" style="flex:1;height:36px;font-size:10px;padding:0 8px;width:auto" onchange="renderApp('activity')">
+        <option value="all" ${filterActor==='all'?'selected':''}>All Actors</option>
+        ${actors.map(ac => `<option value="${ac.id}" ${filterActor===ac.id?'selected':''}>${ac.name}</option>`).join('')}
+      </select>
+    </div>
+
+    ${filtered.length===0?`<div class="empty-s">${IC.zap}<div class="empty-t">ไม่พบกิจกรรมที่ค้นหา</div></div>`:filtered.map(a=>acItem(a)).join('')}`;
 }
 function renderAlerts(){
   const al=LOGS.map(l=>{const u=USERS.find(x=>x.id===l.userId);if(!u||u.role!=='user')return null;const s=hScore(l,u);const rl=LOGS.filter(x=>x.userId===u.id).sort((a,b)=>b.date.localeCompare(a.date));const rs=genRecs(l,u,rl).filter(r=>r.sev==='high');return{l,u,s,rs};}).filter(x=>x&&x.s<70).sort((a,b)=>a.s-b.s);
@@ -1949,8 +1981,34 @@ function renderMCtrl(){
   const tu=USERS.filter(u=>u.role==='user').length,ta=USERS.filter(u=>u.role==='admin').length;
   return`${mBk()}<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold);margin-bottom:12px">Master Control</div>
   <div class="admin-m"><div class="amc"><div class="amc-l">Users</div><div class="amc-v">${tu}</div></div><div class="amc"><div class="amc-l">Admins</div><div class="amc-v" style="color:var(--bl)">${ta}</div></div><div class="amc"><div class="amc-l">Logs</div><div class="amc-v">${LOGS.length}</div></div><div class="amc"><div class="amc-l">Activities</div><div class="amc-v" style="color:var(--gold)">${ACTS.length}</div></div></div>
+  
+  <div class="card" style="margin:15px 0">
+    <div class="sh">Global Settings · ตั้งค่าระบบกลาง</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-size:10px;color:var(--tx2);margin-bottom:4px">มาตรฐานการดื่มน้ำรายวัน (ลิตร)</div>
+        <div style="display:flex;gap:8px">
+          <input type="number" id="cfg-water" step="0.1" class="pb-pin" style="flex:1;height:38px;padding:0 12px;width:auto" value="${GCFG.waterTarget}">
+          <button class="be" style="background:var(--gold);color:var(--bk)" onclick="updateGlobalCfg()">บันทึก</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:8px">กิจกรรมล่าสุด</div>
   ${ACTS.slice(0,8).map(a=>acItem(a)).join('')}`;
+}
+
+function updateGlobalCfg() {
+  const water = parseFloat(document.getElementById('cfg-water').value);
+  if(isNaN(water) || water < 0.5 || water > 10) {
+    showToast('กรุณาระบุตัวเลขที่เหมาะสม (0.5 - 10)');
+    return;
+  }
+  GCFG.waterTarget = water;
+  saveGCFG();
+  showToast('อัปเดตการตั้งค่ากลางสำเร็จ');
+  renderApp('control');
 }
 function renderMRoles(){
   const ru=USERS.filter(u=>u.id!==CU.id);

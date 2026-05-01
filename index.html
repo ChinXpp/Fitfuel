@@ -306,6 +306,15 @@ button svg{pointer-events:none;display:block}
 .tog input:checked + .tog-sl{background:rgba(200,240,0,.18);border-color:var(--lime)}
 .tog input:checked + .tog-sl:before{transform:translateX(18px);background:var(--lime)}
 
+/* MODAL (General) */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;align-items:center;justify-content:center;backdrop-filter:blur(10px);padding:20px}
+.modal-ov.show{display:flex}
+.modal-mo{background:var(--dark);border:1px solid var(--br);border-radius:var(--r);padding:24px;width:100%;max-width:450px;max-height:80vh;overflow-y:auto;position:relative}
+.modal-ti{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--lime);margin-bottom:16px}
+.modal-txt{font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:20px}
+.modal-txt h4{color:var(--tx);margin:12px 0 4px;font-size:13px}
+.modal-close{width:100%;padding:12px;background:var(--card2);border:1px solid var(--br2);color:var(--tx);border-radius:var(--rs);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
+
 /* AUTH */
 .sp-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:60px 28px 48px}
 .sp-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
@@ -485,7 +494,7 @@ select.fi option{background:var(--card2)}
 <!-- MAIN APP -->
 <div id="screen-main" class="screen">
   <div class="topbar">
-    <div class="tb-brand">
+    <div class="tb-brand" onclick="goHome()" style="cursor:pointer">
       <div class="tb-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z"/></svg></div>
       <div><div class="tb-name">FITFUEL</div><div class="tb-sub">Health · OS</div></div>
     </div>
@@ -496,6 +505,23 @@ select.fi option{background:var(--card2)}
   </div>
   <div class="content" id="main-content"></div>
   <nav class="bnav" id="main-nav"></nav>
+</div>
+
+<!-- TERMS MODAL -->
+<div id="modal-terms" class="modal-ov">
+  <div class="modal-mo">
+    <div class="modal-ti">Terms & Conditions</div>
+    <div class="modal-txt">
+      <h4>1. การใช้งานระบบ</h4>
+      <p>FitFuel เป็นระบบบันทึกข้อมูลสุขภาพส่วนบุคคล ข้อมูลทั้งหมดจะถูกเก็บเป็นความลับและใช้เพื่อการวิเคราะห์สุขภาพของคุณเท่านั้น</p>
+      <h4>2. ข้อมูลสุขภาพ</h4>
+      <p>คำแนะนำจาก AI เป็นเพียงการวิเคราะห์เบื้องต้นจากข้อมูลที่คุณบันทึก ไม่สามารถใช้แทนคำวินิจฉัยทางการแพทย์ได้</p>
+      <h4>3. ความเป็นส่วนตัว</h4>
+      <p>เราให้ความสำคัญกับความเป็นส่วนตัวของคุณ คุณสามารถลบข้อมูลทั้งหมดของคุณได้ตลอดเวลาผ่านเมนูจัดการบัญชี</p>
+      <p style="margin-top:10px">FitFuel Health OS · v4.0.0</p>
+    </div>
+    <button class="modal-close" onclick="closeTerms()">ตกลงและปิด</button>
+  </div>
 </div>
 
 <input type="file" id="photo-input" class="ph-in" accept="image/*">
@@ -1591,9 +1617,13 @@ function renderProfile(){
     <div class="pi" onclick="expCSV('${CU.id}')"><div class="pi-ic">${IC.export}</div><div class="pi-main"><div class="pi-t">Export data <span style="font-size:9px;color:var(--tx3);font-weight:400">ส่งออกข้อมูล</span></div><div class="pi-s">CSV · JSON</div></div><div class="pi-r">${IC.arrow}</div></div>
   </div>
   <button class="so-btn" onclick="logout()">${IC.signout} Sign out · ออกจากระบบ</button>
-  <div class="pro-footer">FitFuel Health OS · v4.0.0<br>Built with Bebas Neue × DM Sans</div>
+  <div class="pro-footer" style="cursor:pointer;text-decoration:underline" onclick="openTerms()">Terms & Conditions</div>
   `;
 }
+
+function goHome(){ navTo('home', document.querySelectorAll('.bnav .ni')[0]); }
+function openTerms(){ document.getElementById('modal-terms').classList.add('show'); }
+function closeTerms(){ document.getElementById('modal-terms').classList.remove('show'); }
 
 // ═══ SETTINGS PAGE ═══
 function renderSettings(){

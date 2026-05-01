@@ -21,6 +21,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bk);color:var(--tx);min-h
 .screen.active{display:flex;animation:sIn .2s ease}
 @keyframes sIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
+button svg{pointer-events:none;display:block}
+.btn-ic svg,.st-btn svg,.save-btn svg,.pi-ic svg,.ni svg{width:1.2em;height:1.2em;flex-shrink:0}
+
 /* TOPBAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--dark);border-bottom:1px solid var(--br);position:sticky;top:0;z-index:100}
 .tb-brand{display:flex;align-items:center;gap:9px}

@@ -395,9 +395,9 @@ select.fi option{background:var(--card2)}
 /* Quick Log Modal */
 .ql-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9000;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)}
 .ql-ov.show{display:flex}
-.ql-mo{background:var(--dark);border:1px solid var(--br);border-radius:var(--r) var(--r) 0 0;padding:20px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto}
-.ql-drag{width:36px;height:3px;background:var(--br2);border-radius:2px;margin:0 auto 16px}
-.ql-ti{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--lime);margin-bottom:14px}
+.ql-mo{background:var(--dark);border:1px solid var(--br);border-radius:var(--r) var(--r) 0 0;padding:16px 16px 24px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;position:relative}
+.ql-drag{width:36px;height:4px;background:var(--br2);border-radius:2px;margin:0 auto 14px;flex-shrink:0}
+.ql-ti{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:1px;color:var(--lime);margin-bottom:12px}
 /* Cropper */
 .cr-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9998;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(10px)}
 .cr-ov.show{display:flex}
@@ -1370,50 +1370,49 @@ function openQuickLog(){
   } catch(e) {}
 
   logEl.innerHTML=`
-    <!-- Weight & Exercise Grid (คู่บน) -->
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-      <div class="st-card" style="padding:10px; margin-bottom:0">
-        <div class="sh">WEIGHT (kg)</div>
-        <div class="st-row" style="gap:5px; margin-bottom:8px">
-          <button class="st-btn" style="width:30px;height:30px" onclick="adjLog('weight',-0.1)">−</button>
-          <div class="st-disp"><input type="number" class="st-val-input" id="st-val-weight" style="font-size:24px" value="${logState.weight}" onchange="setLog('weight', this.value)"></div>
-          <button class="st-btn" style="width:30px;height:30px" onclick="adjLog('weight',0.1)">+</button>
-        </div>
-        <div class="pb-wrap" style="height:6px"><input type="range" class="pb-range" id="range-weight" min="30" max="250" step="0.1" value="${logState.weight}" oninput="setLog('weight', this.value)"><div class="pb"><div class="pf pf-l" id="lpf-weight" style="width:0%"></div></div></div>
+    <!-- Row 1: Weight (Full Width) -->
+    <div class="st-card" style="padding:10px; margin-bottom:10px; border-radius:var(--rs)">
+      <div class="sh">WEIGHT (kg)</div>
+      <div class="st-row" style="gap:8px; margin-bottom:10px">
+        <button class="st-btn" style="width:34px;height:34px;font-size:18px" onclick="adjLog('weight',-0.1)">−</button>
+        <div class="st-disp"><input type="number" step="0.1" inputmode="decimal" class="st-val-input" id="st-val-weight" style="font-size:32px;width:100%" value="${logState.weight}" onchange="setLog('weight', this.value)"></div>
+        <button class="st-btn" style="width:34px;height:34px;font-size:18px" onclick="adjLog('weight',0.1)">+</button>
       </div>
-      <div class="st-card" style="padding:10px; margin-bottom:0">
-        <div class="sh">EXERCISE (min)</div>
-        <div class="st-row" style="gap:5px; margin-bottom:8px">
-          <button class="st-btn" style="width:30px;height:30px" onclick="adjLog('exercise',-5)">−</button>
-          <div class="st-disp"><input type="number" class="st-val-input" id="st-val-exercise" style="font-size:24px" value="${logState.exercise}" onchange="setLog('exercise', this.value)"></div>
-          <button class="st-btn" style="width:30px;height:30px" onclick="adjLog('exercise',5)">+</button>
-        </div>
-        <div class="pb-wrap" style="height:6px"><input type="range" class="pb-range" id="range-exercise" min="0" max="300" step="5" value="${logState.exercise}" oninput="setLog('exercise', this.value)"><div class="pb"><div class="pf pf-p" id="lpf-exercise" style="width:0%"></div></div></div>
-      </div>
+      <div class="pb-wrap" style="height:6px"><input type="range" class="pb-range" id="range-weight" min="30" max="250" step="0.1" value="${logState.weight}" oninput="setLog('weight', this.value)"><div class="pb"><div class="pf pf-l" id="lpf-weight" style="width:0%"></div></div></div>
     </div>
 
-    <!-- Sleep & Water Grid (คู่ล่าง - บังคับให้อยู่บรรทัดเดียวกัน) -->
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-      <div class="st-card" style="padding:10px; margin-bottom:0">
+    <!-- Row 2: Exercise (Full Width) -->
+    <div class="st-card" style="padding:10px; margin-bottom:10px; border-radius:var(--rs)">
+      <div class="sh">EXERCISE (min)</div>
+      <div class="st-row" style="gap:8px; margin-bottom:10px">
+        <button class="st-btn" style="width:34px;height:34px;font-size:18px" onclick="adjLog('exercise',-5)">−</button>
+        <div class="st-disp"><input type="number" step="1" inputmode="numeric" class="st-val-input" id="st-val-exercise" style="font-size:32px;width:100%" value="${logState.exercise}" onchange="setLog('exercise', this.value)"></div>
+        <button class="st-btn" style="width:34px;height:34px;font-size:18px" onclick="adjLog('exercise',5)">+</button>
+      </div>
+      <div class="pb-wrap" style="height:6px"><input type="range" class="pb-range" id="range-exercise" min="0" max="300" step="5" value="${logState.exercise}" oninput="setLog('exercise', this.value)"><div class="pb"><div class="pf pf-p" id="lpf-exercise" style="width:0%"></div></div></div>
+    </div>
+
+    <!-- Row 3: Sleep & Water (Split 1:1) -->
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:12px;">
+      <div class="st-card" style="padding:10px; margin-bottom:0; border-radius:var(--rs)">
         <div class="sh">SLEEP (hrs)</div>
         <div class="st-row" style="gap:5px; margin-bottom:0">
-          <button class="st-btn" style="width:30px;height:30px" onclick="adjLog('sleep',-0.5)">−</button>
-          <div class="st-disp"><input type="number" class="st-val-input" id="st-val-sleep" style="font-size:24px" value="${logState.sleep}" onchange="setLog('sleep', this.value)"></div>
-          <button class="st-btn" style="width:30px;height:30px" onclick="adjLog('sleep',0.5)">+</button>
+          <button class="st-btn" style="width:28px;height:28px;font-size:16px" onclick="adjLog('sleep',-0.5)">−</button>
+          <div class="st-disp"><input type="number" step="0.5" inputmode="decimal" class="st-val-input" id="st-val-sleep" style="font-size:22px;width:100%" value="${logState.sleep}" onchange="setLog('sleep', this.value)"></div>
+          <button class="st-btn" style="width:28px;height:28px;font-size:16px" onclick="adjLog('sleep',0.5)">+</button>
         </div>
       </div>
-      <div class="st-card" style="padding:10px; margin-bottom:0">
+      <div class="st-card" style="padding:10px; margin-bottom:0; border-radius:var(--rs)">
         <div class="sh">WATER (L)</div>
         <div class="st-row" style="gap:5px; margin-bottom:0">
-          <button class="st-btn" style="width:30px;height:30px" onclick="adjLog('water',-0.25)">−</button>
-          <div class="st-disp"><input type="number" class="st-val-input" id="st-val-water" style="font-size:24px" value="${logState.water}" onchange="setLog('water', this.value)"></div>
-          <button class="st-btn" style="width:30px;height:30px" onclick="adjLog('water',0.25)">+</button>
+          <button class="st-btn" style="width:28px;height:28px;font-size:16px" onclick="adjLog('water',-0.25)">−</button>
+          <div class="st-disp"><input type="number" step="0.25" inputmode="decimal" class="st-val-input" id="st-val-water" style="font-size:22px;width:100%" value="${logState.water}" onchange="setLog('water', this.value)"></div>
+          <button class="st-btn" style="width:28px;height:28px;font-size:16px" onclick="adjLog('water',0.25)">+</button>
         </div>
       </div>
     </div>
 
     <div style="margin-bottom:15px">
-      <!-- เพิ่ม ID เพื่อให้ตัวเลข Energy Level อัปเดตตามการเลื่อน -->
       <div class="sh">ENERGY LEVEL (<span id="ql-energy-val">${logState.energy}</span>/10)</div>
       <input type="range" id="e-slider" class="e-sl" min="1" max="10" step="1" value="${logState.energy}" oninput="adjLogE(this.value); setLog('energy', this.value);">
     </div>

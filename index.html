@@ -1447,17 +1447,66 @@ async function submitLog(){
   if(logState.sleep<0||logState.sleep>24){err.textContent='ชั่วโมงนอนไม่ถูกต้อง';return;}
   
   err.textContent='';btn.innerHTML='<span class="sp2"></span> กำลังบันทึก...';btn.disabled=true;
-  const{data:logData,error}=await supa.from('daily_logs').insert([{user_id:CU.id,date,weight:logState.weight,sleep_hours:logState.sleep,water_liters:logState.water,exercise_minute:logState.exercise,energy_level:logState.energy}]).select().single();
-  if(error){err.textContent='เกิดข้อผิดพลาด: '+error.message;btn.innerHTML=`${IC.check} Save log · บันทึกข้อมูล`;btn.disabled=false;return;}
+
+  // 1. ตรวจสอบว่ามีข้อมูลของวันนี้อยู่แล้วหรือไม่
+  const { data: existing } = await supa.from('daily_logs').select('id').eq('user_id', CU.id).eq('date', date).single();
+
+  let res;
+  if (existing) {
+    // 2. ถ้ามีแล้ว ให้ทำการ Update
+    res = await supa.from('daily_logs').update({
+      weight: logState.weight,
+      sleep_hours: logState.sleep,
+      water_liters: logState.water,
+      exercise_minute: logState.exercise,
+      energy_level: logState.energy
+    }).eq('id', existing.id).select().single();
+  } else {
+    // 3. ถ้ายังไม่มี ให้ Insert ใหม่
+    res = await supa.from('daily_logs').insert([{
+      user_id: CU.id,
+      date,
+      weight: logState.weight,
+      sleep_hours: logState.sleep,
+      water_liters: logState.water,
+      exercise_minute: logState.exercise,
+      energy_level: logState.energy
+    }]).select().single();
+  }
+
+  if(res.error){
+    err.textContent='เกิดข้อผิดพลาด: '+res.error.message;
+    btn.innerHTML=`${IC.check} Save log · บันทึกข้อมูล`;
+    btn.disabled=false;
+    return;
+  }
   
-  const ml=mL(logData);LOGS.push(ml);
-  await logAct('create',`บันทึก Log: ${date} (${logState.weight}kg, energy ${logState.energy}/10)`,CU.id,'log');
+  const ml=mL(res.data);
+  const idx = LOGS.findIndex(l => l.id === ml.id);
+  if (idx > -1) LOGS[idx] = ml; else LOGS.push(ml);
+
+  await logAct(existing ? 'update' : 'create', `บันทึก Log: ${date} (${logState.weight}kg)`, CU.id, 'log');
   
   // ล้าง Draft
   localStorage.removeItem('fitfuel_draft_' + CU.id);
   
-  showToast('บันทึกข้อมูลสำเร็จ!');
+  showToast(existing ? 'อัปเดตข้อมูลสำเร็จ!' : 'บันทึกข้อมูลสำเร็จ!');
   setTimeout(()=>navTo('home',document.querySelectorAll('.bnav .ni')[0]),600);
+}
+
+async function deleteLog(id) {
+  if(!confirm('ยืนยันการลบ Log นี้?')) return;
+  try {
+    const { error } = await supa.from('daily_logs').delete().eq('id', id);
+    if(error) throw error;
+    LOGS = LOGS.filter(l => l.id !== id);
+    await logAct('delete', `ลบ Log`, CU.id, 'log');
+    showToast('ลบข้อมูลสำเร็จ');
+    renderApp('history');
+  } catch(e) {
+    console.error(e);
+    showToast('ลบไม่สำเร็จ: ' + e.message);
+  }
 }
 
 async function submitQuickLog(){
@@ -1608,7 +1657,23 @@ function renderHistory(){
   return`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div><div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:1px">ประวัติข้อมูล</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px">HISTORY.</div></div><button onclick="expCSV('${CU.id}')" style="display:flex;align-items:center;gap:5px;background:rgba(45,212,191,.08);color:var(--tl);border:1px solid rgba(45,212,191,.2);border-radius:7px;padding:7px 11px;font-size:9px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">${IC.export} CSV</button></div>
   <div style="font-size:10px;color:var(--tx3);margin-bottom:12px;font-family:'JetBrains Mono',monospace">${logs.length} รายการ</div>
   ${logs.map(l=>{const b=bmi(l.weight,CU.height);const s=hScore(l,CU);const rc=s>=80?'rl':s>=50?'rm':'rh';const ec=l.energyLevel?`<span>${l.energyLevel}/10</span>`:'';
-    return`<div class="li"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><span style="font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace">${l.date}</span><span class="rib ${rc}">Score ${s}</span></div><div class="ls"><div class="ls-i">Weight <span>${l.weight}kg</span></div><div class="ls-i">BMI <span>${b.toFixed(1)}</span></div><div class="ls-i">Sleep <span>${l.sleep}h</span></div><div class="ls-i">Water <span>${l.water}L</span></div><div class="ls-i">Exercise <span>${l.exercise}m</span></div>${l.energyLevel?`<div class="ls-i">Energy <span>${l.energyLevel}/10</span></div>`:''}</div></div>`;
+    return`<div class="li">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+        <span style="font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace">${l.date}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="rib ${rc}">Score ${s}</span>
+          <button onclick="deleteLog('${l.id}')" style="background:none;border:none;color:var(--red);cursor:pointer;padding:2px">${IC.delete || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`}</button>
+        </div>
+      </div>
+      <div class="ls">
+        <div class="ls-i">Weight <span>${l.weight}kg</span></div>
+        <div class="ls-i">BMI <span>${b.toFixed(1)}</span></div>
+        <div class="ls-i">Sleep <span>${l.sleep}h</span></div>
+        <div class="ls-i">Water <span>${l.water}L</span></div>
+        <div class="ls-i">Exercise <span>${l.exercise}m</span></div>
+        ${l.energyLevel?`<div class="ls-i">Energy <span>${l.energyLevel}/10</span></div>`:''}
+      </div>
+    </div>`;
   }).join('')}`;
 }
 

@@ -1429,7 +1429,7 @@ function renderProgress(){
       {i:IC.star,l:'Top Score',v:pr.topScore.val,u:'/100',d:pr.topScore.date,lbl:'คะแนนสูงสุด'},
     ].map(r=>`<div class="pr-card"><div class="pr-ic">${r.i}</div><div class="pr-lbl">${r.lbl}</div><div><span class="pr-val">${r.v}</span><span class="pr-unit">${r.u}</span></div>${r.d?`<div class="pr-date">${r.d}</div>`:''}</div>`).join(''):''}
   </div>
-  <button onclick="expCSV('${CU.id}')" style="width:100%;padding:12px;background:rgba(45,212,191,.08);color:var(--tl);border:1px solid rgba(45,212,191,.2);border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'DM Sans',sans-serif">${IC.export} Export Data · ส่งออกข้อมูล</button>
+  <button onclick="expCSV('${CU.id}')" style="width:100%;padding:10px;background:rgba(45,212,191,.08);color:var(--tl);border:1px solid rgba(45,212,191,.2);border-radius:var(--rs);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'DM Sans',sans-serif">${IC.export} Export Data · ส่งออกข้อมูล</button>
   `;
 }
 function setProgDays(d){progDays=d;renderApp('progress');}

@@ -538,7 +538,7 @@ let USERS=[],LOGS=[],ACTS=[],RECS=[];
 let CU=null,CAU=null,CV='user',CP='home';
 let logState={weight:70,sleep:7.5,water:0,exercise:0,energy:5,actType:null,mood:null,notes:''};
 
-const mU=u=>!u?null:{id:u.id,name:u.name,username:u.username||'',email:u.email,age:u.age,gender:u.gender,height:u.height,targetWeight:u.target_weight,goalType:u.goal_type,sleepTarget:u.sleep_target,weeklyExerciseTarget:u.weekly_exercise_target,role:u.role,photo:u.photo,createdAt:u.created_at};
+const mU=u=>!u?null:{id:u.id,name:u.name,username:u.username||'',email:u.email,age:u.age,gender:u.gender,height:u.height,targetWeight:u.target_weight,goalType:u.goal_type,sleepTarget:u.sleep_target,weeklyExerciseTarget:u.weekly_exercise_target,role:u.role,photo:u.photo,createdAt:u.created_at,reminderTime:u.reminder_time,remindersEnabled:u.reminders_enabled};
 const mL=l=>({id:l.id,userId:l.user_id,date:l.date,weight:l.weight,sleep:l.sleep_hours,water:l.water_liters,exercise:l.exercise_minute,energyLevel:l.energy_level,createdAt:l.created_at});
 const mR=r=>({id:r.id,logId:r.log_id,rectype:r.rectype,severity:r.severity,message:r.message,action:r.action,icon:r.icon});
 const mA=a=>({id:a.id,type:a.type,target:a.target,userId:a.user_id,actorId:a.actor_id,actorName:a.actor_name,msg:a.msg,timestamp:a.created_at});
@@ -872,17 +872,42 @@ function drawChart(id,logs,user,days=30){
 
 // ═══ REMINDERS ═══
 const RK='fitfuel_reminder';let RI=null,LRD=null;
-function getRem(){try{return JSON.parse(localStorage.getItem(RK))||{enabled:false,time:'20:00'};}catch{return{enabled:false,time:'20:00'};}}
-function saveRem(s){localStorage.setItem(RK,JSON.stringify(s));}
-async function enableRem(time){
-  if(!('Notification' in window)){showToast('เบราว์เซอร์ไม่รองรับการแจ้งเตือน');return false;}
-  let p=Notification.permission;if(p==='default')p=await Notification.requestPermission();
-  if(p!=='granted'){showToast('กรุณาอนุญาตการแจ้งเตือน');return false;}
-  saveRem({enabled:true,time});startReminder();showToast('ตั้งแจ้งเตือนเวลา '+time);return true;
+function getRem(){
+  const local = JSON.parse(localStorage.getItem(RK)) || {enabled:false,time:'20:00'};
+  if(CU) return {enabled: CU.remindersEnabled ?? local.enabled, time: (CU.reminderTime ? CU.reminderTime.slice(0,5) : local.time)};
+  return local;
 }
-function disableRem(){const s=getRem();saveRem({...s,enabled:false});stopReminder();showToast('ปิดการแจ้งเตือนแล้ว');}
+function saveRem(s){
+  localStorage.setItem(RK,JSON.stringify(s));
+  if(CU) { CU.remindersEnabled = s.enabled; CU.reminderTime = s.time; }
+}
+async function enableRem(time){
+  saveRem({enabled:true,time});
+  if(!('Notification' in window)){
+    showToast('เปิดแจ้งเตือน Email แล้ว (เบราว์เซอร์ไม่รองรับ Push)');
+  } else {
+    let p=Notification.permission;
+    if(p==='default')p=await Notification.requestPermission();
+    if(p==='granted'){
+      startReminder();
+      showToast('เปิดการแจ้งเตือน (Email + Push)');
+    } else {
+      showToast('เปิดแจ้งเตือน Email แล้ว (กรุณาอนุญาต Push ในการตั้งค่า)');
+    }
+  }
+  return true;
+}
+async function disableRem(){
+  const s=getRem();
+  saveRem({enabled:false,time:s.time});
+  stopReminder();
+  if(CU) {
+    try { await supa.from('users').update({reminders_enabled:false}).eq('id',CU.id); } catch(e) {}
+  }
+  showToast('ปิดการแจ้งเตือนแล้ว');
+}
 function checkNotify(){
-  const s=getRem();if(!s.enabled||!CU)return;
+  const s=getRem();if(!s.enabled||!CU||!('Notification' in window)||Notification.permission!=='granted')return;
   const n=new Date(),today=n.toISOString().split('T')[0];
   const cur=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
   if(LOGS.some(l=>l.userId===CU.id&&l.date===today)||LRD===today)return;
@@ -890,17 +915,28 @@ function checkNotify(){
 }
 function startReminder(){stopReminder();RI=setInterval(checkNotify,30000);checkNotify();}
 function stopReminder(){if(RI){clearInterval(RI);RI=null;}}
-function initReminder(){const s=getRem();if(s.enabled&&'Notification' in window&&Notification.permission==='granted')startReminder();}
+function initReminder(){const s=getRem();if(s.enabled)startReminder();}
 async function toggleReminder(){
   const s=getRem();
-  if(s.enabled){disableRem();}
-  else{const time=document.getElementById('reminder-time')?.value||s.time||'20:00';const ok=await enableRem(time);if(ok){try{await supa.from('users').update({reminder_time:time+':00'}).eq('id',CU.id);}catch{}}}
+  if(s.enabled){
+    await disableRem();
+  } else {
+    const time=document.getElementById('reminder-time')?.value||s.time||'20:00';
+    await enableRem(time);
+    if(CU){
+      try{await supa.from('users').update({reminder_time:time+':00', reminders_enabled:true}).eq('id',CU.id);}catch(e){console.error(e);}
+    }
+  }
   renderApp(CP);
 }
 async function changeRemTime(){
-  const t=document.getElementById('reminder-time').value;const s=getRem();saveRem({...s,time:t});
+  const t=document.getElementById('reminder-time').value;
+  const s=getRem();
+  saveRem({enabled:s.enabled,time:t});
   if(s.enabled)startReminder();
-  try{await supa.from('users').update({reminder_time:t+':00'}).eq('id',CU.id);showToast('บันทึกเวลา '+t);}catch{showToast('บันทึกเวลา '+t);}
+  if(CU){
+    try{await supa.from('users').update({reminder_time:t+':00'}).eq('id',CU.id);showToast('บันทึกเวลา '+t);}catch(e){console.error(e);}
+  }
 }
 
 // ═══ SVG ICONS ═══
@@ -1575,10 +1611,16 @@ function renderSettings(){
   </div>
   <div class="card" style="margin-bottom:10px">
     <div class="sh">การแจ้งเตือนรายวัน</div>
-    <div class="es-row"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;margin-bottom:2px">เปิดการแจ้งเตือน</div><div style="font-size:10px;color:var(--tx2)">เตือนถ้ายังไม่บันทึกข้อมูลวันนั้น</div></div><label class="tog"><input type="checkbox" id="reminder-toggle" ${remS.enabled?'checked':''} onchange="toggleReminder()"><span class="tog-sl"></span></label></div>
+    <div class="es-row">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;margin-bottom:2px">เปิดการแจ้งเตือน</div>
+        <div style="font-size:10px;color:var(--tx2)">${np === 'unsupported' ? 'โหมด Email (เบราว์เซอร์ไม่รองรับ Push)' : 'เตือนถ้ายังไม่บันทึกข้อมูลวันนั้น'}</div>
+      </div>
+      <label class="tog"><input type="checkbox" id="reminder-toggle" ${remS.enabled?'checked':''} onchange="toggleReminder()"><span class="tog-sl"></span></label>
+    </div>
     <div class="fg"><label class="fl">เวลาแจ้งเตือน</label><input type="time" id="reminder-time" class="fi" value="${remS.time||'20:00'}" onchange="changeRemTime()"></div>
-    <button onclick="async function t(){if(!('Notification' in window)){showToast('ไม่รองรับ');return;}if(Notification.permission!=='granted'){const p=await Notification.requestPermission();if(p!=='granted'){showToast('กรุณาอนุญาต');return;}}new Notification('FitFuel',{body:'ทดสอบสำเร็จ!'});showToast('ส่งทดสอบแล้ว');}t()" style="width:100%;padding:9px;background:rgba(45,212,191,.08);color:var(--tl);border:1px solid rgba(45,212,191,.2);border-radius:7px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px">ทดสอบการแจ้งเตือน</button>
-    ${np==='denied'?'<p class="fh" style="color:var(--og);margin-top:6px">การแจ้งเตือนถูกบล็อก — เปิดในการตั้งค่าเบราว์เซอร์</p>':np==='unsupported'?'<p class="fh" style="color:var(--og);margin-top:6px">เบราว์เซอร์ไม่รองรับ</p>':'<p class="fh" style="margin-top:6px">ต้องเปิดแท็บ FitFuel ทิ้งไว้ให้แจ้งเตือนทำงาน</p>'}
+    <button onclick="async function t(){if(!('Notification' in window)){showToast('เปิดใช้งาน Email Mode แล้ว (ส่งจริงตามเวลาที่ตั้ง)');return;}if(Notification.permission!=='granted'){const p=await Notification.requestPermission();if(p!=='granted'){showToast('กรุณาอนุญาต Push');return;}}new Notification('FitFuel',{body:'ทดสอบสำเร็จ!'});showToast('ส่งทดสอบ Push แล้ว');}t()" style="width:100%;padding:9px;background:rgba(45,212,191,.08);color:var(--tl);border:1px solid rgba(45,212,191,.2);border-radius:7px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px">ทดสอบการแจ้งเตือน</button>
+    ${np==='denied'?'<p class="fh" style="color:var(--og);margin-top:6px">Push ถูกบล็อก — ระบบจะส่งผ่าน Email แทน</p>':np==='unsupported'?'<p class="fh" style="color:var(--lime);margin-top:6px">ระบบกำลังทำงานในโหมด Email Notification</p>':'<p class="fh" style="margin-top:6px">เปิดแท็บทิ้งไว้เพื่อรับ Push หรือรอรับทาง Email</p>'}
   </div>
   <div class="card">
     <div class="sh">ข้อมูลทั่วไป</div>

@@ -1856,25 +1856,27 @@ async function applyCropper(){
     const stW=st.offsetWidth;
     const ts=cropBase*cropScale;
     
-    // คำนวณหาตำแหน่งเริ่มต้น (Source X, Y) บนรูปภาพจริง
-    // โดยเทียบจากจุดกึ่งกลางของ Stage
-    const sw=stW/ts, sh=stW/ts;
-    const sx=(cropImg.naturalWidth/2)-(cropX/ts)-(sw/2);
-    const sy=(cropImg.naturalHeight/2)-(cropY/ts)-(sh/2);
-
     const OUT=400;
     const canvas=document.createElement('canvas');canvas.width=OUT;canvas.height=OUT;
     const ctx=canvas.getContext('2d');
     
-    // เคลียร์พื้นหลังเป็นสีขาวก่อน (กันรูปโปร่งใสแล้วกลายเป็นดำ)
+    // เคลียร์พื้นหลังเป็นสีขาวก่อน
     ctx.fillStyle='#ffffff';ctx.fillRect(0,0,OUT,OUT);
     
     // ตัดเป็นวงกลม
     ctx.save();
     ctx.beginPath();ctx.arc(OUT/2,OUT/2,OUT/2,0,Math.PI*2);ctx.clip();
     
-    // วาดรูปจาก Source ที่คำนวณได้
-    ctx.drawImage(cropImg,sx,sy,sw,sh,0,0,OUT,OUT);
+    // จำลอง Transform ตาม CSS
+    const ratio = OUT / stW;
+    ctx.translate(OUT/2, OUT/2); // ย้ายจุดหมุนไปตรงกลาง
+    ctx.translate(cropX * ratio, cropY * ratio); // ขยับตามที่ลาก
+    
+    const renderW = cropImg.naturalWidth * ts * ratio;
+    const renderH = cropImg.naturalHeight * ts * ratio;
+    
+    // วาดรูปให้กึ่งกลางอยู่ที่ (0,0)
+    ctx.drawImage(cropImg, -renderW/2, -renderH/2, renderW, renderH);
     ctx.restore();
     
     const url=canvas.toDataURL('image/jpeg',.85);

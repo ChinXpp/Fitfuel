@@ -198,6 +198,7 @@
   .cropper-btn-apply {background:var(--lime);color:var(--black)}
   .cropper-btn-reset {background:transparent;color:var(--text2);text-decoration:underline;border:none;font-size:12px;cursor:pointer;margin-top:4px;width:100%;text-align:center;padding:6px}
 
+  input#ob-username, input#info-username {text-transform:lowercase}
   #global-loader {display:flex;position:fixed;inset:0;background:var(--black);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px}
   @media(max-width:400px){.metrics-grid,.form-row,.summary-grid{grid-template-columns:1fr} .pin-box{width:40px;height:50px;font-size:18px} .content{padding:16px;padding-bottom:100px}}
 </style>
@@ -235,6 +236,7 @@
 <div id="screen-onboarding" class="screen">
   <div class="auth-wrap">
     <div class="auth-header"><h2>สร้างโปรไฟล์</h2><p>ยินดีต้อนรับ! กรอกข้อมูลสุขภาพเพื่อเริ่มต้น</p></div>
+    <div class="form-group"><label>Username *</label><input type="text" id="ob-username" placeholder="เช่น somchai99" autocomplete="username"><p class="field-hint">ใช้ภาษาอังกฤษ ตัวเลข หรือ _ เท่านั้น</p></div>
     <div class="form-group"><label>ชื่อ-นามสกุล *</label><input type="text" id="ob-name" placeholder="เช่น สมชาย ใจดี"></div>
     <div class="form-row">
       <div class="form-group"><label>อายุ (ปี) *</label><input type="number" id="ob-age" placeholder="25" min="10" max="100"></div>
@@ -294,7 +296,7 @@ const supaClient=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPAB
 let USERS=[],LOGS=[],ACTIVITIES=[],RECOMMENDATIONS=[];
 let currentUser=null,currentUserAuth=null,currentView='user',currentPage='home';
 
-const mapUser=u=>!u?null:{id:u.id,name:u.name,email:u.email,age:u.age,gender:u.gender,height:u.height,targetWeight:u.target_weight,goalType:u.goal_type,sleepTarget:u.sleep_target,weeklyExerciseTarget:u.weekly_exercise_target,role:u.role,photo:u.photo,createdAt:u.created_at};
+const mapUser=u=>!u?null:{id:u.id,name:u.name,username:u.username||'',email:u.email,age:u.age,gender:u.gender,height:u.height,targetWeight:u.target_weight,goalType:u.goal_type,sleepTarget:u.sleep_target,weeklyExerciseTarget:u.weekly_exercise_target,role:u.role,photo:u.photo,createdAt:u.created_at};
 const mapLog=l=>({id:l.id,userId:l.user_id,date:l.date,weight:l.weight,sleep:l.sleep_hours,water:l.water_liters,exercise:l.exercise_minute,energyLevel:l.energy_level,createdAt:l.created_at});
 const mapRec=r=>({id:r.id,logId:r.log_id,rectype:r.rectype,severity:r.severity,message:r.message,action:r.action,icon:r.icon,createdAt:r.created_at});
 const mapAct=a=>({id:a.id,type:a.type,target:a.target,userId:a.user_id,actorId:a.actor_id,actorName:a.actor_name,msg:a.msg,timestamp:a.created_at});
@@ -363,6 +365,7 @@ async function handleSession(authUser){
   else{document.getElementById('global-loader').style.display='none';showScreen('onboarding');}
 }
 async function submitOnboarding(){
+  const username=document.getElementById('ob-username').value.trim().toLowerCase();
   const name=document.getElementById('ob-name').value.trim();
   const age=parseInt(document.getElementById('ob-age').value);
   const gender=document.getElementById('ob-gender').value;
@@ -372,16 +375,21 @@ async function submitOnboarding(){
   const sleepTarget=parseFloat(document.getElementById('ob-sleep').value);
   const exTarget=parseInt(document.getElementById('ob-ex').value);
   const err=document.getElementById('ob-error');const btn=document.getElementById('btn-save-ob');
-  if(!name||!age||!gender||!height||!target||!goal||!sleepTarget||!exTarget){err.textContent='กรุณากรอกให้ครบทุกช่อง';return;}
+  if(!username||!name||!age||!gender||!height||!target||!goal||!sleepTarget||!exTarget){err.textContent='กรุณากรอกให้ครบทุกช่อง';return;}
+  if(!/^[a-z0-9_]{3,30}$/.test(username)){err.textContent='Username ต้องเป็นภาษาอังกฤษ ตัวเลข หรือ _ (3-30 ตัว)';return;}
   if(age<10||age>100){err.textContent='อายุไม่ถูกต้อง';return;}
   if(height<100||height>250){err.textContent='ส่วนสูงไม่ถูกต้อง';return;}
   if(target<20||target>300){err.textContent='น้ำหนักเป้าหมายไม่ถูกต้อง';return;}
   err.textContent='';btn.innerHTML='<span class="spinner"></span> กำลังสร้างโปรไฟล์...';btn.disabled=true;
   const{count}=await supaClient.from('users').select('*',{count:'exact',head:true});
   const assignRole=count===0?'master':'user';
-  const dbUser={id:currentUserAuth.id,name,email:currentUserAuth.email,age,gender,height,target_weight:target,goal_type:goal,sleep_target:sleepTarget,weekly_exercise_target:exTarget,role:assignRole};
+  const dbUser={id:currentUserAuth.id,username,name,email:currentUserAuth.email,age,gender,height,target_weight:target,goal_type:goal,sleep_target:sleepTarget,weekly_exercise_target:exTarget,role:assignRole};
   const{data,error}=await supaClient.from('users').insert([dbUser]).select().single();
-  if(error){err.textContent='เกิดข้อผิดพลาด: '+error.message;btn.innerHTML='🎉 บันทึกและเริ่มใช้งาน';btn.disabled=false;return;}
+  if(error){
+    if(error.code==='23505'&&error.message.includes('username'))err.textContent='❌ Username นี้ถูกใช้ไปแล้ว กรุณาเลือกใหม่';
+    else err.textContent='เกิดข้อผิดพลาด: '+error.message;
+    btn.innerHTML='🎉 บันทึกและเริ่มใช้งาน';btn.disabled=false;return;
+  }
   currentUser=mapUser(data);await loadAllData();
   await logActivity('create',`สร้างบัญชีใหม่: ${currentUser.name} (${assignRole})`,currentUser.id,'user');
   showToast('🎉 ยินดีต้อนรับ '+currentUser.name.split(' ')[0]+'!');
@@ -926,7 +934,7 @@ function renderUserProfile(){
   const reminderS=getReminderSettings();
   return`<div class="profile-header">
       <div class="profile-avatar-lg ${avatarClass}" ${photoStyle} onclick="document.getElementById('photo-input').click()">${!currentUser.photo?currentUser.name[0]:''}<div class="photo-edit-overlay">📷 เปลี่ยน</div></div>
-      <div style="flex:1;min-width:0"><div style="font-size:20px;font-weight:600">${currentUser.name}</div><div class="text-muted">${currentUser.email} <span class="role-badge role-${role}">${role.toUpperCase()}</span></div></div>
+      <div style="flex:1;min-width:0"><div style="font-size:20px;font-weight:600">${currentUser.name}</div>${currentUser.username?`<div style="font-size:13px;color:var(--lime);font-family:'JetBrains Mono';margin-bottom:2px">@${currentUser.username}</div>`:''}<div class="text-muted">${currentUser.email} <span class="role-badge role-${role}">${role.toUpperCase()}</span></div></div>
     </div>
     <div class="card">
       <div class="section-sub">ข้อมูลสุขภาพ</div>
@@ -1123,6 +1131,7 @@ function renderSettingsInfo(){
     </div>
     <div class="card">
       <div class="section-sub">ข้อมูลทั่วไป</div>
+      <div class="form-group"><label>Username</label><input type="text" id="info-username" value="${currentUser.username||''}" placeholder="เช่น somchai99" autocomplete="username"><p class="field-hint">ภาษาอังกฤษ ตัวเลข หรือ _ เท่านั้น (3-30 ตัว)</p></div>
       <div class="form-group"><label>ชื่อ-นามสกุล</label><input type="text" id="info-name" value="${currentUser.name}"></div>
       <div class="form-row">
         <div class="form-group"><label>อายุ</label><input type="number" id="info-age" value="${currentUser.age}"></div>
@@ -1151,6 +1160,7 @@ async function removePhoto(){
   updateAvatar();showToast('🗑 ลบรูปแล้ว');renderApp('settings-info');
 }
 async function saveInfo(){
+  const username=document.getElementById('info-username').value.trim().toLowerCase();
   const name=document.getElementById('info-name').value.trim();
   const age=parseInt(document.getElementById('info-age').value);
   const gender=document.getElementById('info-gender').value;
@@ -1161,12 +1171,18 @@ async function saveInfo(){
   const exTarget=parseInt(document.getElementById('info-ex-target').value);
   const err=document.getElementById('info-error');const btn=document.getElementById('btn-save-info');
   if(!name||!age||!gender||!height||!target||!goal||!sleepTarget||!exTarget){err.textContent='กรุณากรอกให้ครบ';return;}
+  if(username&&!/^[a-z0-9_]{3,30}$/.test(username)){err.textContent='Username ต้องเป็นภาษาอังกฤษ ตัวเลข หรือ _ (3-30 ตัว)';return;}
   err.textContent='';btn.innerHTML='<span class="spinner"></span> กำลังบันทึก...';btn.disabled=true;
-  const updates={name,age,gender,height,target_weight:target,goal_type:goal,sleep_target:sleepTarget,weekly_exercise_target:exTarget};
-  await supaClient.from('users').update(updates).eq('id',currentUser.id);
+  const updates={username:username||null,name,age,gender,height,target_weight:target,goal_type:goal,sleep_target:sleepTarget,weekly_exercise_target:exTarget};
+  const{error:saveErr}=await supaClient.from('users').update(updates).eq('id',currentUser.id);
+  if(saveErr){
+    if(saveErr.code==='23505'&&saveErr.message.includes('username'))err.textContent='❌ Username นี้ถูกใช้ไปแล้ว กรุณาเลือกใหม่';
+    else err.textContent='เกิดข้อผิดพลาด: '+saveErr.message;
+    btn.innerHTML='💾 บันทึก';btn.disabled=false;return;
+  }
   const u=USERS.find(x=>x.id===currentUser.id);
-  Object.assign(u,{name,age,gender,height,targetWeight:target,goalType:goal,sleepTarget,weeklyExerciseTarget:exTarget});
-  Object.assign(currentUser,{name,age,gender,height,targetWeight:target,goalType:goal,sleepTarget,weeklyExerciseTarget:exTarget});
+  Object.assign(u,{username,name,age,gender,height,targetWeight:target,goalType:goal,sleepTarget,weeklyExerciseTarget:exTarget});
+  Object.assign(currentUser,{username,name,age,gender,height,targetWeight:target,goalType:goal,sleepTarget,weeklyExerciseTarget:exTarget});
   await logActivity('update','แก้ไขข้อมูลส่วนตัว',currentUser.id,'user');
   updateAvatar();showToast('✅ บันทึกสำเร็จ');
   setTimeout(()=>navTo('profile'),500);

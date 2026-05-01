@@ -1853,44 +1853,37 @@ async function applyCropper(){
   btn.innerHTML='<span class="sp2" style="border-top-color:var(--bk)"></span>';btn.disabled=true;
   try{
     const st=document.getElementById('cropper-stage');
-    // ใช้ getBoundingClientRect เพื่อความแม่นยำสูงสุดของพื้นที่ Stage
-    const rect = st.getBoundingClientRect();
-    const stW = rect.width;
-    const stH = rect.height;
+    const sw=st.offsetWidth;
+    const ts=cropBase*cropScale;
     
-    const OUT=240; // ปรับขนาดขึ้นมานิดหน่อยเพื่อให้ชัดขึ้น (ยังปลอดภัยสำหรับ DB)
+    // คำนวณหาตำแหน่งกึ่งกลางของ Viewport (Stage) บนรูปภาพต้นฉบับ
+    // CSS ใช้ top:50%, left:50% และ translate(-50%, -50%) เพื่อวางรูปกึ่งกลาง
+    // ดังนั้นจุดกึ่งกลางของวงกลมในพิกัดรูปภาพคือ:
+    const centerX = (cropImg.naturalWidth / 2) - (cropX / ts);
+    const centerY = (cropImg.naturalHeight / 2) - (cropY / ts);
+    
+    // ขนาดของพื้นที่ที่จะตัดบนรูปภาพต้นฉบับ (เท่ากับความกว้าง Stage หารด้วย Scale)
+    const sourceSize = sw / ts;
+    const sx = centerX - (sourceSize / 2);
+    const sy = centerY - (sourceSize / 2);
+
+    const OUT=320; // ปรับเป็น 320px เพื่อความคมชัดที่สมดุล
     const canvas=document.createElement('canvas');canvas.width=OUT;canvas.height=OUT;
     const ctx=canvas.getContext('2d');
     
-    // เคลียร์พื้นหลัง (สีขาว)
-    ctx.fillStyle='#ffffff';
-    ctx.fillRect(0,0,OUT,OUT);
+    // เคลียร์พื้นหลังเป็นสีขาว
+    ctx.fillStyle='#ffffff';ctx.fillRect(0,0,OUT,OUT);
     
     // ตัดเป็นวงกลม
     ctx.save();
-    ctx.beginPath();
-    ctx.arc(OUT/2, OUT/2, OUT/2, 0, Math.PI*2);
-    ctx.clip();
+    ctx.beginPath();ctx.arc(OUT/2,OUT/2,OUT/2,0,Math.PI*2);ctx.clip();
     
-    // คำนวณอัตราส่วนการขยายจากหน้าจอมาสู่ Canvas
-    const zoom = OUT / stW;
-    
-    // หัวใจสำคัญ: ย้ายจุดเริ่มต้นไปที่กึ่งกลาง Canvas
-    ctx.translate(OUT/2, OUT/2);
-    
-    // ขยับตามค่าที่ผู้ใช้ลาก (คูณด้วย zoom)
-    ctx.translate(cropX * zoom, cropY * zoom);
-    
-    // คำนวณขนาดรูปที่จะวาด
-    const ts = cropBase * cropScale;
-    const drawW = cropImg.naturalWidth * ts * zoom;
-    const drawH = cropImg.naturalHeight * ts * zoom;
-    
-    // วาดรูปโดยให้จุดศูนย์กลางของรูปอยู่ที่พิกัด (0,0) ของระบบที่ translate มาแล้ว
-    ctx.drawImage(cropImg, -drawW/2, -drawH/2, drawW, drawH);
+    // วาดรูปจากจุด (sx, sy) ที่คำนวณได้ ไปลงที่ (0,0) ของ Canvas ขนาด OUT
+    ctx.drawImage(cropImg, sx, sy, sourceSize, sourceSize, 0, 0, OUT, OUT);
     ctx.restore();
     
-    const url=canvas.toDataURL('image/jpeg', 0.75); // คุณภาพ 75% สมดุลที่สุด
+    const url=canvas.toDataURL('image/jpeg',.8);
+    if(url.length<1000)throw new Error('รูปภาพผิดพลาด');
     
     const{error}=await supa.from('users').update({photo:url}).eq('id',CU.id);
     if(error)throw error;

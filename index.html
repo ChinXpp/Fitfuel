@@ -490,8 +490,8 @@ select.fi option{background:var(--card2)}
       <div><div class="tb-name">FITFUEL</div><div class="tb-sub">Health · OS</div></div>
     </div>
     <div class="tb-right">
-      <span class="rb" id="topbar-role">USER</span>
-      <div class="av" id="user-avatar">U</div>
+      <span class="rb" id="topbar-role" onclick="cycleView()" style="cursor:pointer">USER</span>
+      <div class="av" id="user-avatar" onclick="navTo('profile')">U</div>
     </div>
   </div>
   <div class="content" id="main-content"></div>
@@ -652,8 +652,11 @@ async function logout(){
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');}
 function enterApp(){
   updAv();
-  document.getElementById('topbar-role').className='rb '+CU.role;
-  document.getElementById('topbar-role').textContent=CU.role.toUpperCase();
+  const rb = document.getElementById('topbar-role');
+  if(rb) {
+    rb.className = 'rb ' + CV;
+    rb.textContent = CV.toUpperCase();
+  }
   initReminder();renderApp('home');showScreen('main');
 }
 function updAv(){
@@ -941,20 +944,39 @@ function renderNav(){
   nav.innerHTML=items.map((it,i)=>`<button class="ni${i===ai?' active':''}" onclick="navTo('${it.p}',this)"><span>${it.i}</span>${it.l}</button>`).join('');
 }
 function navTo(p,el){document.querySelectorAll('.bnav .ni').forEach(n=>n.classList.remove('active'));if(el)el.classList.add('active');renderApp(p);}
-function switchView(v){CV=v;renderApp({user:'home',admin:'dashboard',master:'control'}[v]);}
+function switchView(v){
+  CV=v;
+  const viewMap = {user:'home', admin:'dashboard', master:'control'};
+  renderApp(viewMap[v] || 'home');
+  // Update topbar role badge color and text
+  const rb = document.getElementById('topbar-role');
+  if(rb) {
+    rb.className = 'rb ' + v;
+    rb.textContent = v.toUpperCase();
+  }
+}
+
+function cycleView() {
+  const roles = ['user'];
+  if(CU.role === 'admin' || CU.role === 'master') roles.push('admin');
+  if(CU.role === 'master') roles.push('master');
+  
+  let nextIdx = (roles.indexOf(CV) + 1) % roles.length;
+  const nextView = roles[nextIdx];
+  
+  switchView(nextView);
+  showToast(`สลับโหมดเป็น: ${nextView.toUpperCase()}`);
+}
+
 function modeBanner(){
-  if(CV!=='user')return'';
-  if(CU.role==='admin')return`<div class="mode-banner"><div class="mb-l"><div class="mb-t">โหมดปัจจุบัน</div><div class="mb-n">User Mode</div></div><button class="mb-btn mb-ba" onclick="switchView('admin')">Admin Panel</button></div>`;
-  if(CU.role==='master')return`<div class="mode-banner"><div class="mb-l"><div class="mb-t">โหมดปัจจุบัน</div><div class="mb-n">User Mode</div></div><div class="mb-btns"><button class="mb-btn mb-ba" onclick="switchView('admin')">Admin</button><button class="mb-btn mb-bm" onclick="switchView('master')">Master</button></div></div>`;
-  return'';
+  return '';
 }
 
 // ═══ HOME PAGE ═══
 function renderHome(){
   const logs=LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>b.date.localeCompare(a.date));
   const lt=logs[0];
-  const banner=modeBanner();
-  if(!lt)return`${banner}<div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:3px">${greeting()},</div><div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;color:var(--lime);line-height:1;margin-bottom:20px">${CU.name.split(' ')[0].toUpperCase()}</div>
+  if(!lt)return`<div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:3px">${greeting()},</div><div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;color:var(--lime);line-height:1;margin-bottom:20px">${CU.name.split(' ')[0].toUpperCase()}</div>
     <div class="empty-s">${IC.plus}<div class="empty-t">ยังไม่มีข้อมูล</div><div class="empty-d">กดปุ่ม Log เพื่อเริ่มบันทึก</div></div>`;
 
   const B=bmi(lt.weight,CU.height);const cat=bmiCat(B);const score=hScore(lt,CU);

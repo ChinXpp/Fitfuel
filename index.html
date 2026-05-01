@@ -1091,7 +1091,22 @@ function renderHome(){
   const wVals=recent5.map(l=>l.weight);const slVals=recent5.map(l=>l.sleep);
   const waVals=recent5.map(l=>l.water);const exVals=recent5.map(l=>l.exercise);
   const wDl=delta(logs,'weight'),slDl=delta(logs,'sleep'),waDl=delta(logs,'water'),exDl=delta(logs,'exercise');
-  const dlBadge=(v,inv=false)=>v===null?'':`<span class="mc-dl ${v===0?'neu':((v>0)!==inv)?'neg':'pos'}">${v>0?'+':''}${typeof v==='number'&&!Number.isInteger(v)?v.toFixed(1):v}</span>`;
+  
+  // ปรับ logic สีตัวเลข: 
+  // Weight: ลดลง (-) = เขียว (pos), เพิ่มขึ้น (+) = แดง (neg)
+  // Others: เพิ่มขึ้น (+) = เขียว (pos), ลดลง (-) = แดง (neg)
+  const dlBadge=(v,type)=> {
+    if(v===null) return '';
+    let isPos;
+    if(type==='weight') isPos = v < 0; // นน. ลดคือดี
+    else isPos = v > 0; // อื่นๆ เพิ่มคือดี
+    
+    const cls = v === 0 ? 'neu' : (isPos ? 'pos' : 'neg');
+    const sign = v > 0 ? '+' : '';
+    const val = typeof v === 'number' && !Number.isInteger(v) ? v.toFixed(1) : v;
+    return `<span class="mc-dl ${cls}">${sign}${val}</span>`;
+  };
+
   const bmiPct=Math.min(100,Math.max(0,((B-15)/(40-15))*100));
   const savedRecs=RECS.filter(r=>r.logId===lt.id);
   const recList=savedRecs.length>0?savedRecs.map(r=>({sev:r.severity,title:r.rectype,msg:r.message,act:r.action,rt:''})):genRecs(lt,CU,logs);
@@ -1157,22 +1172,22 @@ function renderHome(){
     <div class="mc">
       <div class="mc-head"><div class="mc-lbl">${IC.weight}<span>น้ำหนัก</span></div><div class="mc-rt">Weight</div></div>
       <div><span class="mc-val">${lt.weight}</span><span class="mc-unit">kg</span></div>
-      <div class="mc-foot">${sparkSVG(wVals,'#C8F000')}${dlBadge(wDl,CU.goalType==='ลดน้ำหนัก')}</div>
+      <div class="mc-foot">${sparkSVG(wVals,'#C8F000')}${dlBadge(wDl, 'weight')}</div>
     </div>
     <div class="mc">
       <div class="mc-head"><div class="mc-lbl">${IC.moon}<span>นอนหลับ</span></div><div class="mc-rt">Sleep</div></div>
       <div><span class="mc-val" style="color:var(--og)">${lt.sleep}</span><span class="mc-unit">hrs</span></div>
-      <div class="mc-foot">${sparkSVG(slVals,'#FF8C42')}${dlBadge(slDl)}</div>
+      <div class="mc-foot">${sparkSVG(slVals,'#FF8C42')}${dlBadge(slDl, 'sleep')}</div>
     </div>
     <div class="mc">
       <div class="mc-head"><div class="mc-lbl">${IC.droplet}<span>ดื่มน้ำ</span></div><div class="mc-rt">Water</div></div>
       <div><span class="mc-val" style="color:var(--bl)">${lt.water}</span><span class="mc-unit">L</span></div>
-      <div class="mc-foot">${sparkSVG(waVals,'#3B82F6')}${dlBadge(waDl)}</div>
+      <div class="mc-foot">${sparkSVG(waVals,'#3B82F6')}${dlBadge(waDl, 'water')}</div>
     </div>
     <div class="mc">
       <div class="mc-head"><div class="mc-lbl">${IC.run}<span>ออกกำลังกาย</span></div><div class="mc-rt">Exercise</div></div>
       <div><span class="mc-val" style="color:var(--pu)">${lt.exercise}</span><span class="mc-unit">min</span></div>
-      <div class="mc-foot">${sparkSVG(exVals,'#A78BFA')}${dlBadge(exDl)}</div>
+      <div class="mc-foot">${sparkSVG(exVals,'#A78BFA')}${dlBadge(exDl, 'exercise')}</div>
     </div>
   </div>
   <div class="bmi-card">

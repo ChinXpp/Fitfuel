@@ -1852,20 +1852,37 @@ async function applyCropper(){
   const btn=document.getElementById('cropper-apply-btn');
   btn.innerHTML='<span class="sp2" style="border-top-color:var(--bk)"></span>';btn.disabled=true;
   try{
-    const st=document.getElementById('cropper-stage'),img=document.getElementById('cropper-img');
-    const stR=st.getBoundingClientRect(),imgR=img.getBoundingClientRect();
-    if(!stR.width||!imgR.width)throw new Error('ขนาดยังไม่พร้อม');
-    const scale=imgR.width/cropImg.naturalWidth;
-    const sx=(stR.left-imgR.left)/scale,sy=(stR.top-imgR.top)/scale;
-    const sw=stR.width/scale,sh=stR.height/scale;
-    const OUT=400;const canvas=document.createElement('canvas');canvas.width=OUT;canvas.height=OUT;
+    const st=document.getElementById('cropper-stage');
+    const stW=st.offsetWidth;
+    const ts=cropBase*cropScale;
+    
+    // คำนวณหาตำแหน่งเริ่มต้น (Source X, Y) บนรูปภาพจริง
+    // โดยเทียบจากจุดกึ่งกลางของ Stage
+    const sw=stW/ts, sh=stW/ts;
+    const sx=(cropImg.naturalWidth/2)-(cropX/ts)-(sw/2);
+    const sy=(cropImg.naturalHeight/2)-(cropY/ts)-(sh/2);
+
+    const OUT=400;
+    const canvas=document.createElement('canvas');canvas.width=OUT;canvas.height=OUT;
     const ctx=canvas.getContext('2d');
-    ctx.save();ctx.beginPath();ctx.arc(OUT/2,OUT/2,OUT/2,0,Math.PI*2);ctx.clip();
-    ctx.drawImage(cropImg,sx,sy,sw,sh,0,0,OUT,OUT);ctx.restore();
-    const url=canvas.toDataURL('image/jpeg',.92);
-    if(url.length<3000)throw new Error('รูปที่ตัดออกมาว่างเปล่า');
+    
+    // เคลียร์พื้นหลังเป็นสีขาวก่อน (กันรูปโปร่งใสแล้วกลายเป็นดำ)
+    ctx.fillStyle='#ffffff';ctx.fillRect(0,0,OUT,OUT);
+    
+    // ตัดเป็นวงกลม
+    ctx.save();
+    ctx.beginPath();ctx.arc(OUT/2,OUT/2,OUT/2,0,Math.PI*2);ctx.clip();
+    
+    // วาดรูปจาก Source ที่คำนวณได้
+    ctx.drawImage(cropImg,sx,sy,sw,sh,0,0,OUT,OUT);
+    ctx.restore();
+    
+    const url=canvas.toDataURL('image/jpeg',.85);
+    if(url.length<2000)throw new Error('รูปภาพผิดพลาด');
+    
     const{error}=await supa.from('users').update({photo:url}).eq('id',CU.id);
     if(error)throw error;
+    
     CU.photo=url;const u=USERS.find(x=>x.id===CU.id);if(u)u.photo=url;
     await logAct('update','เปลี่ยนรูปโปรไฟล์',CU.id,'user');
     updAv();showToast('เปลี่ยนรูปโปรไฟล์สำเร็จ!');cancelCropper();btn.innerHTML='ใช้';btn.disabled=false;renderApp(CP);

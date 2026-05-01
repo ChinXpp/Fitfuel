@@ -590,15 +590,27 @@ function setupPins(id){
 setupPins('otp-input-wrap');
 
 async function autoVerifyOTP(token){
-  const email=document.getElementById('auth-email').value.trim().toLowerCase();
-  document.getElementById('verify-error').textContent='';
-  document.getElementById('otp-checking').style.display='block';
-  document.querySelectorAll('#otp-input-wrap .pb-pin').forEach(i=>i.disabled=true);
-  const{data:{user},error}=await supa.auth.verifyOtp({email,token,type:'email'});
-  document.getElementById('otp-checking').style.display='none';
-  document.querySelectorAll('#otp-input-wrap .pb-pin').forEach(i=>i.disabled=false);
-  if(error){document.getElementById('verify-error').textContent='OTP ไม่ถูกต้องหรือหมดอายุ';}
-  else await handleSession(user);
+  try {
+    const email=document.getElementById('auth-email').value.trim().toLowerCase();
+    document.getElementById('verify-error').textContent='';
+    document.getElementById('otp-checking').style.display='block';
+    document.querySelectorAll('#otp-input-wrap .pb-pin').forEach(i=>i.disabled=true);
+    const{data,error}=await supa.auth.verifyOtp({email,token,type:'email'});
+    document.getElementById('otp-checking').style.display='none';
+    document.querySelectorAll('#otp-input-wrap .pb-pin').forEach(i=>i.disabled=false);
+    if(error){
+      document.getElementById('verify-error').textContent='OTP ไม่ถูกต้องหรือหมดอายุ';
+    } else if (data && data.user) {
+      await handleSession(data.user);
+    } else {
+      document.getElementById('verify-error').textContent='ไม่สามารถยืนยันตัวตนได้';
+    }
+  } catch (e) {
+    console.error('OTP Error:', e);
+    document.getElementById('otp-checking').style.display='none';
+    document.querySelectorAll('#otp-input-wrap .pb-pin').forEach(i=>i.disabled=false);
+    document.getElementById('verify-error').textContent='เกิดข้อผิดพลาด: ' + e.message;
+  }
 }
 
 async function sendAuthOTP(){
@@ -616,11 +628,38 @@ async function sendAuthOTP(){
 }
 
 async function handleSession(au){
-  document.getElementById('global-loader').style.display='flex';
-  CAU=au;
-  const{data:p}=await supa.from('users').select('*').eq('id',au.id).single();
-  if(p){CU=mU(p);await loadAll();document.getElementById('global-loader').style.display='none';enterApp();}
-  else{document.getElementById('global-loader').style.display='none';showScreen('onboarding');}
+  try {
+    console.log('Handling session for user:', au.id);
+    document.getElementById('global-loader').style.display='flex';
+    CAU=au;
+    const {data:p, error}=await supa.from('users').select('*').eq('id',au.id).single();
+    
+    if(p){
+      console.log('User profile found:', p.name);
+      CU=mU(p);
+      try {
+        await loadAll();
+      } catch (loadErr) {
+        console.error('LoadAll Error:', loadErr);
+        throw new Error('ไม่สามารถโหลดข้อมูลเริ่มต้นได้: ' + loadErr.message);
+      }
+      document.getElementById('global-loader').style.display='none';
+      enterApp();
+    } else {
+      if (error && error.code !== 'PGRST116') {
+        console.error('Profile fetch error:', error);
+        throw new Error('เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์: ' + error.message);
+      }
+      console.log('No profile found, redirecting to onboarding');
+      document.getElementById('global-loader').style.display='none';
+      showScreen('onboarding');
+    }
+  } catch (e) {
+    console.error('Session Error:', e);
+    document.getElementById('global-loader').style.display='none';
+    alert('Login Error: ' + e.message);
+    showScreen('splash');
+  }
 }
 async function submitOnboarding(){
   const username=document.getElementById('ob-username').value.trim().toLowerCase();

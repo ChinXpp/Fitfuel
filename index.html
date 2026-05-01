@@ -2,89 +2,94 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>FitFuel – Health Tracking Pro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root {--lime:#C8F000;--lime-dark:#a8cc00;--gold:#FFD700;--black:#0A0A0A;--dark:#111214;--card:#1A1C1F;--card2:#222428;--border:#2A2D32;--muted:#555A62;--text:#E8EBF0;--text2:#9BA3AF;--red:#FF4757;--orange:#FF8C42;--teal:#2DD4BF;--blue:#3B82F6;--purple:#A78BFA;--aqua:#38bdf8;--radius:16px;--radius-sm:10px}
+  :root {--lime:#C8F000;--lime-dark:#a8cc00;--gold:#FFD700;--black:#050505;--dark:#0A0A0A;--card:#121212;--card2:#1A1A1A;--border:#222222;--muted:#555A62;--text:#E8EBF0;--text2:#9BA3AF;--red:#FF4757;--orange:#FF8C42;--teal:#2DD4BF;--blue:#3B82F6;--purple:#A78BFA;--aqua:#38bdf8;--radius:16px;--radius-sm:10px}
   * {margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body {max-width:100%;overflow-x:hidden}
-  body {font-family:'DM Sans',sans-serif;background:var(--black);color:var(--text);min-height:100vh}
+  html,body {max-width:100%;overflow-x:hidden;background:var(--black);}
+  body {font-family:'DM Sans',sans-serif;color:var(--text);min-height:100vh}
   .screen {display:none;min-height:100vh;flex-direction:column;animation:fadeIn .3s ease}
   .screen.active {display:flex}
   @keyframes fadeIn {from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)}}
+  
+  /* SVG Icons Base */
+  .icon {width:16px;height:16px;vertical-align:middle;display:inline-block;}
+  .icon-lg {width:24px;height:24px;vertical-align:middle;display:inline-block;}
+  
   .splash-logo {text-align:center;padding:24px}
-  .splash-logo .icon {font-size:72px;margin-bottom:12px;display:block}
   .splash-logo h1 {font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:4px;color:var(--lime);line-height:1}
-  .splash-btns {margin-top:60px;display:flex;flex-direction:column;gap:12px;width:290px;margin:60px auto 0}
   .auth-wrap {max-width:420px;width:100%;margin:0 auto;padding:40px 24px 60px}
   .auth-header {margin-bottom:28px;text-align:center}
   .auth-header h2 {font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;color:var(--lime)}
-  .btn {border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:var(--radius-sm);transition:all .18s ease;letter-spacing:.3px}
+  .btn {display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border-radius:var(--radius-sm);transition:all .18s ease;letter-spacing:.3px}
   .btn-primary {background:var(--lime);color:var(--black);padding:16px 24px;font-size:15px;width:100%}
   .btn-primary:hover {background:var(--lime-dark);transform:translateY(-1px)}
   .btn-primary:disabled {opacity:.5;cursor:not-allowed;transform:none}
-  .btn-sm {background:var(--lime);color:var(--black);padding:9px 16px;font-size:12px;border-radius:8px;cursor:pointer;border:none;font-weight:600;font-family:'DM Sans'}
-  .btn-danger {background:rgba(255,71,87,.15);color:var(--red);border:1px solid rgba(255,71,87,.3);padding:10px 20px;font-size:13px;border-radius:8px;cursor:pointer;font-weight:600}
-  .btn-export {background:rgba(45,212,191,.15);color:var(--teal);border:1px solid rgba(45,212,191,.3);padding:10px 16px;font-size:12px;border-radius:8px;cursor:pointer;font-weight:600}
+  .btn-sm {background:var(--card2);color:var(--text);padding:9px 16px;font-size:12px;border-radius:8px;cursor:pointer;border:1px solid var(--border);font-weight:600;font-family:'DM Sans'}
+  .btn-danger {background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.2);padding:10px 20px;font-size:13px;border-radius:8px;cursor:pointer;font-weight:600}
+  .btn-export {background:rgba(200,240,0,.1);color:var(--lime);border:1px solid rgba(200,240,0,.2);padding:10px 16px;font-size:12px;border-radius:8px;cursor:pointer;font-weight:600}
+  
   .form-group {margin-bottom:14px;width:100%}
-  .form-group label {display:block;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+  .form-group label {display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
   .form-group input, .form-group select {width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);padding:13px 16px;border-radius:var(--radius-sm);font-size:15px;box-sizing:border-box;max-width:100%}
   .form-group input[type=date], .form-group input[type=time] {font-family:'JetBrains Mono',monospace;text-align:left;padding:12px;font-size:14px;min-height:46px;width:100%;appearance:none;-webkit-appearance:none;position:relative}
   .form-group input[type=date]::-webkit-calendar-picker-indicator,
   .form-group input[type=time]::-webkit-calendar-picker-indicator {filter:invert(1) opacity(.6);cursor:pointer;padding:4px;flex-shrink:0}
-  @media(max-width:380px){.form-group input[type=date], .form-group input[type=time]{font-size:13px;padding:12px 8px}}
   .form-group input:focus, .form-group select:focus {outline:none;border-color:var(--lime)}
   .form-row {display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .error-msg {color:var(--red);font-size:13px;margin-top:8px;text-align:center;min-height:18px}
   .field-hint {font-size:11px;color:var(--text2);margin-top:5px}
+  
   .pin-wrap {display:flex;gap:8px;justify-content:center;margin:8px 0;max-width:100%}
-  .pin-box {width:44px;height:54px;text-align:center;font-size:22px;font-weight:600;background:var(--card);border:2px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'JetBrains Mono'}
-  .pin-box:focus {outline:none;border-color:var(--lime);transform:scale(1.05)}
-  .pin-box.filled {border-color:var(--lime)}
-  .topbar {display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--dark);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+  .pin-box {width:44px;height:54px;text-align:center;font-size:22px;font-weight:600;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--lime);font-family:'JetBrains Mono'}
+  .pin-box:focus {outline:none;border-color:var(--lime);background:rgba(200,240,0,0.05);}
+  .pin-box.filled {border-color:var(--lime);background:rgba(200,240,0,0.05);}
+  
+  .topbar {display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--black);position:sticky;top:0;z-index:100}
   .topbar-logo {font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--lime)}
-  .avatar {width: 36px;height: 36px;border-radius: 50%;background: var(--lime);display: flex;align-items: center;justify-content: center;font-weight: 700;color: var(--black);cursor: pointer;background-size: cover;       /* เพิ่มบรรทัดนี้ */background-position: center;    /* เพิ่มบรรทัดนี้ */background-repeat: no-repeat; /* เพิ่มบรรทัดนี้ */}
+  .avatar {width:36px;height:36px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);cursor:pointer;background-size:cover;background-position:center;background-repeat:no-repeat;}
   .avatar.admin {background:var(--blue);color:white}
   .avatar.master {background:var(--gold);color:var(--black)}
+  
   .role-badge {font-size:9px;padding:3px 8px;border-radius:10px;font-weight:700;text-transform:uppercase;background:rgba(200,240,0,.15);color:var(--lime);border:1px solid rgba(200,240,0,.3)}
   .role-admin {background:rgba(59,130,246,.15);color:var(--blue);border-color:rgba(59,130,246,.3)}
   .role-master {background:rgba(255,215,0,.15);color:var(--gold);border-color:rgba(255,215,0,.3)}
-  .mode-switch {background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(255,215,0,.04));border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  
+  .mode-switch {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
   .mode-btn {padding:8px 14px;font-size:12px;border-radius:8px;font-weight:600;cursor:pointer;border:none}
   .mode-btn-admin {background:var(--blue);color:white}
   .mode-btn-master {background:var(--gold);color:var(--black)}
+  
   .content {flex:1;overflow-y:auto;padding:20px;padding-bottom:100px}
-  .bottom-nav {position:fixed;bottom:0;left:0;right:0;background:var(--dark);border-top:1px solid var(--border);display:flex;padding:8px 0 20px;z-index:100}
-  .nav-item {flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px;color:var(--muted);font-size:10px;font-weight:500;text-transform:uppercase;background:none;border:none}
+  .bottom-nav {position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,0.95);backdrop-filter:blur(10px);border-top:1px solid var(--border);display:flex;padding:12px 0 24px;z-index:100}
+  .nav-item {flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;background:none;border:none;transition:color 0.2s}
   .nav-item.active {color:var(--lime)}
+  
   .card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
   .card-sm {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px}
   .settings-list {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
   .setting-item {padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;border-bottom:1px solid var(--border)}
   .setting-item:hover {background:var(--card2)}
   .setting-item:last-child {border-bottom:none}
-  .setting-icon {width:36px;height:36px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:18px}
+  .setting-icon {width:36px;height:36px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;color:var(--text)}
   .setting-content {flex:1;min-width:0}
   .setting-title {font-size:14px;font-weight:600;margin-bottom:2px}
   .setting-desc {font-size:12px;color:var(--text2)}
 
   .metrics-grid {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-  .metric-chip {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden}
-  .metric-chip::before {content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.07}
-  .metric-chip.lime::before {background:var(--lime)} .metric-chip.teal::before {background:var(--teal)}
-  .metric-chip.orange::before {background:var(--orange)} .metric-chip.blue::before {background:var(--blue)}
-  .metric-chip.purple::before {background:var(--purple)} .metric-chip.aqua::before {background:var(--aqua)}
-  .metric-chip .chip-label {font-size:11px;color:var(--text2);text-transform:uppercase;margin-bottom:6px}
+  .metric-chip {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:8px;}
+  .metric-chip .chip-label {display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);text-transform:uppercase;font-weight:600;}
   .metric-chip .chip-value {font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1}
-  .metric-chip .chip-unit {font-size:12px;color:var(--text2);margin-top:2px}
+  .metric-chip .chip-unit {font-size:12px;color:var(--text2);margin-top:2px;font-family:'DM Sans';text-transform:lowercase;}
   .metric-chip.lime .chip-value{color:var(--lime)} .metric-chip.teal .chip-value{color:var(--teal)}
   .metric-chip.orange .chip-value{color:var(--orange)} .metric-chip.blue .chip-value{color:var(--blue)}
   .metric-chip.purple .chip-value{color:var(--purple)} .metric-chip.aqua .chip-value{color:var(--aqua)}
 
-  .score-mini-stats {display:flex;align-items:center;gap:14px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(200,240,0,.15);font-size:12px;flex-wrap:wrap}
-  .score-mini-stat {display:flex;align-items:center;gap:5px;color:var(--text2)}
+  .score-mini-stats {display:flex;align-items:center;gap:14px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);font-size:12px;flex-wrap:wrap}
+  .score-mini-stat {display:flex;align-items:center;gap:6px;color:var(--text2)}
   .score-mini-stat b {color:var(--text);font-weight:600;font-family:'JetBrains Mono'}
 
   .bmi-card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
@@ -95,256 +100,213 @@
   .progress-bar {background:var(--border);height:8px;border-radius:4px;overflow:hidden;margin:8px 0}
   .progress-bar-fill {height:100%;border-radius:4px}
   .progress-row {display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
-  .streak-box {background:linear-gradient(135deg,rgba(255,140,66,.12),rgba(255,71,87,.06));border:1px solid rgba(255,140,66,.3);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:14px}
-  .streak-num {font-family:'Bebas Neue';font-size:42px;color:var(--orange);line-height:1}
+  .streak-box {background:linear-gradient(135deg,rgba(255,140,66,.1),rgba(255,71,87,.05));border:1px solid rgba(255,140,66,.2);border-radius:var(--radius);padding:20px;margin-bottom:16px;display:flex;align-items:center;gap:20px}
+  .streak-num {font-family:'Bebas Neue';font-size:48px;color:var(--orange);line-height:1}
+  
   .risk-badge {display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600}
-  .risk-low {background:rgba(200,240,0,.15);color:var(--lime);border:1px solid rgba(200,240,0,.3)}
-  .risk-medium {background:rgba(255,140,66,.15);color:var(--orange);border:1px solid rgba(255,140,66,.3)}
-  .risk-high {background:rgba(255,71,87,.15);color:var(--red);border:1px solid rgba(255,71,87,.3)}
-  .rec-box {border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;border-left:3px solid}
-  .rec-box.low {background:rgba(200,240,0,.08);border-color:var(--lime)}
-  .rec-box.medium {background:rgba(255,140,66,.08);border-color:var(--orange)}
-  .rec-box.high {background:rgba(255,71,87,.08);border-color:var(--red)}
-  .rec-box p {font-size:13px;line-height:1.6}
-  .rec-box .rec-label {font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600}
-  .rec-box.low .rec-label{color:var(--lime)} .rec-box.medium .rec-label{color:var(--orange)} .rec-box.high .rec-label{color:var(--red)}
-  .rec-action {font-size:12px;color:var(--text2);margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-style:italic}
-  .log-item {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px}
-  .log-stats {display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
-  .log-stat {font-size:12px;color:var(--text2)}
-  .log-stat span {color:var(--text);font-weight:600}
-  .activity-item {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
-  .activity-icon {width:32px;height:32px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
-  .activity-time {font-size:11px;color:var(--text2);margin-top:3px;font-family:'JetBrains Mono'}
-  .section-title {font-family:'Bebas Neue';font-size:24px;letter-spacing:1px;color:var(--lime);margin-bottom:16px}
-  .section-sub {font-size:12px;color:var(--text2);margin-bottom:14px;text-transform:uppercase;letter-spacing:1px}
+  .risk-low {background:rgba(200,240,0,.1);color:var(--lime);border:1px solid rgba(200,240,0,.2)}
+  .risk-medium {background:rgba(255,140,66,.1);color:var(--orange);border:1px solid rgba(255,140,66,.2)}
+  .risk-high {background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.2)}
+  
+  .rec-box {background:var(--card2);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;display:flex;gap:16px;align-items:flex-start;border:1px solid var(--border);}
+  .rec-icon {width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .rec-box.low .rec-icon {background:rgba(200,240,0,.1);color:var(--lime);}
+  .rec-box.medium .rec-icon {background:rgba(255,140,66,.1);color:var(--orange);}
+  .rec-box.high .rec-icon {background:rgba(255,71,87,.1);color:var(--red);}
+  .rec-content h4 {font-size:14px;margin-bottom:4px;color:var(--text);display:flex;align-items:center;gap:6px;}
+  .rec-content p {font-size:13px;color:var(--text2);line-height:1.5;}
+  .rec-action {display:inline-block;margin-top:10px;font-size:12px;color:var(--text);background:var(--black);padding:6px 12px;border-radius:6px;border:1px solid var(--border);}
+
+  .log-item {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;margin-bottom:12px}
+  .log-stats {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+  .log-stat {font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;}
+  .log-stat span {color:var(--text);font-weight:600;font-family:'JetBrains Mono'}
+  
+  .activity-item {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+  .activity-icon {width:32px;height:32px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--lime)}
+  .activity-time {font-size:11px;color:var(--text2);margin-top:6px;font-family:'JetBrains Mono'}
+  
+  .section-title {font-family:'Bebas Neue';font-size:28px;letter-spacing:1px;color:var(--text);margin:24px 0 16px;display:flex;align-items:center;gap:8px;}
+  .section-sub {font-size:12px;color:var(--text2);margin-bottom:14px;text-transform:uppercase;letter-spacing:1px;font-weight:600}
   .section-flex {display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px}
 
-  /* Weight Chart */
-  .chart-card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 16px 12px;margin-bottom:16px}
-  .chart-card .chart-head {display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:0 4px}
-  .chart-card canvas {display:block;width:100%;height:200px}
+  .chart-card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 16px 16px;margin-bottom:24px}
+  .chart-card .chart-head {display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:0 4px}
+  .chart-card canvas {display:block;width:100%;height:220px}
 
-  /* Weekly Summary */
-  .summary-card {background:linear-gradient(135deg,rgba(200,240,0,.05),rgba(45,212,191,.03));border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px}
-  .summary-grid {display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-  .summary-stat {background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px}
-  .summary-stat .ss-label {font-size:10px;color:var(--text2);text-transform:uppercase;margin-bottom:4px;letter-spacing:.5px}
-  .summary-stat .ss-value {font-family:'Bebas Neue';font-size:26px;line-height:1;color:var(--text)}
-  .summary-stat .ss-delta {font-size:11px;font-family:'JetBrains Mono';margin-top:3px}
+  .summary-card {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+  .summary-grid {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .summary-stat {background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px}
+  .summary-stat .ss-label {display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text2);text-transform:uppercase;margin-bottom:8px;letter-spacing:1px;font-weight:600}
+  .summary-stat .ss-value {font-family:'Bebas Neue';font-size:32px;line-height:1;color:var(--text)}
+  .summary-stat .ss-delta {font-size:11px;font-family:'JetBrains Mono';margin-top:6px}
   .summary-stat .ss-delta.up {color:var(--orange)} .summary-stat .ss-delta.down {color:var(--lime)}
   .summary-stat .ss-delta.neutral {color:var(--text2)}
-  .summary-stat .ss-unit {font-size:11px;color:var(--text2)}
+  .summary-stat .ss-unit {font-size:12px;color:var(--text2);font-family:'DM Sans';text-transform:lowercase;}
 
-  /* Reminder Toggle */
   .toggle-switch {position:relative;display:inline-block;width:48px;height:26px;flex-shrink:0}
   .toggle-switch input {opacity:0;width:0;height:0}
   .toggle-slider {position:absolute;cursor:pointer;inset:0;background:var(--card2);border:1px solid var(--border);border-radius:26px;transition:.3s}
   .toggle-slider:before {position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:var(--text2);border-radius:50%;transition:.3s}
-  .toggle-switch input:checked + .toggle-slider {background:rgba(200,240,0,.2);border-color:var(--lime)}
+  .toggle-switch input:checked + .toggle-slider {background:rgba(200,240,0,.15);border-color:var(--lime)}
   .toggle-switch input:checked + .toggle-slider:before {transform:translateX(22px);background:var(--lime)}
 
-  .energy-slider-box {margin-top:8px}
-  .energy-slider {width:100%;-webkit-appearance:none;appearance:none;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--red) 0%,var(--orange) 30%,var(--lime) 60%,var(--teal) 100%);outline:none}
-  .energy-slider::-webkit-slider-thumb {-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:var(--text);cursor:pointer;border:3px solid var(--card);box-shadow:0 0 0 1px var(--border)}
-  .energy-slider::-moz-range-thumb {width:24px;height:24px;border-radius:50%;background:var(--text);cursor:pointer;border:3px solid var(--card)}
-  .energy-display {display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:12px;color:var(--text2)}
-  .energy-value {font-family:'Bebas Neue';font-size:28px;color:var(--lime);line-height:1}
-  .energy-label-text {font-size:13px;font-weight:600}
-  .energy-info {background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);border-radius:var(--radius-sm);padding:10px 14px;margin-top:10px;font-size:12px;color:var(--text2);line-height:1.5}
-  .energy-info b {color:var(--purple)}
+  .energy-slider-box {margin-top:12px}
+  .energy-slider {width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--red) 0%,var(--orange) 30%,var(--lime) 60%,var(--teal) 100%);outline:none}
+  .energy-slider::-webkit-slider-thumb {-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:var(--text);cursor:pointer;border:4px solid var(--card);box-shadow:0 0 0 1px var(--border)}
+  .energy-slider::-moz-range-thumb {width:24px;height:24px;border-radius:50%;background:var(--text);cursor:pointer;border:4px solid var(--card)}
+  .energy-display {display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:12px;color:var(--text2)}
+  .energy-value {font-family:'Bebas Neue';font-size:32px;color:var(--lime);line-height:1}
+  .energy-label-text {font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;}
+  .energy-info {background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;margin-top:12px;font-size:12px;color:var(--text2);line-height:1.5}
+  .energy-info b {color:var(--text)}
 
-  .spinner {display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+  .spinner {display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
   @keyframes spin {to {transform:rotate(360deg)}}
-  .toast {position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--lime);color:var(--black);padding:12px 24px;border-radius:30px;font-weight:600;font-size:14px;opacity:0;transition:all .3s ease;z-index:9999;white-space:nowrap;max-width:88vw;text-align:center;pointer-events:none}
+  .toast {position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--black);padding:14px 24px;border-radius:30px;font-weight:600;font-size:14px;opacity:0;transition:all .3s ease;z-index:9999;white-space:nowrap;max-width:88vw;text-align:center;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,0.5);}
   .toast.show {opacity:1;transform:translateX(-50%) translateY(0)}
-  .profile-header {display:flex;align-items:center;gap:16px;margin-bottom:24px}
-  .profile-avatar-lg {width: 80px;height: 80px;border-radius: 50%;background: linear-gradient(135deg,var(--lime),var(--teal));display: flex;align-items: center;justify-content: center;font-size: 32px;font-weight: 700;color: var(--black);flex-shrink: 0;background-size: cover;       /* เพิ่มบรรทัดนี้ */background-position: center;    /* เพิ่มบรรทัดนี้ */background-repeat: no-repeat; /* เพิ่มบรรทัดนี้ */position: relative;overflow: hidden;cursor: pointer;border: 3px solid var(--border);}
-  .profile-avatar-lg.admin {background:linear-gradient(135deg,var(--blue),var(--purple));color:white}
-  .profile-avatar-lg.master {background:linear-gradient(135deg,var(--gold),var(--orange));color:var(--black)}
-  .profile-avatar-lg .photo-edit-overlay {position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:18px;color:white}
+  
+  .profile-header {display:flex;align-items:center;gap:20px;margin-bottom:32px}
+  .profile-avatar-lg {width:80px;height:80px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:var(--black);flex-shrink:0;background-size:cover;background-position:center;background-repeat:no-repeat;position:relative;overflow:hidden;cursor:pointer;}
+  .profile-avatar-lg.admin {background:var(--blue);color:white}
+  .profile-avatar-lg.master {background:var(--gold);color:var(--black)}
+  .profile-avatar-lg .photo-edit-overlay {position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;color:white}
   .profile-avatar-lg:hover .photo-edit-overlay {opacity:1}
   .photo-input {display:none}
-  .subpage-header {display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-  .subpage-back {background:var(--card);border:1px solid var(--border);color:var(--text);width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  
+  .subpage-header {display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+  .subpage-back {background:var(--card2);border:1px solid var(--border);color:var(--text);width:40px;height:40px;border-radius:50%;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  
   .flex-between {display:flex;justify-content:space-between;align-items:center}
   .text-muted {color:var(--text2);font-size:13px}
   .fw-600 {font-weight:600}
   .mono {font-family:'JetBrains Mono',monospace}
-  .empty-state {text-align:center;padding:40px 20px;color:var(--text2)}
-  .empty-state .empty-icon {font-size:48px;margin-bottom:12px;display:block}
+  .empty-state {text-align:center;padding:60px 20px;color:var(--text2)}
+  .empty-state .empty-icon {margin-bottom:16px;display:block;color:var(--border)}
 
   /* Cropper */
-  .cropper-overlay {display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9998;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)}
+  .cropper-overlay {display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9998;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)}
   .cropper-overlay.show {display:flex}
-  .cropper-modal {background:var(--dark);border:1px solid var(--border);border-radius:var(--radius);padding:20px;width:100%;max-width:380px;max-height:95vh;overflow-y:auto}
-  .cropper-modal h3 {font-family:'Bebas Neue';font-size:24px;letter-spacing:1px;color:var(--lime);margin-bottom:16px;text-align:center}
+  .cropper-modal {background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:380px;max-height:95vh;overflow-y:auto}
+  .cropper-modal h3 {font-family:'Bebas Neue';font-size:28px;letter-spacing:1px;color:var(--text);margin-bottom:20px;text-align:center}
   .cropper-stage {position:relative;width:100%;aspect-ratio:1/1;background:#000;border-radius:var(--radius-sm);overflow:hidden;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none}
   .cropper-stage:active{cursor:grabbing}
   .cropper-stage img {position:absolute;top:50%;left:50%;transform-origin:center center;pointer-events:none;user-select:none;-webkit-user-drag:none;max-width:none;opacity:0;transition:opacity .2s ease}
   .cropper-stage img.ready {opacity:1}
   .cropper-circle {position:absolute;inset:0;pointer-events:none}
-  .cropper-circle::before {content:'';position:absolute;inset:0;background:rgba(0,0,0,.5);-webkit-mask:radial-gradient(circle at center,transparent 49.5%,black 50%);mask:radial-gradient(circle at center,transparent 49.5%,black 50%)}
-  .cropper-circle::after {content:'';position:absolute;top:50%;left:50%;width:100%;height:100%;border-radius:50%;border:2px solid white;transform:translate(-50%,-50%);box-shadow:0 0 0 1px rgba(0,0,0,.5)}
-  .cropper-zoom-row {display:flex;align-items:center;gap:12px;margin:18px 0 8px}
-  .cropper-zoom-icon {font-size:14px;color:var(--text2);flex-shrink:0}
-  .cropper-zoom-icon.big {font-size:20px}
+  .cropper-circle::before {content:'';position:absolute;inset:0;background:rgba(0,0,0,.6);-webkit-mask:radial-gradient(circle at center,transparent 49.5%,black 50%);mask:radial-gradient(circle at center,transparent 49.5%,black 50%)}
+  .cropper-circle::after {content:'';position:absolute;top:50%;left:50%;width:100%;height:100%;border-radius:50%;border:2px solid rgba(255,255,255,.5);transform:translate(-50%,-50%);}
+  .cropper-zoom-row {display:flex;align-items:center;gap:16px;margin:24px 0 16px}
+  .cropper-zoom-icon {color:var(--text2);flex-shrink:0}
   .cropper-zoom-slider {flex:1;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:var(--border);outline:none}
   .cropper-zoom-slider::-webkit-slider-thumb {-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:var(--text);cursor:pointer;border:2px solid var(--card)}
-  .cropper-zoom-slider::-moz-range-thumb {width:20px;height:20px;border-radius:50%;background:var(--text);cursor:pointer;border:2px solid var(--card)}
-  .cropper-actions {display:flex;gap:10px;margin-top:16px}
-  .cropper-btn {flex:1;padding:12px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans';font-weight:600;font-size:14px;cursor:pointer}
-  .cropper-btn-cancel {background:var(--card2);color:var(--text)}
+  .cropper-actions {display:flex;gap:12px;margin-top:20px}
+  .cropper-btn {flex:1;padding:14px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans';font-weight:600;font-size:14px;cursor:pointer}
+  .cropper-btn-cancel {background:var(--card2);color:var(--text);border:1px solid var(--border)}
   .cropper-btn-apply {background:var(--lime);color:var(--black)}
-  .cropper-btn-reset {background:transparent;color:var(--text2);text-decoration:underline;border:none;font-size:12px;cursor:pointer;margin-top:4px;width:100%;text-align:center;padding:6px}
 
   input#ob-username, input#info-username {text-transform:lowercase}
-  #global-loader {display:flex;position:fixed;inset:0;background:var(--black);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+  #global-loader {display:flex;position:fixed;inset:0;background:var(--black);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px}
   @media(max-width:400px){.metrics-grid,.form-row,.summary-grid{grid-template-columns:1fr} .pin-box{width:40px;height:50px;font-size:18px} .content{padding:16px;padding-bottom:100px}}
-
-  /* ─── SPLASH SCREEN ─── */
-  #screen-splash{background:var(--black);justify-content:space-between;padding:60px 32px 50px;position:relative;overflow:hidden;align-items:center}
-  #screen-splash::before{content:'';position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(200,240,0,0.07) 0%,transparent 65%);pointer-events:none}
-  .splash-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%}
-  .splash-icon-wrap{width:84px;height:84px;border-radius:24px;background:rgba(200,240,0,0.08);border:1px solid rgba(200,240,0,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;box-shadow:0 0 60px rgba(200,240,0,0.1)}
-  .splash-title{font-family:'Bebas Neue',sans-serif;font-size:62px;letter-spacing:6px;color:var(--lime);line-height:1;text-shadow:0 0 40px rgba(200,240,0,0.15)}
-  .splash-subtitle{font-size:11px;letter-spacing:3px;color:var(--text2);text-transform:uppercase;margin-top:6px}
-  .splash-tagline{font-size:14px;color:var(--text2);margin-top:24px;line-height:1.7}
-  .splash-bottom{width:100%;max-width:340px}
-  .splash-version{text-align:center;font-size:11px;color:var(--muted);margin-top:14px;font-family:'JetBrains Mono'}
-
-  /* ─── AUTH SCREENS ─── */
-  #screen-auth,#screen-verify-otp,#screen-onboarding{background:var(--black);justify-content:flex-start;overflow-y:auto}
-  #screen-auth .auth-wrap,#screen-verify-otp .auth-wrap,#screen-onboarding .auth-wrap{padding:0 24px 60px}
-  .auth-screen-header{padding:36px 0 0;text-align:center}
-  .auth-logo-wrap{display:inline-flex;align-items:center;justify-content:center;width:58px;height:58px;border-radius:17px;background:rgba(200,240,0,0.08);border:1px solid rgba(200,240,0,0.22);margin-bottom:12px;box-shadow:0 0 40px rgba(200,240,0,0.08)}
-  .auth-app-name{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;color:var(--lime);line-height:1;text-shadow:0 0 24px rgba(200,240,0,0.18)}
-  .auth-app-sub{font-size:10px;letter-spacing:3px;color:var(--text2);text-transform:uppercase;margin-top:4px}
-  .auth-form-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:20px;box-shadow:0 8px 32px rgba(0,0,0,0.25)}
-  .back{background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;padding:0;margin-bottom:4px;line-height:1;display:flex;align-items:center;gap:6px;font-size:13px}
-  .back:hover{color:var(--lime)}
-  .auth-header{margin-bottom:20px}
-  .auth-header h2{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--text);margin-bottom:4px;margin-top:10px}
-  .auth-header p{font-size:13px;color:var(--text2);line-height:1.6}
-  .ob-section-header{padding:40px 24px 0;text-align:center;margin-bottom:4px}
-
-  /* ─── TOPBAR LOGO ─── */
-  .topbar-logo-wrap{display:flex;align-items:center;gap:8px}
-
-  /* ─── NAV SVG ICONS ─── */
-  .nav-item span:first-child{display:flex;align-items:center;justify-content:center;height:24px;margin-bottom:0}
-  .nav-item svg{width:20px;height:20px;display:block}
-  .nav-item.active svg{filter:drop-shadow(0 0 6px rgba(200,240,0,0.5))}
 </style>
 </head>
 <body>
 
 <div id="global-loader">
-  <div class="spinner" style="width:30px;height:30px;border-width:3px;border-top-color:var(--lime)"></div>
-  <div style="font-size:14px;color:var(--lime);font-family:'Bebas Neue';letter-spacing:1px">CONNECTING TO DATABASE...</div>
+  <div class="spinner" style="width:40px;height:40px;border-width:3px;border-top-color:var(--lime)"></div>
+  <div style="font-size:16px;color:var(--lime);font-family:'Bebas Neue';letter-spacing:2px">CONNECTING TO DATABASE</div>
 </div>
 
 <div id="screen-splash" class="screen">
-  <div class="splash-center">
-    <div class="splash-icon-wrap">
-      <svg width="44" height="44" viewBox="0 0 24 24" fill="none">
-        <path d="M14 2L4 13.5L10.5 13.5L9 22L20 9.5L13.5 9.5L15 2Z" fill="#C8F000"/>
-      </svg>
-    </div>
-    <div class="splash-title">FITFUEL</div>
-    <div class="splash-subtitle">HEALTH · OS</div>
-    <div class="splash-tagline">ติดตามสุขภาพของคุณ<br>ทุกวัน ทุกที่</div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" style="margin-bottom:24px">
+      <path d="M14 2L4 13.5L10.5 13.5L9 22L20 9.5L13.5 9.5L15 2Z" fill="#C8F000"/>
+    </svg>
+    <div style="font-family:'Bebas Neue';font-size:72px;color:var(--lime);letter-spacing:6px;line-height:1">FITFUEL</div>
+    <div style="font-size:12px;letter-spacing:4px;color:var(--text2);text-transform:uppercase;margin-top:8px">HEALTH OS</div>
   </div>
-  <div class="splash-bottom">
-    <button class="btn btn-primary" onclick="showScreen('auth')">เข้าสู่ระบบ / สมัครสมาชิก</button>
-    <div class="splash-version">Supabase · Cloud Sync</div>
+  <div style="padding:40px 24px;">
+    <button class="btn btn-primary" onclick="showScreen('auth')">SIGN IN / SIGN UP</button>
   </div>
 </div>
 
 <div id="screen-auth" class="screen">
   <div class="auth-wrap">
-    <div class="auth-screen-header">
-      <div class="auth-logo-wrap">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-          <path d="M14 2L4 13.5L10.5 13.5L9 22L20 9.5L13.5 9.5L15 2Z" fill="#C8F000"/>
-        </svg>
-      </div>
-      <div class="auth-app-name">FITFUEL</div>
-      <div class="auth-app-sub">HEALTH · OS</div>
+    <button class="btn-sm" style="margin-bottom:32px;background:transparent" onclick="showScreen('splash')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> BACK
+    </button>
+    <div class="auth-header">
+      <h2>SIGN IN</h2>
+      <p style="color:var(--text2);margin-top:8px;font-size:14px">เข้าใช้งานด้วยอีเมล · ไม่ต้องใช้รหัสผ่าน</p>
     </div>
-    <div class="auth-form-card">
-      <button class="back" onclick="showScreen('splash')">← กลับ</button>
-      <div class="auth-header"><h2>เข้าสู่ระบบ</h2><p>เข้าใช้งานด้วยอีเมล · ไม่ต้องใช้รหัสผ่าน</p></div>
-      <div class="form-group"><label>Email ของคุณ</label><input type="email" id="auth-email" placeholder="your@email.com"><p class="field-hint">ระบบจะส่งรหัส 6 หลักไปที่อีเมลนี้</p></div>
-      <p class="error-msg" id="auth-error"></p>
-      <button class="btn btn-primary" id="btn-send-otp" onclick="sendAuthOTP()">ส่งรหัส OTP ทางอีเมล</button>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="auth-email" placeholder="your@email.com">
+      <p class="field-hint">ระบบจะส่งรหัส 6 หลักไปที่อีเมลนี้</p>
     </div>
+    <p class="error-msg" id="auth-error"></p>
+    <button class="btn btn-primary" id="btn-send-otp" onclick="sendAuthOTP()">GET OTP</button>
   </div>
 </div>
 
 <div id="screen-verify-otp" class="screen">
   <div class="auth-wrap">
-    <div class="auth-screen-header">
-      <div class="auth-logo-wrap">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-          <path d="M14 2L4 13.5L10.5 13.5L9 22L20 9.5L13.5 9.5L15 2Z" fill="#C8F000"/>
-        </svg>
-      </div>
-      <div class="auth-app-name">FITFUEL</div>
-      <div class="auth-app-sub">HEALTH · OS</div>
+    <button class="btn-sm" style="margin-bottom:32px;background:transparent" onclick="showScreen('auth')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> BACK
+    </button>
+    <div class="auth-header">
+      <h2>ENTER OTP</h2>
+      <p style="color:var(--text2);margin-top:8px;font-size:14px">กรอกรหัส 6 หลักที่ส่งไปที่ <br><span id="display-email" style="color:var(--lime)"></span></p>
     </div>
-    <div class="auth-form-card">
-      <button class="back" onclick="showScreen('auth')">← กลับ</button>
-      <div class="auth-header"><h2>ยืนยัน OTP</h2><p>กรอกรหัส 6 หลักที่ส่งไปที่ <br><span id="display-email" style="color:var(--lime);font-weight:600"></span></p></div>
-      <div class="form-group"><div class="pin-wrap" id="otp-input-wrap"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"><input class="pin-box" maxlength="1" inputmode="numeric"></div></div>
-      <p class="error-msg" id="verify-error"></p>
-      <button class="btn btn-primary" id="btn-verify-otp" onclick="verifyAuthOTP()">ยืนยันและเข้าสู่ระบบ</button>
+    <div class="pin-wrap" id="otp-input-wrap">
+      <input class="pin-box" maxlength="1" inputmode="numeric">
+      <input class="pin-box" maxlength="1" inputmode="numeric">
+      <input class="pin-box" maxlength="1" inputmode="numeric">
+      <input class="pin-box" maxlength="1" inputmode="numeric">
+      <input class="pin-box" maxlength="1" inputmode="numeric">
+      <input class="pin-box" maxlength="1" inputmode="numeric">
     </div>
+    <p class="error-msg" id="verify-error"></p>
+    <button class="btn btn-primary" id="btn-verify-otp" onclick="verifyAuthOTP()" style="display:none">ยืนยันและเข้าสู่ระบบ</button>
   </div>
 </div>
 
 <div id="screen-onboarding" class="screen">
   <div class="auth-wrap">
-    <div class="auth-screen-header">
-      <div class="auth-logo-wrap">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-          <path d="M14 2L4 13.5L10.5 13.5L9 22L20 9.5L13.5 9.5L15 2Z" fill="#C8F000"/>
-        </svg>
-      </div>
-      <div class="auth-app-name">สร้างโปรไฟล์</div>
-      <div class="auth-app-sub">ยินดีต้อนรับสู่ FitFuel</div>
+    <div class="auth-header" style="margin-top:40px">
+      <h2>CREATE PROFILE</h2>
+      <p style="color:var(--text2);margin-top:8px;font-size:14px">ยินดีต้อนรับสู่ FitFuel</p>
     </div>
-    <div class="auth-form-card" style="margin-bottom:20px">
-    <div class="form-group"><label>Username *</label><input type="text" id="ob-username" placeholder="เช่น somchai99" autocomplete="username"><p class="field-hint">ใช้ภาษาอังกฤษ ตัวเลข หรือ _ เท่านั้น (3-30 ตัว)</p></div>
-    <div class="form-group"><label>ชื่อ-นามสกุล *</label><input type="text" id="ob-name" placeholder="เช่น สมชาย ใจดี"></div>
+    <div class="form-group"><label>Username</label><input type="text" id="ob-username" placeholder="somchai99" autocomplete="username"><p class="field-hint">ภาษาอังกฤษ ตัวเลข หรือ _ (3-30 ตัว)</p></div>
+    <div class="form-group"><label>ชื่อ-นามสกุล</label><input type="text" id="ob-name" placeholder="สมชาย ใจดี"></div>
     <div class="form-row">
-      <div class="form-group"><label>อายุ (ปี) *</label><input type="number" id="ob-age" placeholder="25" min="10" max="100"></div>
-      <div class="form-group"><label>เพศ *</label><select id="ob-gender"><option value="">เลือก</option><option>ชาย</option><option>หญิง</option><option>ไม่ระบุ</option></select></div>
+      <div class="form-group"><label>อายุ</label><input type="number" id="ob-age" placeholder="25" min="10" max="100"></div>
+      <div class="form-group"><label>เพศ</label><select id="ob-gender"><option value="">เลือก</option><option>ชาย</option><option>หญิง</option><option>ไม่ระบุ</option></select></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>ส่วนสูง (cm) *</label><input type="number" id="ob-height" placeholder="170" min="100" max="250"></div>
-      <div class="form-group"><label>น้ำหนักเป้า (kg) *</label><input type="number" id="ob-target" placeholder="65" step="0.5"></div>
+      <div class="form-group"><label>ส่วนสูง (cm)</label><input type="number" id="ob-height" placeholder="170" min="100" max="250"></div>
+      <div class="form-group"><label>น้ำหนักเป้า (kg)</label><input type="number" id="ob-target" placeholder="65" step="0.5"></div>
     </div>
-    <div class="form-group"><label>เป้าหมายหลัก *</label><select id="ob-goal"><option value="">เลือก</option><option>ลดน้ำหนัก</option><option>เพิ่มกล้ามเนื้อ</option><option>รักษาน้ำหนัก</option><option>ปรับปรุงสุขภาพโดยรวม</option></select></div>
+    <div class="form-group"><label>เป้าหมายหลัก</label><select id="ob-goal"><option value="">เลือก</option><option>ลดน้ำหนัก</option><option>เพิ่มกล้ามเนื้อ</option><option>รักษาน้ำหนัก</option><option>ปรับปรุงสุขภาพโดยรวม</option></select></div>
     <div class="form-row">
-      <div class="form-group"><label>เป้าการนอน (ชม.) *</label><input type="number" id="ob-sleep" placeholder="7.5" step="0.5" value="7.5"></div>
-      <div class="form-group"><label>เป้าออกกำลัง (นาที/สัปดาห์) *</label><input type="number" id="ob-ex" placeholder="150" step="10" value="150"></div>
+      <div class="form-group"><label>เป้าการนอน (ชม.)</label><input type="number" id="ob-sleep" value="7.5" step="0.5"></div>
+      <div class="form-group"><label>เป้าออกกำลัง (นาที/สัปดาห์)</label><input type="number" id="ob-ex" value="150" step="10"></div>
     </div>
     <p class="error-msg" id="ob-error"></p>
-    <button class="btn btn-primary" id="btn-save-ob" onclick="submitOnboarding()">บันทึกและเริ่มใช้งาน</button>
-    </div>
+    <button class="btn btn-primary" id="btn-save-ob" onclick="submitOnboarding()">SAVE & START</button>
   </div>
 </div>
 
 <div id="screen-main" class="screen">
   <div class="topbar">
-    <div class="topbar-logo-wrap">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
-        <path d="M14 2L4 13.5L10.5 13.5L9 22L20 9.5L13.5 9.5L15 2Z" fill="#C8F000"/>
-      </svg>
-      <span class="topbar-logo">FITFUEL</span>
+    <div class="topbar-logo-wrap" style="display:flex;align-items:center;gap:8px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14 2L4 13.5L10.5 13.5L9 22L20 9.5L13.5 9.5L15 2Z" fill="#C8F000"/></svg>
+      <span class="topbar-logo" style="margin:0">FITFUEL</span>
     </div>
-    <div style="display:flex;align-items:center;gap:8px"><span class="role-badge" id="topbar-role">USER</span><div class="avatar" id="user-avatar">U</div></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span class="role-badge" id="topbar-role">USER</span>
+      <div class="avatar" id="user-avatar" onclick="navTo('profile', document.querySelectorAll('.nav-item')[4])">U</div>
+    </div>
   </div>
   <div class="content" id="main-content"></div>
   <nav class="bottom-nav" id="main-nav"></nav>
@@ -354,20 +316,19 @@
 
 <div class="cropper-overlay" id="cropper-overlay">
   <div class="cropper-modal">
-    <h3>แก้ไขรูปภาพ</h3>
+    <h3>CROP IMAGE</h3>
     <div class="cropper-stage" id="cropper-stage">
       <img id="cropper-img" alt="">
       <div class="cropper-circle"></div>
     </div>
     <div class="cropper-zoom-row">
-      <span class="cropper-zoom-icon">🖼</span>
+      <svg class="cropper-zoom-icon icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
       <input type="range" id="cropper-zoom" class="cropper-zoom-slider" min="1" max="3" step="0.01" value="1">
-      <span class="cropper-zoom-icon big">🖼</span>
+      <svg class="cropper-zoom-icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
     </div>
-    <button class="cropper-btn-reset" onclick="resetCropper()">↺ รีเซ็ต</button>
     <div class="cropper-actions">
-      <button class="cropper-btn cropper-btn-cancel" onclick="cancelCropper()">ยกเลิก</button>
-      <button class="cropper-btn cropper-btn-apply" id="cropper-apply-btn" onclick="applyCropper()">ใช้</button>
+      <button class="cropper-btn cropper-btn-cancel" onclick="cancelCropper()">CANCEL</button>
+      <button class="cropper-btn cropper-btn-apply" id="cropper-apply-btn" onclick="applyCropper()">APPLY</button>
     </div>
   </div>
 </div>
@@ -375,6 +336,49 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// --- SVG Helper Dictionary ---
+const svgIcon = (path) => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg>`;
+const I = {
+  weight: svgIcon("M3 14h18v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4zm9-6V4m-3 4V4m6 4V4"),
+  sleep: svgIcon("M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"),
+  water: svgIcon("M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"),
+  exercise: svgIcon("M13 4v16m-4-8h8"),
+  energy: svgIcon("M13 2L3 14h9l-1 8 10-12h-9l1-8z"),
+  alert: svgIcon("M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4m0 4h.01"),
+  info: svgIcon("M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-14v4m0 4h.01"),
+  check: svgIcon("M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"),
+  trendUp: svgIcon("M23 6l-9.5 9.5-5-5L1 18m22-12v6m0-6h-6"),
+  trendDown: svgIcon("M23 18l-9.5-9.5-5 5L1 6m22 12v-6m0 6h-6"),
+  calendar: svgIcon("M3 4h18v18H3zM16 2v4M8 2v4M3 10h18"),
+  user: svgIcon("M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"),
+  settings: svgIcon("M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1zM12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"),
+  delete: svgIcon("M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"),
+  edit: svgIcon("M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"),
+  add: svgIcon("M12 5v14m-7-7h14"),
+  log: svgIcon("M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm-2 0v6h6M16 13H8M16 17H8"),
+  bell: svgIcon("M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"),
+  bellOff: svgIcon("M13.73 21a2 2 0 0 1-3.46 0M18.63 13A17.89 17.89 0 0 1 18 8M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14M18 8a6 6 0 0 0-9.33-5M1 1l22 22"),
+  mail: svgIcon("M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6"),
+  download: svgIcon("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"),
+  shield: svgIcon("M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z")
+};
+
+const _NAV_SVG = {
+  home: `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+  log: `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
+  progress: `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
+  history: `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  profile: `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  dashboard: `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`,
+  users: `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  logs: `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
+  activity: `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
+  alerts: `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  control: `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+  roles: `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  backup: `<svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>`
+};
+
 const SUPABASE_URL='https://gyaptfiwxvruiorczbxv.supabase.co';
 const SUPABASE_KEY='sb_publishable_phEtg4XZtjlbcz-xOz0Tjw_o-cQUJkf';
 const supaClient=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
@@ -413,9 +417,19 @@ function setupPinInputs(id){
   const c=document.getElementById(id);if(!c)return;
   const inputs=c.querySelectorAll('.pin-box');
   inputs.forEach((inp,i)=>{
-    inp.oninput=e=>{const v=e.target.value.replace(/[^0-9]/g,'');e.target.value=v;if(v)e.target.classList.add('filled');else e.target.classList.remove('filled');if(v&&i<inputs.length-1)inputs[i+1].focus();};
+    inp.oninput=e=>{
+        const v=e.target.value.replace(/[^0-9]/g,'');e.target.value=v;
+        if(v)e.target.classList.add('filled');else e.target.classList.remove('filled');
+        if(v&&i<inputs.length-1)inputs[i+1].focus();
+        if(getPinValue(id).length===6){ setTimeout(()=>verifyAuthOTP(), 50); } // AUTO SUBMIT
+    };
     inp.onkeydown=e=>{if(e.key==='Backspace'&&!e.target.value&&i>0){inputs[i-1].focus();inputs[i-1].value='';inputs[i-1].classList.remove('filled');}};
-    inp.onpaste=e=>{e.preventDefault();const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/[^0-9]/g,'').slice(0,6);txt.split('').forEach((c,j)=>{if(inputs[j]){inputs[j].value=c;inputs[j].classList.add('filled');}});if(inputs[Math.min(txt.length,inputs.length-1)])inputs[Math.min(txt.length,inputs.length-1)].focus();};
+    inp.onpaste=e=>{
+        e.preventDefault();const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/[^0-9]/g,'').slice(0,6);
+        txt.split('').forEach((c,j)=>{if(inputs[j]){inputs[j].value=c;inputs[j].classList.add('filled');}});
+        if(inputs[Math.min(txt.length,inputs.length-1)])inputs[Math.min(txt.length,inputs.length-1)].focus();
+        if(getPinValue(id).length===6){ setTimeout(()=>verifyAuthOTP(), 50); } // AUTO SUBMIT
+    };
   });
 }
 const getPinValue=id=>{const c=document.getElementById(id);return c?Array.from(c.querySelectorAll('.pin-box')).map(i=>i.value).join(''):'';};
@@ -426,22 +440,24 @@ async function sendAuthOTP(){
   const email=document.getElementById('auth-email').value.trim().toLowerCase();
   const err=document.getElementById('auth-error');const btn=document.getElementById('btn-send-otp');
   err.textContent='';
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='กรุณากรอกอีเมลให้ถูกต้อง';return;}
-  btn.innerHTML='<span class="spinner"></span> กำลังส่ง OTP...';btn.disabled=true;
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='Invalid email format';return;}
+  btn.innerHTML='<span class="spinner"></span> SENDING...';btn.disabled=true;
   const{error}=await supaClient.auth.signInWithOtp({email});
-  if(error){err.textContent='เกิดข้อผิดพลาด: '+error.message;btn.innerHTML='ส่งรหัส OTP ทางอีเมล';btn.disabled=false;}
-  else{document.getElementById('display-email').textContent=email;btn.innerHTML='ส่งรหัส OTP ทางอีเมล';btn.disabled=false;clearPinInputs('otp-input-wrap');document.getElementById('verify-error').textContent='';showScreen('verify-otp');setTimeout(()=>document.querySelector('#otp-input-wrap .pin-box').focus(),100);}
+  if(error){err.textContent=error.message;btn.innerHTML='GET OTP';btn.disabled=false;}
+  else{document.getElementById('display-email').textContent=email;btn.innerHTML='GET OTP';btn.disabled=false;clearPinInputs('otp-input-wrap');document.getElementById('verify-error').textContent='';showScreen('verify-otp');setTimeout(()=>document.querySelector('#otp-input-wrap .pin-box').focus(),100);}
 }
+
 async function verifyAuthOTP(){
   const email=document.getElementById('auth-email').value.trim().toLowerCase();
   const token=getPinValue('otp-input-wrap');
-  const err=document.getElementById('verify-error');const btn=document.getElementById('btn-verify-otp');
-  if(token.length!==6){err.textContent='กรุณากรอก OTP 6 หลัก';return;}
-  btn.innerHTML='<span class="spinner"></span> กำลังตรวจสอบ...';btn.disabled=true;
+  const err=document.getElementById('verify-error');
+  if(token.length!==6){err.textContent='Please enter 6 digits';return;}
+  err.style.color = 'var(--lime)'; err.textContent = 'Verifying...';
   const{data:{user},error}=await supaClient.auth.verifyOtp({email,token,type:'email'});
-  if(error){err.textContent='❌ รหัส OTP ไม่ถูกต้องหรือหมดอายุ';btn.innerHTML='🔐 ยืนยันและเข้าสู่ระบบ';btn.disabled=false;}
-  else{await handleSession(user);btn.innerHTML='🔐 ยืนยันและเข้าสู่ระบบ';btn.disabled=false;}
+  if(error){err.style.color = 'var(--red)'; err.textContent='Invalid or expired OTP';}
+  else{err.textContent='';await handleSession(user);}
 }
+
 async function handleSession(authUser){
   document.getElementById('global-loader').style.display='flex';
   currentUserAuth=authUser;
@@ -449,6 +465,7 @@ async function handleSession(authUser){
   if(profile){currentUser=mapUser(profile);await loadAllData();document.getElementById('global-loader').style.display='none';enterApp();}
   else{document.getElementById('global-loader').style.display='none';showScreen('onboarding');}
 }
+
 async function submitOnboarding(){
   const username=document.getElementById('ob-username').value.trim().toLowerCase();
   const name=document.getElementById('ob-name').value.trim();
@@ -460,26 +477,25 @@ async function submitOnboarding(){
   const sleepTarget=parseFloat(document.getElementById('ob-sleep').value);
   const exTarget=parseInt(document.getElementById('ob-ex').value);
   const err=document.getElementById('ob-error');const btn=document.getElementById('btn-save-ob');
-  if(!username||!name||!age||!gender||!height||!target||!goal||!sleepTarget||!exTarget){err.textContent='กรุณากรอกให้ครบทุกช่อง';return;}
-  if(!/^[a-z0-9_]{3,30}$/.test(username)){err.textContent='Username ต้องเป็นภาษาอังกฤษ ตัวเลข หรือ _ (3-30 ตัว)';return;}
-  if(age<10||age>100){err.textContent='อายุไม่ถูกต้อง';return;}
-  if(height<100||height>250){err.textContent='ส่วนสูงไม่ถูกต้อง';return;}
-  if(target<20||target>300){err.textContent='น้ำหนักเป้าหมายไม่ถูกต้อง';return;}
-  err.textContent='';btn.innerHTML='<span class="spinner"></span> กำลังสร้างโปรไฟล์...';btn.disabled=true;
+  if(!username||!name||!age||!gender||!height||!target||!goal||!sleepTarget||!exTarget){err.textContent='Please fill all fields';return;}
+  if(!/^[a-z0-9_]{3,30}$/.test(username)){err.textContent='Username format: a-z, 0-9, _ (3-30 chars)';return;}
+  if(age<10||age>100||height<100||height>250||target<20||target>300){err.textContent='Invalid numbers';return;}
+  err.textContent='';btn.innerHTML='<span class="spinner"></span> SAVING...';btn.disabled=true;
   const{count}=await supaClient.from('users').select('*',{count:'exact',head:true});
   const assignRole=count===0?'master':'user';
   const dbUser={id:currentUserAuth.id,username,name,email:currentUserAuth.email,age,gender,height,target_weight:target,goal_type:goal,sleep_target:sleepTarget,weekly_exercise_target:exTarget,role:assignRole};
   const{data,error}=await supaClient.from('users').insert([dbUser]).select().single();
   if(error){
-    if(error.code==='23505'&&error.message.includes('username'))err.textContent='❌ Username นี้ถูกใช้ไปแล้ว กรุณาเลือกใหม่';
-    else err.textContent='เกิดข้อผิดพลาด: '+error.message;
-    btn.innerHTML='🎉 บันทึกและเริ่มใช้งาน';btn.disabled=false;return;
+    if(error.code==='23505'&&error.message.includes('username'))err.textContent='Username taken';
+    else err.textContent=error.message;
+    btn.innerHTML='SAVE & START';btn.disabled=false;return;
   }
   currentUser=mapUser(data);await loadAllData();
-  await logActivity('create',`สร้างบัญชีใหม่: ${currentUser.name} (${assignRole})`,currentUser.id,'user');
-  showToast('🎉 ยินดีต้อนรับ '+currentUser.name.split(' ')[0]+'!');
+  await logActivity('create',`New account: ${currentUser.name} (${assignRole})`,currentUser.id,'user');
+  showToast('Welcome '+currentUser.name.split(' ')[0]+'!');
   enterApp();
 }
+
 async function logout(){
   document.getElementById('global-loader').style.display='flex';
   stopReminderTimer();
@@ -488,7 +504,9 @@ async function logout(){
   document.getElementById('global-loader').style.display='none';
   showScreen('splash');
 }
+
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');}
+
 function enterApp(){
   updateAvatar();
   const role=currentUser.role;
@@ -498,12 +516,14 @@ function enterApp(){
   renderApp('home');
   showScreen('main');
 }
+
 function updateAvatar(){
   const av=document.getElementById('user-avatar');
   av.className='avatar '+(currentUser.role==='master'?'master':currentUser.role==='admin'?'admin':'');
   if(currentUser.photo){av.style.backgroundImage=`url("${currentUser.photo}")`;av.textContent='';}
   else{av.style.backgroundImage='';av.textContent=currentUser.name[0];}
 }
+
 async function logActivity(type,msg,userId=null,target='log'){
   if(!supaClient||!currentUser)return;
   const{data}=await supaClient.from('activities').insert([{type,target,user_id:userId,actor_id:currentUser.id,actor_name:currentUser.name,msg}]).select().single();
@@ -513,10 +533,10 @@ async function logActivity(type,msg,userId=null,target='log'){
 // ═════ CALCULATIONS ═════
 const calcBMI=(w,h)=>w/Math.pow(h/100,2);
 function bmiCategory(bmi){
-  if(bmi<18.5)return{label:'น้ำหนักน้อย',color:'#3B82F6',risk:'low'};
-  if(bmi<25)return{label:'น้ำหนักปกติ',color:'#C8F000',risk:'low'};
-  if(bmi<30)return{label:'น้ำหนักเกิน',color:'#FF8C42',risk:'medium'};
-  return{label:'โรคอ้วน',color:'#FF4757',risk:'high'};
+  if(bmi<18.5)return{label:'Underweight',color:'#3B82F6',risk:'low'};
+  if(bmi<25)return{label:'Normal',color:'#C8F000',risk:'low'};
+  if(bmi<30)return{label:'Overweight',color:'#FF8C42',risk:'medium'};
+  return{label:'Obese',color:'#FF4757',risk:'high'};
 }
 function calcHealthScore(log,user){
   let s=100;const bmi=calcBMI(log.weight,user.height);
@@ -527,37 +547,39 @@ function calcHealthScore(log,user){
   return Math.max(0,s);
 }
 function energyInfo(level){
-  if(level<=3)return{label:'พลังงานต่ำ',emoji:'😴',color:'#FF4757',advice:'ควรพักผ่อน เพิ่มการนอน หรือทบทวนความเครียด'};
-  if(level<=6)return{label:'พลังงานปานกลาง',emoji:'😐',color:'#FF8C42',advice:'พลังงานปกติ ลองเพิ่มกิจกรรมเบาๆ'};
-  if(level<=8)return{label:'พลังงานดี',emoji:'😊',color:'#C8F000',advice:'รักษาวินัยปัจจุบันต่อไป'};
-  return{label:'พลังงานเต็มเปี่ยม',emoji:'🔥',color:'#2DD4BF',advice:'สุดยอด! เป็นโอกาสดีในการ workout หนักๆ'};
+  if(level<=3)return{label:'Low',icon:I.trendDown,color:'#FF4757',advice:'Need more rest or recovery.'};
+  if(level<=6)return{label:'Moderate',icon:I.trendUp,color:'#FF8C42',advice:'Normal energy. Light activity is fine.'};
+  if(level<=8)return{label:'Good',icon:I.check,color:'#C8F000',advice:'Keep up the discipline.'};
+  return{label:'Peak',icon:I.energy,color:'#2DD4BF',advice:'Perfect for heavy workouts!'};
 }
+
 function generateRecommendations(log,user,history=[]){
   const recs=[];const bmi=calcBMI(log.weight,user.height);const cat=bmiCategory(bmi);
-  if(cat.risk==='high')recs.push({severity:'high',icon:'⚠',title:'BMI โรคอ้วน',msg:'BMI '+bmi.toFixed(1)+' อยู่ในระดับโรคอ้วน',action:'ลดน้ำหนัก 0.5–1 kg/สัปดาห์ ลดแคลอรี่ 500 kcal/วัน + ออกกำลังกาย 150 นาที/สัปดาห์'});
-  else if(cat.risk==='medium')recs.push({severity:'medium',icon:'💡',title:'น้ำหนักเกิน',msg:'BMI '+bmi.toFixed(1)+' เกินมาตรฐาน',action:'ลดของหวาน เครื่องดื่มน้ำตาลสูง เดิน 30 นาทีหลังอาหาร'});
-  else if(bmi<18.5)recs.push({severity:'medium',icon:'💡',title:'น้ำหนักน้อย',msg:'BMI '+bmi.toFixed(1)+' ต่ำกว่ามาตรฐาน',action:'เพิ่มแคลอรี่จากโปรตีน 1.6–2 g/kg + ฝึกเวท'});
-  if(log.sleep<(user.sleepTarget||7))recs.push({severity:'high',icon:'⚠',title:'นอนน้อยเกินไป',msg:'นอนเพียง '+log.sleep+' ชม. (เป้าหมาย: '+(user.sleepTarget||7)+' ชม.)',action:'ปิดมือถือก่อนนอน 1 ชม. นอนตื่นเวลาเดียวกันทุกวัน'});
-  if(log.water<1.5)recs.push({severity:'high',icon:'⚠',title:'ดื่มน้ำน้อยมาก',msg:'ดื่ม '+log.water+' L',action:'พกขวด 1L ติดตัว ดื่มทุก 2 ชม.'});
-  else if(log.water<2)recs.push({severity:'medium',icon:'💡',title:'ควรดื่มน้ำเพิ่ม',msg:'ดื่ม '+log.water+' L',action:'ตั้งเตือนทุก 2 ชม.'});
+  if(cat.risk==='high')recs.push({severity:'high',icon:I.alert,title:'BMI Obese',msg:'BMI '+bmi.toFixed(1)+' is in obese range.',action:'Target 0.5–1 kg/wk loss. -500 kcal/day + 150m exercise/wk'});
+  else if(cat.risk==='medium')recs.push({severity:'medium',icon:I.info,title:'Overweight',msg:'BMI '+bmi.toFixed(1)+' is above standard.',action:'Cut simple sugars. Walk 30m after meals.'});
+  else if(bmi<18.5)recs.push({severity:'medium',icon:I.info,title:'Underweight',msg:'BMI '+bmi.toFixed(1)+' is below standard.',action:'Increase protein intake + Resistance training.'});
+  if(log.sleep<(user.sleepTarget||7))recs.push({severity:'high',icon:I.sleep,title:'Sleep Deficit',msg:'Slept only '+log.sleep+'h (Goal: '+(user.sleepTarget||7)+'h)',action:'Screen off 1hr before bed. Consistent schedule.'});
+  if(log.water<1.5)recs.push({severity:'high',icon:I.water,title:'Severe Dehydration Risk',msg:'Drank '+log.water+' L',action:'Carry a 1L bottle. Drink every 2 hrs.'});
+  else if(log.water<2)recs.push({severity:'medium',icon:I.water,title:'Increase Hydration',msg:'Drank '+log.water+' L',action:'Set 2hr reminders.'});
   const targetExDaily=user.weeklyExerciseTarget?Math.round(user.weeklyExerciseTarget/7):30;
-  if(log.exercise<targetExDaily/2)recs.push({severity:'high',icon:'⚠',title:'ออกกำลังกายน้อยไป',msg:'วันนี้ออกกำลังกาย '+log.exercise+' นาที (เป้าเฉลี่ย: '+targetExDaily+' นาที/วัน)',action:'เริ่มเดินเร็ว 20 นาที หรือ HIIT 10 นาที'});
-  else if(log.exercise<targetExDaily)recs.push({severity:'medium',icon:'💡',title:'ออกกำลังกายยังไม่ถึงเป้า',msg:'ออกกำลังกาย '+log.exercise+' นาที',action:'เพิ่มความเข้มข้นอีกนิด'});
+  if(log.exercise<targetExDaily/2)recs.push({severity:'high',icon:I.exercise,title:'Low Activity',msg:'Active for '+log.exercise+'m (Avg target: '+targetExDaily+'m/d)',action:'Try a 20m brisk walk or 10m HIIT.'});
+  else if(log.exercise<targetExDaily)recs.push({severity:'medium',icon:I.exercise,title:'Below Activity Goal',msg:'Active for '+log.exercise+'m',action:'Increase intensity slightly.'});
   if(log.energyLevel){
     if(log.energyLevel<=3){
-      if(log.exercise>=60)recs.push({severity:'high',icon:'⚠',title:'พลังงานต่ำ + ออกกำลังกายหนัก',msg:'พลังงาน '+log.energyLevel+'/10 + ออกกำลังกาย '+log.exercise+' นาที อาจเข้าข่าย Overtraining',action:'พักผ่อน 1-2 วัน เพิ่มการนอนและโภชนาการ'});
-      else if(log.sleep<7)recs.push({severity:'high',icon:'😴',title:'พลังงานต่ำ',msg:'พลังงาน '+log.energyLevel+'/10 น่าจะเป็นเพราะนอนน้อย',action:'นอนให้ครบ 7-9 ชม. + ดื่มน้ำเปล่ามากๆ + งดคาเฟอีนช่วงบ่าย'});
-      else recs.push({severity:'medium',icon:'😴',title:'พลังงานต่ำผิดปกติ',msg:'พลังงาน '+log.energyLevel+'/10 ทั้งที่นอนพอ',action:'อาจมีความเครียด ขาดธาตุเหล็ก หรือสารอาหาร — ลองตรวจสุขภาพ'});
-    }else if(log.energyLevel>=8&&log.exercise<targetExDaily/2)recs.push({severity:'low',icon:'🔥',title:'พลังงานดีเยี่ยม!',msg:'พลังงาน '+log.energyLevel+'/10 แต่ออกกำลังกายแค่ '+log.exercise+' นาที',action:'เป็นโอกาสดี! เพิ่มความเข้มข้นการออกกำลังกายได้เลย'});
+      if(log.exercise>=60)recs.push({severity:'high',icon:I.alert,title:'Overtraining Risk',msg:'Energy '+log.energyLevel+'/10 + '+log.exercise+'m workout.',action:'Rest 1-2 days. Prioritize sleep & nutrition.'});
+      else if(log.sleep<7)recs.push({severity:'high',icon:I.sleep,title:'Low Energy',msg:'Energy '+log.energyLevel+'/10 likely due to lack of sleep.',action:'Get 7-9h sleep + hydrate + cut afternoon caffeine.'});
+      else recs.push({severity:'medium',icon:I.info,title:'Unusual Low Energy',msg:'Energy '+log.energyLevel+'/10 despite adequate sleep.',action:'Monitor stress or micronutrients.'});
+    }else if(log.energyLevel>=8&&log.exercise<targetExDaily/2)recs.push({severity:'low',icon:I.energy,title:'Peak Energy!',msg:'Energy '+log.energyLevel+'/10 but only '+log.exercise+'m exercise.',action:'Great time to push harder in workouts!'});
   }
   if(history.length>=3){
     const r3=history.slice(0,3);const trend=r3[0].weight-r3[r3.length-1].weight;
-    if(user.goalType==='ลดน้ำหนัก'&&trend>0)recs.push({severity:'medium',icon:'📉',title:'น้ำหนักขึ้น',msg:'3 วันล่าสุดน้ำหนักเพิ่ม '+trend.toFixed(1)+' kg',action:'ทบทวนอาหาร ลดของแปรรูปและน้ำตาล'});
-    else if(user.goalType==='ลดน้ำหนัก'&&trend<-0.5)recs.push({severity:'low',icon:'🎉',title:'ความคืบหน้าดี!',msg:'น้ำหนักลด '+Math.abs(trend).toFixed(1)+' kg',action:'ระวังอย่าลดเร็วเกิน (ไม่ควรเกิน 1 kg/สัปดาห์)'});
+    if(user.goalType==='ลดน้ำหนัก'&&trend>0)recs.push({severity:'medium',icon:I.trendUp,title:'Weight Up',msg:'+'+trend.toFixed(1)+'kg over 3 days.',action:'Review diet. Cut processed foods.'});
+    else if(user.goalType==='ลดน้ำหนัก'&&trend<-0.5)recs.push({severity:'low',icon:I.check,title:'Good Progress',msg:'-'+Math.abs(trend).toFixed(1)+'kg.',action:'Ensure safe rate (max 1kg/wk).'});
   }
-  if(recs.length===0)recs.push({severity:'low',icon:'🎉',title:'ทำได้ดีมาก!',msg:'สุขภาพอยู่ในเกณฑ์ดีเยี่ยม',action:'ความสม่ำเสมอคือกุญแจสำคัญ'});
+  if(recs.length===0)recs.push({severity:'low',icon:I.check,title:'Excellent!',msg:'All metrics are looking solid.',action:'Consistency is key.'});
   return recs;
 }
+
 function calcProgress(user){
   const logs=LOGS.filter(l=>l.userId===user.id).sort((a,b)=>a.date.localeCompare(b.date));
   if(!logs.length)return null;
@@ -585,7 +607,6 @@ function calcProgress(user){
   };
 }
 
-// ═════ WEEKLY SUMMARY ═════
 function calcWeeklySummary(user){
   const allLogs=LOGS.filter(l=>l.userId===user.id).sort((a,b)=>a.date.localeCompare(b.date));
   if(!allLogs.length)return null;
@@ -615,38 +636,38 @@ function calcWeeklySummary(user){
     weekStart:fmt(last7),weekEnd:fmt(today)
   };
 }
+
 function renderWeeklySummary(user){
   const s=calcWeeklySummary(user);if(!s)return'';
   const wDir=parseFloat(s.weightDelta);
   const wClass=user.goalType==='ลดน้ำหนัก'?(wDir<0?'down':wDir>0?'up':'neutral'):(wDir>0?'down':wDir<0?'up':'neutral');
   const sClass=s.scoreDelta>0?'down':s.scoreDelta<0?'up':'neutral';
   return `<div class="summary-card">
-    <div class="flex-between" style="margin-bottom:4px"><div class="section-title" style="margin-bottom:0">🏆 สรุปสัปดาห์</div><span class="text-muted mono" style="font-size:11px">${s.weekStart} → ${s.weekEnd}</span></div>
-    <div style="font-size:13px;color:var(--text2)">บันทึกข้อมูล <b style="color:var(--lime)">${s.daysLogged}/${s.daysOf}</b> วัน</div>
+    <div class="flex-between" style="margin-bottom:4px"><div class="section-title" style="margin-bottom:0">${I.check} WEEKLY SUMMARY</div><span class="text-muted mono" style="font-size:11px">${s.weekStart} → ${s.weekEnd}</span></div>
+    <div style="font-size:13px;color:var(--text2)">Logged <b style="color:var(--lime)">${s.daysLogged}/${s.daysOf}</b> days</div>
     <div class="summary-grid">
-      <div class="summary-stat"><div class="ss-label">⚖️ น้ำหนักเฉลี่ย</div><div class="ss-value">${s.avgWeight} <span class="ss-unit">kg</span></div>${s.hasComparison?`<div class="ss-delta ${wClass}">${wDir>0?'+':''}${s.weightDelta} kg vs สัปดาห์ก่อน</div>`:'<div class="ss-delta neutral">— ยังไม่มีข้อมูลเปรียบเทียบ</div>'}</div>
-      <div class="summary-stat"><div class="ss-label">⭐ คะแนนเฉลี่ย</div><div class="ss-value">${s.avgScore}<span class="ss-unit">/100</span></div>${s.hasComparison?`<div class="ss-delta ${sClass}">${s.scoreDelta>0?'+':''}${s.scoreDelta} pts</div>`:'<div class="ss-delta neutral">—</div>'}</div>
-      <div class="summary-stat"><div class="ss-label">🌙 นอนเฉลี่ย</div><div class="ss-value">${s.avgSleep} <span class="ss-unit">ชม</span></div><div class="ss-delta neutral">เป้า ${user.sleepTarget||7.5} ชม</div></div>
-      <div class="summary-stat"><div class="ss-label">🏃 ออกกำลังกาย</div><div class="ss-value">${s.avgExercise} <span class="ss-unit">นาที/วัน</span></div><div class="ss-delta neutral">รวม ${s.avgExercise*s.daysLogged} นาที</div></div>
+      <div class="summary-stat"><div class="ss-label">${I.weight} Avg Weight</div><div class="ss-value">${s.avgWeight} <span class="ss-unit">kg</span></div>${s.hasComparison?`<div class="ss-delta ${wClass}">${wDir>0?'+':''}${s.weightDelta} kg vs last wk</div>`:'<div class="ss-delta neutral">—</div>'}</div>
+      <div class="summary-stat"><div class="ss-label">${I.star} Avg Score</div><div class="ss-value">${s.avgScore}<span class="ss-unit">/100</span></div>${s.hasComparison?`<div class="ss-delta ${sClass}">${s.scoreDelta>0?'+':''}${s.scoreDelta} pts</div>`:'<div class="ss-delta neutral">—</div>'}</div>
+      <div class="summary-stat"><div class="ss-label">${I.sleep} Avg Sleep</div><div class="ss-value">${s.avgSleep} <span class="ss-unit">h</span></div><div class="ss-delta neutral">Target ${user.sleepTarget||7.5} h</div></div>
+      <div class="summary-stat"><div class="ss-label">${I.exercise} Exercise</div><div class="ss-value">${s.avgExercise} <span class="ss-unit">m/d</span></div><div class="ss-delta neutral">Total ${s.avgExercise*s.daysLogged} m</div></div>
     </div>
-    ${s.bestDay?`<div class="card-sm" style="margin-top:12px;background:rgba(200,240,0,.06);border-color:rgba(200,240,0,.2)"><div style="font-size:11px;color:var(--lime);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">🌟 วันที่ดีที่สุด</div><div class="flex-between" style="font-size:13px"><span class="mono">${s.bestDay.date}</span><span class="fw-600">Score ${s.bestScore}/100</span></div></div>`:''}
+    ${s.bestDay?`<div class="card-sm" style="margin-top:12px;background:rgba(200,240,0,.05);border-color:rgba(200,240,0,.1)"><div style="font-size:11px;color:var(--lime);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${I.star} BEST DAY</div><div class="flex-between" style="font-size:13px"><span class="mono">${s.bestDay.date}</span><span class="fw-600">Score ${s.bestScore}/100</span></div></div>`:''}
   </div>`;
 }
 
-// ═════ WEIGHT CHART (Canvas line chart) ═════
 function drawWeightChart(canvasId,logs,user){
   const canvas=document.getElementById(canvasId);if(!canvas)return;
   const ctx=canvas.getContext('2d');
   const dpr=window.devicePixelRatio||1;
   const cssW=canvas.clientWidth||canvas.parentElement.clientWidth-32;
-  const cssH=200;
+  const cssH=220;
   canvas.width=cssW*dpr;canvas.height=cssH*dpr;
   canvas.style.height=cssH+'px';
   ctx.scale(dpr,dpr);ctx.clearRect(0,0,cssW,cssH);
   const recent=[...logs].sort((a,b)=>a.date.localeCompare(b.date)).slice(-30);
   if(recent.length<2){
     ctx.fillStyle='#9BA3AF';ctx.font='13px DM Sans,sans-serif';ctx.textAlign='center';
-    ctx.fillText('ต้องการข้อมูลอย่างน้อย 2 วันเพื่อแสดงกราฟ',cssW/2,cssH/2);return;
+    ctx.fillText('Not enough data (min 2 days)',cssW/2,cssH/2);return;
   }
   const pad={top:18,right:12,bottom:24,left:38};
   const cw=cssW-pad.left-pad.right;const ch=cssH-pad.top-pad.bottom;
@@ -658,16 +679,14 @@ function drawWeightChart(canvasId,logs,user){
   const yMin=minV-padR,yMax=maxV+padR;const yRange=yMax-yMin;
   const xAt=i=>pad.left+(recent.length===1?cw/2:(i/(recent.length-1))*cw);
   const yAt=v=>pad.top+((yMax-v)/yRange)*ch;
-  // Grid + labels
   ctx.strokeStyle='#2A2D32';ctx.lineWidth=1;
-  ctx.fillStyle='#9BA3AF';ctx.font='10px JetBrains Mono,monospace';
+  ctx.fillStyle='#555A62';ctx.font='10px JetBrains Mono,monospace';
   ctx.textAlign='right';ctx.textBaseline='middle';
   for(let i=0;i<=4;i++){
     const y=pad.top+(i/4)*ch;
     ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cw,y);ctx.stroke();
     ctx.fillText((yMax-(i/4)*yRange).toFixed(1),pad.left-6,y);
   }
-  // Target line
   if(targetW&&targetW>=yMin&&targetW<=yMax){
     const ty=yAt(targetW);
     ctx.strokeStyle='#FFD700';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
@@ -675,34 +694,29 @@ function drawWeightChart(canvasId,logs,user){
     ctx.setLineDash([]);
     ctx.fillStyle='#FFD700';ctx.font='bold 10px DM Sans,sans-serif';
     ctx.textAlign='right';ctx.textBaseline='bottom';
-    ctx.fillText(`🎯 เป้า ${targetW}kg`,pad.left+cw-4,ty-3);
+    ctx.fillText(`TARGET ${targetW}kg`,pad.left+cw-4,ty-3);
   }
-  // Area gradient
   const grd=ctx.createLinearGradient(0,pad.top,0,pad.top+ch);
-  grd.addColorStop(0,'rgba(200,240,0,0.35)');grd.addColorStop(1,'rgba(200,240,0,0)');
+  grd.addColorStop(0,'rgba(200,240,0,0.2)');grd.addColorStop(1,'rgba(200,240,0,0)');
   ctx.beginPath();ctx.moveTo(xAt(0),yAt(recent[0].weight));
   for(let i=1;i<recent.length;i++)ctx.lineTo(xAt(i),yAt(recent[i].weight));
   ctx.lineTo(xAt(recent.length-1),pad.top+ch);ctx.lineTo(xAt(0),pad.top+ch);
   ctx.closePath();ctx.fillStyle=grd;ctx.fill();
-  // Line
   ctx.strokeStyle='#C8F000';ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';
   ctx.beginPath();
   recent.forEach((log,i)=>{const x=xAt(i),y=yAt(log.weight);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});
   ctx.stroke();
-  // Dots
   const dotEvery=recent.length>14?Math.ceil(recent.length/10):1;
   recent.forEach((log,i)=>{
     if(i%dotEvery!==0&&i!==recent.length-1)return;
     const x=xAt(i),y=yAt(log.weight);
-    ctx.fillStyle='#0A0A0A';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#050505';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#C8F000';ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fill();
   });
-  // Highlight latest
   const lx=xAt(recent.length-1),ly=yAt(recent[recent.length-1].weight);
   ctx.fillStyle='#C8F000';ctx.beginPath();ctx.arc(lx,ly,5,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle='#0A0A0A';ctx.lineWidth=2;ctx.stroke();
-  // X-axis
-  ctx.fillStyle='#9BA3AF';ctx.font='9px JetBrains Mono,monospace';
+  ctx.strokeStyle='#050505';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#555A62';ctx.font='9px JetBrains Mono,monospace';
   ctx.textAlign='center';ctx.textBaseline='top';
   const labelCount=Math.min(5,recent.length);
   for(let i=0;i<labelCount;i++){
@@ -711,23 +725,23 @@ function drawWeightChart(canvasId,logs,user){
   }
 }
 
-// ═════ REMINDERS (Web Notifications) ═════
+// ═════ REMINDERS ═════
 const REMINDER_KEY='fitfuel_reminder';
 let reminderInterval=null;
 let lastReminderDate=null;
 function getReminderSettings(){try{return JSON.parse(localStorage.getItem(REMINDER_KEY))||{enabled:false,time:'20:00'};}catch{return{enabled:false,time:'20:00'};}}
 function saveReminderSettings(s){localStorage.setItem(REMINDER_KEY,JSON.stringify(s));}
 async function enableReminder(time){
-  if(!('Notification' in window)){showToast('❌ เบราว์เซอร์ไม่รองรับการแจ้งเตือน');return false;}
+  if(!('Notification' in window)){showToast('Notifications unsupported');return false;}
   let perm=Notification.permission;
   if(perm==='default')perm=await Notification.requestPermission();
-  if(perm!=='granted'){showToast('❌ กรุณาอนุญาตการแจ้งเตือน');return false;}
+  if(perm!=='granted'){showToast('Please allow notifications');return false;}
   saveReminderSettings({enabled:true,time});
   startReminderTimer();
-  showToast('🔔 ตั้งแจ้งเตือนเวลา '+time+' แล้ว');
+  showToast('Reminder set for '+time);
   return true;
 }
-function disableReminder(){const s=getReminderSettings();saveReminderSettings({...s,enabled:false});stopReminderTimer();showToast('🔕 ปิดการแจ้งเตือนแล้ว');}
+function disableReminder(){const s=getReminderSettings();saveReminderSettings({...s,enabled:false});stopReminderTimer();showToast('Reminders disabled');}
 function checkAndNotify(){
   const s=getReminderSettings();if(!s.enabled||!currentUser)return;
   const now=new Date();const today=now.toISOString().split('T')[0];
@@ -736,7 +750,7 @@ function checkAndNotify(){
   if(todayLogged||lastReminderDate===today)return;
   if(cur===s.time){
     lastReminderDate=today;
-    try{new Notification('🔥 FitFuel - เวลาบันทึกสุขภาพ',{body:'อย่าลืมบันทึกข้อมูลสุขภาพประจำวันนี้นะ 💪',tag:'fitfuel-reminder',requireInteraction:false});}catch(e){console.error(e);}
+    try{new Notification('FITFUEL - Time to Log!',{body:'Stay on track! Update your daily metrics.',tag:'fitfuel-reminder',requireInteraction:false});}catch(e){console.error(e);}
   }
 }
 function startReminderTimer(){stopReminderTimer();reminderInterval=setInterval(checkAndNotify,30000);checkAndNotify();}
@@ -744,57 +758,34 @@ function stopReminderTimer(){if(reminderInterval){clearInterval(reminderInterval
 function initReminders(){const s=getReminderSettings();if(s.enabled&&'Notification' in window&&Notification.permission==='granted')startReminderTimer();}
 async function toggleReminder(){
   const s=getReminderSettings();
-  if(s.enabled){
-    disableReminder();
-  } else {
+  if(s.enabled){disableReminder();} 
+  else {
     const time=document.getElementById('reminder-time')?.value||s.time||'20:00';
     await enableReminder(time);
-    
-    // โค้ดส่วนที่เพิ่มมา: อัปเดตเวลาลง Supabase ทันทีที่กดเปิด
     const fullTime = time + ":00";
-    try {
-        await supaClient
-            .from('users')
-            .update({ reminder_time: fullTime })
-            .eq('id', currentUser.id);
-    } catch(err) {
-        console.error("Failed to update reminder_time", err);
-    }
+    try { await supaClient.from('users').update({ reminder_time: fullTime }).eq('id', currentUser.id); } catch(err) { console.error(err); }
   }
   renderApp(currentPage);
 }
 async function changeReminderTime(){
   const time=document.getElementById('reminder-time').value;
-  const s=getReminderSettings();
-  saveReminderSettings({...s,time});
-  
-  if(s.enabled){
-    startReminderTimer();
-  }
-  
-  // อัปเดตเวลาลง Supabase
+  const s=getReminderSettings();saveReminderSettings({...s,time});
+  if(s.enabled) startReminderTimer();
   const fullTime = time + ":00";
   try {
-    const { error } = await supaClient
-        .from('users')
-        .update({ reminder_time: fullTime })
-        .eq('id', currentUser.id);
-        
+    const { error } = await supaClient.from('users').update({ reminder_time: fullTime }).eq('id', currentUser.id);
     if(error) throw error;
-    showToast('✅ บันทึกเวลาใหม่: '+time);
-  } catch(err) {
-    console.error(err);
-    showToast('❌ เกิดข้อผิดพลาดในการบันทึกเวลา');
-  }
+    showToast('Time updated to '+time);
+  } catch(err) { console.error(err); }
 }
 async function testReminder(){
-  if(!('Notification' in window)){showToast('❌ เบราว์เซอร์ไม่รองรับ');return;}
-  if(Notification.permission!=='granted'){const p=await Notification.requestPermission();if(p!=='granted'){showToast('❌ กรุณาอนุญาตการแจ้งเตือน');return;}}
-  new Notification('🔥 FitFuel - ทดสอบ',{body:'การแจ้งเตือนทำงานแล้ว! 🎉',tag:'fitfuel-test'});
-  showToast('✅ ส่งทดสอบแล้ว');
+  if(!('Notification' in window)){showToast('Unsupported');return;}
+  if(Notification.permission!=='granted'){const p=await Notification.requestPermission();if(p!=='granted'){showToast('Allow notifications first');return;}}
+  new Notification('FITFUEL Test',{body:'Notifications are working!',tag:'fitfuel-test'});
+  showToast('Test sent');
 }
 
-// ═════ RENDER ═════
+// ═════ RENDER FRAMEWORK ═════
 function renderApp(page){
   currentPage=page;renderNav();
   const el=document.getElementById('main-content');
@@ -817,36 +808,19 @@ function renderApp(page){
     else if(page==='activity')el.innerHTML=renderAdminActivity();
     else if(page==='backup')el.innerHTML=renderMasterBackup();
   }
-  // Energy slider
   const es=document.getElementById('log-energy');
   if(es){
     const upd=()=>{const v=parseInt(es.value);const info=energyInfo(v);
       const d=document.getElementById('energy-display');const a=document.getElementById('energy-advice');
-      if(d)d.innerHTML=`<span class="energy-value" style="color:${info.color}">${v}</span><span class="energy-label-text" style="color:${info.color}">${info.emoji} ${info.label}</span>`;
-      if(a)a.innerHTML=`<b>${info.label}:</b> ${info.advice}`;};
+      if(d)d.innerHTML=`<span class="energy-value" style="color:${info.color}">${v}</span><span class="energy-label-text" style="color:${info.color}">${info.icon} ${info.label}</span>`;
+      if(a)a.innerHTML=`<b style="color:${info.color}">${info.label}:</b> ${info.advice}`;};
     es.oninput=upd;upd();
   }
-  // Weight chart
   if(document.getElementById('weight-chart')){
     requestAnimationFrame(()=>{drawWeightChart('weight-chart',LOGS.filter(l=>l.userId===currentUser.id),currentUser);});
   }
 }
 
-const _NAV_SVG={
-  home:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>`,
-  log:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>`,
-  progress:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>`,
-  history:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg>`,
-  profile:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>`,
-  dashboard:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`,
-  users:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 3.1a4 4 0 0 1 0 7.8M21 21c0-3.3-2.7-6-6-6"/></svg>`,
-  logs:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
-  activity:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>`,
-  alerts:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>`,
-  control:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 0 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 0 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 0 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 0 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>`,
-  roles:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v5c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-3z"/></svg>`,
-  backup:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M3 15v3a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-3"/></svg>`,
-};
 function renderNav(){
   const nav=document.getElementById('main-nav');
   let items;
@@ -856,111 +830,122 @@ function renderNav(){
   let activeIdx=items.findIndex(it=>it.p===currentPage);
   if(activeIdx===-1&&currentPage.startsWith('settings'))activeIdx=items.findIndex(it=>it.p==='profile');
   if(activeIdx===-1)activeIdx=0;
-  nav.innerHTML=items.map((it,i)=>`<button class="nav-item${i===activeIdx?' active':''}" onclick="navTo('${it.p}',this)"><span>${it.i}</span>${it.l}</button>`).join('');
+  nav.innerHTML=items.map((it,i)=>`<button class="nav-item${i===activeIdx?' active':''}" onclick="navTo('${it.p}',this)">${it.i}<span>${it.l}</span></button>`).join('');
 }
 function navTo(page,el){document.querySelectorAll('#main-nav .nav-item').forEach(n=>n.classList.remove('active'));if(el)el.classList.add('active');renderApp(page);}
 function switchView(v){currentView=v;renderApp({user:'home',admin:'dashboard',master:'control'}[v]);}
 function modeSwitchHTML(){
   if(currentView!=='user')return'';
-  if(currentUser.role==='admin')return`<div class="mode-switch"><div><div style="font-size:11px;color:var(--text2);text-transform:uppercase">โหมดปัจจุบัน</div><div style="font-weight:600">👤 User Mode</div></div><button class="mode-btn mode-btn-admin" onclick="switchView('admin')">🛡 Admin Panel →</button></div>`;
-  if(currentUser.role==='master')return`<div class="mode-switch"><div><div style="font-size:11px;color:var(--text2);text-transform:uppercase">โหมดปัจจุบัน</div><div style="font-weight:600">👤 User Mode</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="mode-btn mode-btn-admin" onclick="switchView('admin')">🛡 Admin</button><button class="mode-btn mode-btn-master" onclick="switchView('master')">⚙ Master</button></div></div>`;
+  if(currentUser.role==='admin')return`<div class="mode-switch"><div><div style="font-size:11px;color:var(--text2);text-transform:uppercase">Current Mode</div><div style="font-weight:600">${I.user} User Mode</div></div><button class="mode-btn mode-btn-admin" onclick="switchView('admin')">Admin Panel →</button></div>`;
+  if(currentUser.role==='master')return`<div class="mode-switch"><div><div style="font-size:11px;color:var(--text2);text-transform:uppercase">Current Mode</div><div style="font-weight:600">${I.user} User Mode</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="mode-btn mode-btn-admin" onclick="switchView('admin')">Admin</button><button class="mode-btn mode-btn-master" onclick="switchView('master')">Master</button></div></div>`;
   return'';
 }
 
-// ═════ USER HOME — 4 chips + inline water/energy + chart + summary ═════
+// ═════ USER VIEWS ═════
 function renderUserHome(){
   const logs=LOGS.filter(l=>l.userId===currentUser.id).sort((a,b)=>b.date.localeCompare(a.date));
   const latest=logs[0];
   const switcher=modeSwitchHTML();
-  if(!latest)return`${switcher}<div class="section-title">สวัสดี, ${currentUser.name.split(' ')[0]}</div>${currentUser.username?`<div style="font-size:12px;color:var(--lime);font-family:'JetBrains Mono';margin-top:-14px;margin-bottom:20px">@${currentUser.username}</div>`:''}<div class="empty-state"><span class="empty-icon">📊</span><p>ยังไม่มีข้อมูล<br>กดแท็บ <b>Log</b> เพื่อเริ่ม!</p></div>`;
+  if(!latest)return`${switcher}<div class="section-title">Hello, ${currentUser.name.split(' ')[0]}</div><div class="empty-state"><span class="empty-icon">${I.info}</span><p>No data yet.<br>Tap <b>Log</b> to begin!</p></div>`;
   const bmi=calcBMI(latest.weight,currentUser.height);const cat=bmiCategory(bmi);
   const score=calcHealthScore(latest,currentUser);
   const savedRecs=RECOMMENDATIONS.filter(r=>r.logId===latest.id);
   const recsHTML=savedRecs.length>0
-    ?savedRecs.map(r=>`<div class="rec-box ${r.severity}"><div class="rec-label">${r.icon||'📌'} ${r.rectype}</div><p>${r.message}</p>${r.action?`<div class="rec-action">📋 ${r.action}</div>`:''}</div>`).join('')
-    :generateRecommendations(latest,currentUser,logs).map(r=>`<div class="rec-box ${r.severity}"><div class="rec-label">${r.icon} ${r.title}</div><p>${r.msg}</p>${r.action?`<div class="rec-action">📋 ${r.action}</div>`:''}</div>`).join('');
+    ?savedRecs.map(r=>`<div class="rec-box ${r.severity}"><div class="rec-icon">${r.icon||I.info}</div><div class="rec-content"><h4>${r.rectype}</h4><p>${r.message}</p>${r.action?`<div class="rec-action">${r.action}</div>`:''}</div></div>`).join('')
+    :generateRecommendations(latest,currentUser,logs).map(r=>`<div class="rec-box ${r.severity}"><div class="rec-icon">${r.icon}</div><div class="rec-content"><h4>${r.title}</h4><p>${r.msg}</p>${r.action?`<div class="rec-action">${r.action}</div>`:''}</div></div>`).join('');
   const bmiPct=Math.min(100,Math.max(0,((bmi-15)/(40-15))*100));
-  const scoreColor=score>=80?'#C8F000':score>=50?'#FF8C42':'#FF4757';
+  const scoreColor=score>=80?'var(--lime)':score>=50?'var(--orange)':'var(--red)';
   const riskClass=cat.risk==='low'?'risk-low':cat.risk==='medium'?'risk-medium':'risk-high';
   const prog=calcProgress(currentUser);
   const ei=energyInfo(latest.energyLevel||5);
-  const energyVal=latest.energyLevel||5;
+  const dashOffset=314-(314*score)/100;
+  
   return `${switcher}
-    <div class="section-title">สวัสดี, ${currentUser.name.split(' ')[0]}</div>
-    ${currentUser.username?`<div style="font-size:12px;color:var(--lime);font-family:'JetBrains Mono';margin-top:-14px;margin-bottom:4px">@${currentUser.username}</div>`:''}
-    <p class="text-muted" style="margin-bottom:20px">ข้อมูลล่าสุด: ${latest.date}</p>
-    <div class="card" style="background:linear-gradient(135deg,#1a2800,#111214);border-color:#2d4000">
-      <div class="flex-between">
-        <div>
-          <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px">Health Score</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:64px;color:${scoreColor};line-height:1">${score}</div>
-          <div style="font-size:13px;color:var(--text2)">จาก 100 คะแนน</div>
-        </div>
-        <div style="text-align:right">
-          <span class="risk-badge ${riskClass}">● ${cat.label}</span>
-          <div style="margin-top:12px;font-size:12px;color:var(--text2)">เป้าหมาย</div>
-          <div style="font-size:14px;font-weight:600">${currentUser.goalType}</div>
+    <div style="margin-top:24px;margin-bottom:32px;">
+      <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px">Good Evening,</div>
+      <div style="font-family:'Bebas Neue';font-size:48px;line-height:1;letter-spacing:1px">${currentUser.name.split(' ')[0]}</div>
+      ${currentUser.username?`<div style="font-size:13px;color:var(--lime);font-family:'JetBrains Mono';margin-top:4px">@${currentUser.username}</div>`:''}
+    </div>
+    
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;padding:32px 24px;border-color:rgba(200,240,0,0.1);background:linear-gradient(135deg,rgba(200,240,0,0.05),transparent)">
+      <div>
+        <div style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Health Score</div>
+        <div style="font-family:'DM Sans';font-size:14px;color:var(--text);margin-bottom:4px"><span style="color:${scoreColor}">Live</span> &middot; Updated ${latest.date}</div>
+        <div style="margin-top:16px;display:flex;gap:12px;font-size:12px">
+          <div style="color:var(--text2)">Goal: <span style="color:var(--text);font-weight:600">${currentUser.goalType}</span></div>
         </div>
       </div>
-      <div class="score-mini-stats">
-        <div class="score-mini-stat">💧 <b>${latest.water}</b> ลิตร</div>
-        <div class="score-mini-stat" style="color:${ei.color}">${ei.emoji} <b style="color:${ei.color}">${energyVal}/10</b> ${ei.label}</div>
+      <div style="position:relative;width:100px;height:100px;display:flex;align-items:center;justify-content:center;">
+        <svg viewBox="0 0 120 120" style="position:absolute;inset:0;transform:rotate(-90deg)">
+          <circle cx="60" cy="60" r="50" style="fill:none;stroke:var(--border);stroke-width:8;stroke-linecap:round"></circle>
+          <circle cx="60" cy="60" r="50" style="fill:none;stroke:${scoreColor};stroke-width:8;stroke-linecap:round;stroke-dasharray:314;stroke-dashoffset:${dashOffset};transition:1s"></circle>
+        </svg>
+        <div style="font-family:'Bebas Neue';font-size:36px;color:${scoreColor};line-height:1">${score}</div>
       </div>
     </div>
-    ${prog&&prog.streak>1?`<div class="streak-box"><div class="streak-num">${prog.streak}</div><div><div class="fw-600" style="font-size:14px">🔥 Streak ${prog.streak} วันต่อเนื่อง!</div><div class="text-muted" style="font-size:12px">รักษาวินัยให้ต่อเนื่อง</div></div></div>`:''}
+    
+    ${prog&&prog.streak>1?`<div class="streak-box"><div class="streak-num">${prog.streak}</div><div><div class="fw-600" style="font-size:16px">Day Streak!</div><div class="text-muted" style="font-size:13px;margin-top:4px">Consistency is key. Keep going.</div></div></div>`:''}
+    
     <div class="metrics-grid">
-      <div class="metric-chip lime"><div class="chip-label">น้ำหนัก</div><div class="chip-value">${latest.weight}</div><div class="chip-unit">กิโลกรัม</div></div>
-      <div class="metric-chip teal"><div class="chip-label">BMI</div><div class="chip-value">${bmi.toFixed(1)}</div><div class="chip-unit">${cat.label}</div></div>
-      <div class="metric-chip orange"><div class="chip-label">นอนหลับ</div><div class="chip-value">${latest.sleep}</div><div class="chip-unit">ชั่วโมง</div></div>
-      <div class="metric-chip blue"><div class="chip-label">ออกกำลังกาย</div><div class="chip-value">${latest.exercise}</div><div class="chip-unit">นาที</div></div>
+      <div class="metric-chip lime"><div class="chip-label">${I.weight} Weight</div><div class="chip-value">${latest.weight}</div><div class="chip-unit">kg</div></div>
+      <div class="metric-chip teal"><div class="chip-label">${I.info} BMI</div><div class="chip-value">${bmi.toFixed(1)}</div><div class="chip-unit">${cat.label}</div></div>
+      <div class="metric-chip orange"><div class="chip-label">${I.sleep} Sleep</div><div class="chip-value">${latest.sleep}</div><div class="chip-unit">hrs</div></div>
+      <div class="metric-chip purple"><div class="chip-label">${I.exercise} Exercise</div><div class="chip-value">${latest.exercise}</div><div class="chip-unit">min</div></div>
     </div>
+    
     <div class="bmi-card">
       <h3 style="font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px">BMI Indicator</h3>
       <div style="text-align:center;margin-bottom:20px"><div class="bmi-number" style="color:${cat.color}">${bmi.toFixed(1)}</div><div style="font-size:14px;font-weight:500;margin-top:4px;color:${cat.color}">${cat.label}</div></div>
       <div class="bmi-bar"><div style="width:100%;height:100%;border-radius:6px;background:linear-gradient(90deg,#3B82F6 0%,#C8F000 35%,#FF8C42 65%,#FF4757 100%)"></div><div class="bmi-indicator" style="left:${bmiPct}%"></div></div>
     </div>
+    
     <div class="chart-card">
-      <div class="chart-head"><span style="font-size:13px;font-weight:600">📈 แนวโน้มน้ำหนัก 30 วัน</span><span class="text-muted mono" style="font-size:11px">${logs.length} จุดข้อมูล</span></div>
+      <div class="chart-head"><span style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px">${I.trendUp} Weight Trend (30D)</span><span class="text-muted mono" style="font-size:11px">${logs.length} pts</span></div>
       <canvas id="weight-chart"></canvas>
     </div>
+    
     ${renderWeeklySummary(currentUser)}
-    <div class="section-title" style="margin-top:8px">คำแนะนำจากระบบ</div>
+    
+    <div class="section-title">AI RECOMMENDATIONS</div>
     ${recsHTML}
   `;
 }
 
 function renderUserLog(){
   const today=new Date().toISOString().split('T')[0];
-  return`<div class="section-title">บันทึกข้อมูลวันนี้</div>
-    <div class="card">
-      <div class="form-group"><label>วันที่</label><input type="date" id="log-date" value="${today}" max="${today}"></div>
+  return`
+    <div class="section-title" style="justify-content:space-between"><span>DAILY LOG</span><span style="font-size:14px;color:var(--text2);font-family:'JetBrains Mono'">${today}</span></div>
+    <div class="card" style="padding:0;background:transparent;border:none">
+      <div class="form-group"><label>${I.calendar} Date</label><input type="date" id="log-date" value="${today}" max="${today}"></div>
       <div class="form-row">
-        <div class="form-group"><label>น้ำหนัก (kg)</label><input type="number" id="log-weight" placeholder="70" step="0.1" inputmode="decimal"></div>
-        <div class="form-group"><label>นอนหลับ (ชม.)</label><input type="number" id="log-sleep" placeholder="7.5" step="0.5" inputmode="decimal"></div>
+        <div class="form-group"><label>${I.weight} Weight (kg)</label><input type="number" id="log-weight" placeholder="70" step="0.1" inputmode="decimal"></div>
+        <div class="form-group"><label>${I.sleep} Sleep (hrs)</label><input type="number" id="log-sleep" placeholder="7.5" step="0.5" inputmode="decimal"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>ดื่มน้ำ (ลิตร)</label><input type="number" id="log-water" placeholder="2.0" step="0.1" inputmode="decimal"></div>
-        <div class="form-group"><label>ออกกำลังกาย (นาที)</label><input type="number" id="log-exercise" placeholder="30" inputmode="numeric"></div>
+        <div class="form-group"><label>${I.water} Water (L)</label><input type="number" id="log-water" placeholder="2.0" step="0.1" inputmode="decimal"></div>
+        <div class="form-group"><label>${I.exercise} Exercise (min)</label><input type="number" id="log-exercise" placeholder="30" inputmode="numeric"></div>
       </div>
-      <div class="form-group">
-        <label>⚡ ระดับพลังงานวันนี้</label>
+      
+      <div class="form-group" style="background:var(--card);padding:20px;border-radius:var(--radius);border:1px solid var(--border);margin-top:20px;">
+        <label>${I.energy} Energy Level</label>
         <div class="energy-slider-box">
           <input type="range" id="log-energy" class="energy-slider" min="1" max="10" step="1" value="5">
-          <div class="energy-display" id="energy-display"><span class="energy-value">5</span><span class="energy-label-text">😐 พลังงานปานกลาง</span></div>
-          <div class="energy-info" id="energy-advice"><b>พลังงานปานกลาง:</b> พลังงานปกติ ลองเพิ่มกิจกรรมเบาๆ</div>
-          <p class="field-hint" style="margin-top:8px">💡 ระบบจะใช้ค่านี้วิเคราะห์ overtraining และคำแนะนำเฉพาะตัว</p>
+          <div class="energy-display" id="energy-display"><span class="energy-value">5</span><span class="energy-label-text">Neutral</span></div>
+          <div class="energy-info" id="energy-advice"><b>Neutral:</b> Normal energy level.</div>
         </div>
       </div>
+      
       <p class="error-msg" id="log-error"></p>
-      <button class="btn btn-primary" id="log-btn" onclick="submitLog()">บันทึกข้อมูล</button>
+      <button class="btn btn-primary" id="log-btn" onclick="submitLog()" style="margin-top:10px">Save Log</button>
     </div>
-    <div class="section-sub">เป้าหมายที่ตั้งไว้</div>
-    ${[['เป้าหมายออกกำลังกาย',(currentUser.weeklyExerciseTarget||150)+' นาที/สัปดาห์'],['เป้าหมายการนอน',(currentUser.sleepTarget||7.5)+' ชั่วโมง/วัน'],['BMI เป้าหมาย','18.5–24.9']].map(([k,v])=>`<div class="card-sm" style="margin-bottom:10px"><div class="flex-between"><span class="text-muted">${k}</span><span style="color:var(--lime);font-weight:600">${v}</span></div></div>`).join('')}
+    
+    <div class="section-sub" style="margin-top:32px">Current Goals</div>
+    ${[['Exercise Target',(currentUser.weeklyExerciseTarget||150)+' min/wk'],['Sleep Target',(currentUser.sleepTarget||7.5)+' hrs/day'],['BMI Target','18.5–24.9']].map(([k,v])=>`<div class="card-sm" style="margin-bottom:10px"><div class="flex-between"><span class="text-muted">${k}</span><span style="color:var(--lime);font-weight:600">${v}</span></div></div>`).join('')}
   `;
 }
 
 async function submitLog(){
-  if(!supaClient){alert("เชื่อมต่อ Database ไม่ได้");return;}
+  if(!supaClient){alert("No DB Connection");return;}
   const date=document.getElementById('log-date').value;
   const weight=parseFloat(document.getElementById('log-weight').value);
   const sleep=parseFloat(document.getElementById('log-sleep').value);
@@ -968,61 +953,80 @@ async function submitLog(){
   const exercise=parseInt(document.getElementById('log-exercise').value);
   const energy=parseInt(document.getElementById('log-energy').value);
   const err=document.getElementById('log-error');const btn=document.getElementById('log-btn');
-  if(!date||isNaN(weight)||isNaN(sleep)||isNaN(water)||isNaN(exercise)){err.textContent='กรุณากรอกข้อมูลให้ครบ';return;}
-  if(weight<20||weight>300){err.textContent='น้ำหนักไม่ถูกต้อง';return;}
-  if(sleep<0||sleep>24){err.textContent='ชั่วโมงนอนไม่ถูกต้อง';return;}
-  if(water<0||water>20){err.textContent='ปริมาณน้ำไม่ถูกต้อง';return;}
-  err.textContent='';btn.innerHTML='<span class="spinner"></span> กำลังบันทึก...';btn.disabled=true;
+  if(!date||isNaN(weight)||isNaN(sleep)||isNaN(water)||isNaN(exercise)){err.textContent='Please fill all data';return;}
+  if(weight<20||weight>300||sleep<0||sleep>24||water<0||water>20){err.textContent='Invalid input values';return;}
+  err.textContent='';btn.innerHTML='<span class="spinner"></span> SAVING...';btn.disabled=true;
   const{data:logData,error}=await supaClient.from('daily_logs').insert([{user_id:currentUser.id,date,weight,sleep_hours:sleep,water_liters:water,exercise_minute:exercise,energy_level:energy}]).select().single();
-  if(error){err.textContent='เกิดข้อผิดพลาด: '+error.message;btn.innerHTML='บันทึกข้อมูล';btn.disabled=false;return;}
+  if(error){err.textContent=error.message;btn.innerHTML='Save Log';btn.disabled=false;return;}
   const mappedLog=mapLog(logData);LOGS.push(mappedLog);
-  await logActivity('create',`บันทึก Log: ${date} (${weight}kg, พลังงาน ${energy}/10)`,currentUser.id,'log');
+  await logActivity('create',`Logged data: ${date} (${weight}kg, Energy ${energy}/10)`,currentUser.id,'log');
   const recsToSave=generateRecommendations(mappedLog,currentUser,LOGS.filter(l=>l.userId===currentUser.id).sort((a,b)=>b.date.localeCompare(a.date)));
   const dbRecs=recsToSave.map(r=>({log_id:logData.id,rectype:r.title,severity:r.severity,message:r.msg,action:r.action,icon:r.icon}));
   const{data:recData}=await supaClient.from('recommendations').insert(dbRecs).select();
   if(recData)recData.forEach(r=>RECOMMENDATIONS.push(mapRec(r)));
-  showToast('✅ บันทึกข้อมูลสำเร็จ!');
+  showToast('Log Saved!');
   setTimeout(()=>navTo('home',document.querySelectorAll('#main-nav .nav-item')[0]),600);
 }
 
 function renderUserProgress(){
   const logs=LOGS.filter(l=>l.userId===currentUser.id);
-  if(!logs.length)return`<div class="section-title">🎯 Progress</div><div class="empty-state"><span class="empty-icon">🎯</span><p>เริ่ม Log เพื่อดู progress!</p></div>`;
-  const p=calcProgress(currentUser);if(!p)return`<div class="empty-state"><p>ไม่สามารถคำนวณได้</p></div>`;
+  if(!logs.length)return`<div class="section-title">PROGRESS</div><div class="empty-state"><span class="empty-icon">${I.info}</span><p>Start logging to see progress!</p></div>`;
+  const p=calcProgress(currentUser);if(!p)return`<div class="empty-state"><p>Error calc</p></div>`;
   const dirClass=p.weightDelta<0?'var(--lime)':p.weightDelta>0?'var(--orange)':'var(--text2)';
-  const goalDir=currentUser.goalType==='ลดน้ำหนัก'?(p.weightDelta<0?'✅':'⚠'):(currentUser.goalType==='เพิ่มกล้ามเนื้อ'?(p.weightDelta>0?'✅':'⚠'):'─');
-  return`<div class="section-title">🎯 Progress Tracking</div>
-    <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">เป้าหมาย: <b style="color:var(--lime)">${currentUser.goalType}</b></p>
+  const goalDir=currentUser.goalType==='ลดน้ำหนัก'?(p.weightDelta<0?I.check:I.alert):(currentUser.goalType==='เพิ่มกล้ามเนื้อ'?(p.weightDelta>0?I.check:I.alert):'─');
+  return`
+    <div class="section-title" style="flex-direction:column;align-items:flex-start">
+      <span>YOUR TRAJECTORY</span>
+      <p class="text-muted" style="font-size:14px;font-family:'DM Sans';margin-top:4px;font-weight:400;letter-spacing:0">Goal: <b style="color:var(--lime)">${currentUser.goalType}</b></p>
+    </div>
+    
     <div class="progress-card">
-      <div class="flex-between" style="margin-bottom:12px">
-        <div><div class="section-sub" style="margin-bottom:0">น้ำหนักเป้าหมาย</div><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--lime);line-height:1.1">${p.weightPct}<span style="font-size:18px">%</span></div></div>
-        <div style="text-align:right"><div style="font-size:11px;color:var(--text2);text-transform:uppercase">ปัจจุบัน → เป้าหมาย</div><div class="fw-600" style="font-size:18px">${p.currentWeight} → ${p.targetWeight} <span style="font-size:13px;color:var(--text2)">kg</span></div></div>
+      <div class="flex-between" style="margin-bottom:16px">
+        <div><div class="section-sub" style="margin-bottom:0">Goal Completion</div><div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--lime);line-height:1">${p.weightPct}<span style="font-size:20px">%</span></div></div>
+        <div style="text-align:right"><div style="font-size:11px;color:var(--text2);text-transform:uppercase">Current &rarr; Target</div><div class="fw-600" style="font-size:20px">${p.currentWeight} &rarr; ${p.targetWeight} <span style="font-size:13px;color:var(--text2)">kg</span></div></div>
       </div>
       <div class="progress-bar"><div class="progress-bar-fill" style="width:${p.weightPct}%;background:linear-gradient(90deg,var(--teal),var(--lime))"></div></div>
-      <div class="progress-row"><span>เริ่มต้น ${p.startWeight} kg</span><span style="color:${dirClass}">${p.weightDelta>0?'+':''}${p.weightDelta} kg ${goalDir}</span></div>
+      <div class="progress-row" style="margin-top:8px"><span>Start: ${p.startWeight} kg</span><span style="color:${dirClass};display:flex;align-items:center;gap:4px">${p.weightDelta>0?'+':''}${p.weightDelta} kg ${goalDir}</span></div>
     </div>
+    
     ${renderWeeklySummary(currentUser)}
+    
     <div class="metrics-grid">
-      <div class="metric-chip lime"><div class="chip-label">วันที่ติดตาม</div><div class="chip-value">${p.daysTracked}</div><div class="chip-unit">วัน</div></div>
-      <div class="metric-chip orange"><div class="chip-label">Streak</div><div class="chip-value">${p.streak}</div><div class="chip-unit">วันต่อเนื่อง</div></div>
-      <div class="metric-chip teal"><div class="chip-label">Avg Score</div><div class="chip-value">${p.avgScore}</div><div class="chip-unit">/100</div></div>
-      ${p.avgEnergy?`<div class="metric-chip purple"><div class="chip-label">⚡ Avg Energy</div><div class="chip-value">${p.avgEnergy}</div><div class="chip-unit">/10</div></div>`:`<div class="metric-chip blue"><div class="chip-label">น้ำหนักปัจจุบัน</div><div class="chip-value">${parseFloat(p.currentWeight).toFixed(1)}</div><div class="chip-unit">kg</div></div>`}
+      <div class="metric-chip lime"><div class="chip-label">${I.calendar} Logged</div><div class="chip-value">${p.daysTracked}</div><div class="chip-unit">days</div></div>
+      <div class="metric-chip orange"><div class="chip-label">${I.star} Streak</div><div class="chip-value">${p.streak}</div><div class="chip-unit">days</div></div>
+      <div class="metric-chip teal"><div class="chip-label">${I.check} Avg Score</div><div class="chip-value">${p.avgScore}</div><div class="chip-unit">/100</div></div>
+      ${p.avgEnergy?`<div class="metric-chip purple"><div class="chip-label">${I.energy} Avg Energy</div><div class="chip-value">${p.avgEnergy}</div><div class="chip-unit">/10</div></div>`:`<div class="metric-chip blue"><div class="chip-label">${I.weight} Weight</div><div class="chip-value">${parseFloat(p.currentWeight).toFixed(1)}</div><div class="chip-unit">kg</div></div>`}
     </div>
-    <div class="section-title" style="margin-top:8px">เฉลี่ย 7 วันล่าสุด</div>
-    <div class="progress-card"><div class="progress-row"><span>🌙 นอนหลับ <span class="mono">${p.avgSleep} ชม.</span></span><span>${p.sleepGoal}%</span></div><div class="progress-bar"><div class="progress-bar-fill" style="width:${p.sleepGoal}%;background:var(--orange)"></div></div></div>
-    <div class="progress-card"><div class="progress-row"><span>💧 ดื่มน้ำ <span class="mono">${p.avgWater} ลิตร</span></span><span>${p.waterGoal}%</span></div><div class="progress-bar"><div class="progress-bar-fill" style="width:${p.waterGoal}%;background:var(--blue)"></div></div></div>
-    <div class="progress-card"><div class="progress-row"><span>🏃 ออกกำลังกาย <span class="mono">${p.avgExercise} นาที</span></span><span>${p.exerciseGoal}%</span></div><div class="progress-bar"><div class="progress-bar-fill" style="width:${p.exerciseGoal}%;background:var(--lime)"></div></div></div>
-    <button class="btn-export" style="width:100%;justify-content:center;padding:12px" onclick="exportUserCSV('${currentUser.id}')">📥 ดาวน์โหลด (Excel/CSV)</button>
+    
+    <div class="section-title" style="margin-top:16px">7-DAY AVERAGES</div>
+    <div class="progress-card"><div class="progress-row"><span>${I.sleep} Sleep <span class="mono">${p.avgSleep}h</span></span><span>${p.sleepGoal}%</span></div><div class="progress-bar"><div class="progress-bar-fill" style="width:${p.sleepGoal}%;background:var(--orange)"></div></div></div>
+    <div class="progress-card"><div class="progress-row"><span>${I.water} Water <span class="mono">${p.avgWater}L</span></span><span>${p.waterGoal}%</span></div><div class="progress-bar"><div class="progress-bar-fill" style="width:${p.waterGoal}%;background:var(--aqua)"></div></div></div>
+    <div class="progress-card"><div class="progress-row"><span>${I.exercise} Exercise <span class="mono">${p.avgExercise}m</span></span><span>${p.exerciseGoal}%</span></div><div class="progress-bar"><div class="progress-bar-fill" style="width:${p.exerciseGoal}%;background:var(--purple)"></div></div></div>
+    
+    <button class="btn-export" style="width:100%;justify-content:center;padding:14px;margin-top:16px" onclick="exportUserCSV('${currentUser.id}')">${I.download} Download Report (CSV)</button>
   `;
 }
 
 function renderUserHistory(){
   const logs=LOGS.filter(l=>l.userId===currentUser.id).sort((a,b)=>b.date.localeCompare(a.date));
-  if(!logs.length)return`<div class="section-title">ประวัติ</div><div class="empty-state"><span class="empty-icon">📋</span><p>ยังไม่มีประวัติ</p></div>`;
-  return`<div class="section-flex"><div class="section-title">ประวัติข้อมูล</div><button class="btn-export" onclick="exportUserCSV('${currentUser.id}')">📥 CSV</button></div>
-    <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">ทั้งหมด ${logs.length} รายการ</p>
-    ${logs.map(l=>{const bmi=calcBMI(l.weight,currentUser.height);const score=calcHealthScore(l,currentUser);const rc=score>=80?'risk-low':score>=50?'risk-medium':'risk-high';const ee=l.energyLevel?energyInfo(l.energyLevel).emoji:'';
-      return`<div class="log-item"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px"><span class="fw-600">📅 ${l.date}</span><span class="risk-badge ${rc}">Score: ${score}</span></div><div class="log-stats"><div class="log-stat">⚖️ <span>${l.weight}kg</span></div><div class="log-stat">BMI <span>${bmi.toFixed(1)}</span></div><div class="log-stat">🌙 <span>${l.sleep}h</span></div><div class="log-stat">💧 <span>${l.water}L</span></div><div class="log-stat">🏃 <span>${l.exercise}m</span></div>${l.energyLevel?`<div class="log-stat">⚡ <span>${l.energyLevel}/10 ${ee}</span></div>`:''}</div></div>`;
+  if(!logs.length)return`<div class="section-title">HISTORY</div><div class="empty-state"><span class="empty-icon">${I.log}</span><p>No history found.</p></div>`;
+  return`<div class="section-flex"><div class="section-title">LOG HISTORY</div><button class="btn-export" onclick="exportUserCSV('${currentUser.id}')">${I.download} CSV</button></div>
+    <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">Total ${logs.length} entries</p>
+    ${logs.map(l=>{const bmi=calcBMI(l.weight,currentUser.height);const score=calcHealthScore(l,currentUser);const rc=score>=80?'risk-low':score>=50?'risk-medium':'risk-high';
+      return`<div class="log-item">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:12px;">
+          <span class="fw-600" style="display:flex;align-items:center;gap:6px">${I.calendar} ${l.date}</span>
+          <span class="risk-badge ${rc}">Score: ${score}</span>
+        </div>
+        <div class="log-stats">
+          <div class="log-stat">${I.weight} <span>${l.weight}kg</span></div>
+          <div class="log-stat">${I.info} BMI <span>${bmi.toFixed(1)}</span></div>
+          <div class="log-stat">${I.sleep} <span>${l.sleep}h</span></div>
+          <div class="log-stat">${I.water} <span>${l.water}L</span></div>
+          <div class="log-stat">${I.exercise} <span>${l.exercise}m</span></div>
+          ${l.energyLevel?`<div class="log-stat">${I.energy} <span>${l.energyLevel}/10</span></div>`:''}
+        </div>
+      </div>`;
     }).join('')}`;
 }
 
@@ -1033,39 +1037,43 @@ function renderUserProfile(){
   const role=currentUser.role;const avatarClass=role==='master'?'master':role==='admin'?'admin':'';
   const photoStyle=currentUser.photo?`style="background-image:url('${currentUser.photo}')"`:'';
   const reminderS=getReminderSettings();
-  return`<div class="profile-header">
-      <div class="profile-avatar-lg ${avatarClass}" ${photoStyle} onclick="document.getElementById('photo-input').click()">${!currentUser.photo?currentUser.name[0]:''}<div class="photo-edit-overlay">📷 เปลี่ยน</div></div>
-      <div style="flex:1;min-width:0"><div style="font-size:20px;font-weight:600">${currentUser.name}</div>${currentUser.username?`<div style="font-size:13px;color:var(--lime);font-family:'JetBrains Mono';margin-bottom:2px">@${currentUser.username}</div>`:''}<div class="text-muted">${currentUser.email} <span class="role-badge role-${role}">${role.toUpperCase()}</span></div></div>
+  return`
+    <div class="card" style="margin-top:24px;display:flex;align-items:center;gap:24px;background:linear-gradient(180deg, var(--card2), var(--card));border-color:rgba(200,240,0,0.1)">
+      <div class="profile-avatar-lg ${avatarClass}" ${photoStyle} onclick="document.getElementById('photo-input').click()">${!currentUser.photo?currentUser.name[0]:''}<div class="photo-edit-overlay">${I.edit}</div></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'Bebas Neue';font-size:32px;letter-spacing:1px;line-height:1;margin-bottom:6px;word-break:break-word">${currentUser.name}</div>
+        ${currentUser.username?`<div style="font-size:13px;color:var(--lime);font-family:'JetBrains Mono';margin-bottom:4px">@${currentUser.username}</div>`:''}
+        <div class="text-muted" style="font-size:12px;overflow:hidden;text-overflow:ellipsis">${currentUser.email}</div>
+        <div style="margin-top:8px"><span class="role-badge role-${role}">${role.toUpperCase()}</span></div>
+      </div>
     </div>
-    <div class="card">
-      <div class="section-sub">ข้อมูลสุขภาพ</div>
-      ${[['อายุ',currentUser.age+' ปี'],['เพศ',currentUser.gender],['ส่วนสูง',currentUser.height+' cm'],['น้ำหนักเป้าหมาย',(currentUser.targetWeight||'-')+' kg'],['เป้าหมาย',currentUser.goalType],['จำนวน Log',logs.length+' รายการ'],...(bmi?[['BMI ล่าสุด',bmi.toFixed(1)+' ('+bmiCategory(bmi).label+')']]:[])].map(([k,v])=>`<div class="flex-between" style="padding:10px 0;border-bottom:1px solid var(--border)"><span class="text-muted">${k}</span><span class="fw-600">${v}</span></div>`).join('')}
+    
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="section-sub" style="padding:20px 20px 10px;margin:0">HEALTH DATA</div>
+      ${[['Age',currentUser.age+' y'],['Gender',currentUser.gender],['Height',currentUser.height+' cm'],['Target',(currentUser.targetWeight||'-')+' kg'],['Goal',currentUser.goalType],['Logs',logs.length+' entries'],...(bmi?[['Latest BMI',bmi.toFixed(1)+' ('+bmiCategory(bmi).label+')']]:[])].map(([k,v])=>`<div class="flex-between" style="padding:16px 20px;border-bottom:1px solid var(--border)"><span class="text-muted">${k}</span><span class="fw-600">${v}</span></div>`).join('')}
     </div>
-    <div class="section-sub">การตั้งค่า</div>
+    
+    <div class="section-sub" style="margin-top:24px">PREFERENCES</div>
     <div class="settings-list">
-      <div class="setting-item" onclick="navTo('settings-info')"><div class="setting-icon">⚙</div><div class="setting-content"><div class="setting-title">แก้ไขข้อมูลส่วนตัว</div><div class="setting-desc">ชื่อ, รูปโปรไฟล์, เป้าหมาย, การแจ้งเตือน</div></div><span style="color:var(--muted);font-size:18px">›</span></div>
-      <div class="setting-item" onclick="navTo('settings-info')"><div class="setting-icon">${reminderS.enabled?'🔔':'🔕'}</div><div class="setting-content"><div class="setting-title">การแจ้งเตือนรายวัน</div><div class="setting-desc">${reminderS.enabled?'เปิด · เวลา '+reminderS.time:'ปิดอยู่'}</div></div><span style="color:${reminderS.enabled?'var(--lime)':'var(--muted)'};font-size:13px;font-weight:600">${reminderS.enabled?'ON':'OFF'}</span></div>
+      <div class="setting-item" onclick="navTo('settings-info')"><div class="setting-icon">${I.user}</div><div class="setting-content"><div class="setting-title">Personal Info</div><div class="setting-desc">Name, photo, goals</div></div><span style="color:var(--muted);font-size:18px">›</span></div>
+      <div class="setting-item" onclick="navTo('settings-info')"><div class="setting-icon">${reminderS.enabled?I.bell:I.bellOff}</div><div class="setting-content"><div class="setting-title">Daily Reminders</div><div class="setting-desc">${reminderS.enabled?'ON · '+reminderS.time:'OFF'}</div></div><span style="color:${reminderS.enabled?'var(--lime)':'var(--muted)'};font-size:13px;font-weight:600">${reminderS.enabled?'ON':'OFF'}</span></div>
     </div>
-    <button class="btn btn-danger" style="width:100%;margin-top:4px" onclick="logout()">ออกจากระบบ</button>
+    
+    <button class="btn btn-danger" style="width:100%;margin-top:8px;padding:16px" onclick="logout()">Sign Out</button>
   `;
 }
 
-// ═════ PHOTO UPLOAD ═════
+// ═════ PHOTO UPLOAD & CROPPER ═════
 document.getElementById('photo-input').addEventListener('change',function(e){
   const file=e.target.files[0];if(!file)return;
-  if(!file.type.startsWith('image/')){showToast('❌ กรุณาเลือกไฟล์รูปภาพ');return;}
-  if(file.size>10*1024*1024){showToast('❌ ไฟล์ใหญ่เกิน 10MB');return;}
+  if(!file.type.startsWith('image/')){showToast('Please select an image file');return;}
+  if(file.size>10*1024*1024){showToast('File too large (max 10MB)');return;}
   const reader=new FileReader();
   reader.onload=ev=>openCropper(ev.target.result);
   reader.readAsDataURL(file);
   e.target.value='';
 });
 
-// ════════════════════════════════════════════════════════════
-//  IMAGE CROPPER — REWRITTEN with getBoundingClientRect()
-//  Reads ACTUAL DOM positions. NO fillStyle background hack.
-//  Output is PNG (lossless, transparent edges if any).
-// ════════════════════════════════════════════════════════════
 let cropImg=null;
 let cropX=0,cropY=0,cropScale=1,cropBaseScale=1;
 let cropDragging=false,cropDragStart={x:0,y:0};
@@ -1122,82 +1130,47 @@ window.addEventListener('touchmove',onCropMove,{passive:false});
 window.addEventListener('touchend',onCropUp);
 document.getElementById('cropper-zoom').addEventListener('input',e=>{cropScale=parseFloat(e.target.value);constrainCrop();applyCropTransform();});
 
-function resetCropper(){cropX=0;cropY=0;cropScale=1;document.getElementById('cropper-zoom').value=1;applyCropTransform();}
 function cancelCropper(){document.getElementById('cropper-overlay').classList.remove('show');document.getElementById('cropper-img').classList.remove('ready');cropImg=null;}
 
-;
-    const canvas = document.createElement('canvas');
-    canvas.width = OUTPUT; canvas.height = OUTPUT;
-    const ctx = canvas.getContext('2d');
-
-    // พื้นหลังสีขาว
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, OUTPUT, OUTPUT);
 async function applyCropper(){
-  if(!cropImg){showToast('❌ ไม่พบรูปภาพ');return;}
+  if(!cropImg){showToast('No image');return;}
   const btn = document.getElementById('cropper-apply-btn');
-  btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก...'; btn.disabled = true;
-
+  btn.innerHTML = '<span class="spinner"></span> SAVING'; btn.disabled = true;
   try {
     const stage = document.getElementById('cropper-stage');
     const imgEl = document.getElementById('cropper-img');
-    
     const stageW = stage.clientWidth;
-    const rect = imgEl.getBoundingClientRect();       // หาตำแหน่งและขนาดรูปที่ปรากฏบนจอจริงๆ
-    const stageRect = stage.getBoundingClientRect();   // หาตำแหน่งของกรอบครอบบนจอจริงๆ
-
-    // 1. คำนวณระยะห่างของรูปจากขอบกรอบ (บนหน้าจอ)
+    const rect = imgEl.getBoundingClientRect();
+    const stageRect = stage.getBoundingClientRect();
     const relativeX = rect.left - stageRect.left;
     const relativeY = rect.top - stageRect.top;
-    
-    // 2. ตั้งค่าขนาดไฟล์ Output
     const OUTPUT = 400; 
-    const ratio = OUTPUT / stageW; // อัตราส่วนขยายจากหน้าจอไปเป็นขนาดไฟล์จริง
-
-    // 3. สร้าง Canvas สำหรับวาดรูป
+    const ratio = OUTPUT / stageW; 
     const canvas = document.createElement('canvas');
-    canvas.width = OUTPUT; 
-    canvas.height = OUTPUT;
+    canvas.width = OUTPUT; canvas.height = OUTPUT;
     const ctx = canvas.getContext('2d');
-
-    // ใส่พื้นหลังสีขาวกันพลาด
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, OUTPUT, OUTPUT);
-
-    // 4. คำนวณตำแหน่งและขนาดที่จะวาดลงบน Canvas 400x400
-    // โดยขยายทุกอย่างจากหน้าจอด้วย ratio
     const finalDrawX = relativeX * ratio;
     const finalDrawY = relativeY * ratio;
     const finalDrawW = rect.width * ratio;
     const finalDrawH = rect.height * ratio;
-
-    // 5. วาดภาพลงบน Canvas
     ctx.drawImage(cropImg, finalDrawX, finalDrawY, finalDrawW, finalDrawH);
-
-    // 6. แปลงเป็น Data URL (JPEG)
     const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-
-    // 7. อัปเดตลงฐานข้อมูล Supabase
     const { error } = await supaClient.from('users').update({ photo: dataUrl }).eq('id', currentUser.id);
     if(error) throw error;
-
-    // 8. อัปเดตข้อมูลในตัวแปรและหน้าแอปทันที
     currentUser.photo = dataUrl;
     const u = USERS.find(x => x.id === currentUser.id); 
     if(u) u.photo = dataUrl;
-    
-    await logActivity('update', 'เปลี่ยนรูปโปรไฟล์', currentUser.id, 'user');
+    await logActivity('update', 'Updated Profile Photo', currentUser.id, 'user');
     updateAvatar();
-    showToast('✅ เปลี่ยนรูปโปรไฟล์สำเร็จ!');
+    showToast('Profile photo updated!');
     cancelCropper();
     renderApp(currentPage);
-    
   } catch(e) {
-    console.error('Crop error:', e);
-    showToast('❌ ' + e.message);
+    console.error(e);showToast(e.message);
   } finally {
-    btn.innerHTML = 'ใช้'; 
-    btn.disabled = false;
+    btn.innerHTML = 'APPLY'; btn.disabled = false;
   }
 }
 
@@ -1205,60 +1178,63 @@ async function applyCropper(){
 function renderSettingsInfo(){
   const reminderS=getReminderSettings();
   const notifPerm=('Notification' in window)?Notification.permission:'unsupported';
-  return`<div class="subpage-header">
-      <button class="subpage-back" onclick="navTo('profile')">←</button>
-      <div style="font-family:'Bebas Neue';font-size:28px;letter-spacing:1px;color:var(--lime)">ข้อมูลส่วนตัว</div>
+  return`
+    <div class="subpage-header">
+      <button class="subpage-back" onclick="navTo('profile')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+      <div style="font-family:'Bebas Neue';font-size:28px;letter-spacing:1px;color:var(--text)">EDIT PROFILE</div>
     </div>
+    
     <div class="card">
-      <div class="section-sub">รูปโปรไฟล์</div>
-      <div style="display:flex;align-items:center;gap:16px">
-        <div class="profile-avatar-lg ${currentUser.role==='master'?'master':currentUser.role==='admin'?'admin':''}" ${currentUser.photo?`style="background-image:url('${currentUser.photo}')"`:''} onclick="document.getElementById('photo-input').click()">${!currentUser.photo?currentUser.name[0]:''}<div class="photo-edit-overlay">📷</div></div>
+      <div class="section-sub">Profile Photo</div>
+      <div style="display:flex;align-items:center;gap:20px">
+        <div class="profile-avatar-lg ${currentUser.role==='master'?'master':currentUser.role==='admin'?'admin':''}" ${currentUser.photo?`style="background-image:url('${currentUser.photo}')"`:''} onclick="document.getElementById('photo-input').click()">${!currentUser.photo?currentUser.name[0]:''}<div class="photo-edit-overlay">${I.edit}</div></div>
         <div style="flex:1">
-          <button class="btn-sm" onclick="document.getElementById('photo-input').click()">📷 เลือกรูปใหม่</button>
-          ${currentUser.photo?'<button class="btn-danger" style="margin-left:6px" onclick="removePhoto()">🗑 ลบ</button>':''}
-          <p class="field-hint" style="margin-top:8px">เลือกรูป → ปรับตำแหน่ง+ขนาดได้</p>
+          <button class="btn-sm" onclick="document.getElementById('photo-input').click()">Upload Photo</button>
+          ${currentUser.photo?`<button class="btn-danger" style="margin-left:6px;padding:9px 16px" onclick="removePhoto()">Remove</button>`:''}
         </div>
       </div>
     </div>
+    
     <div class="card">
-      <div class="section-sub">🔔 การแจ้งเตือนรายวัน</div>
-      <div class="flex-between" style="margin-bottom:14px">
-        <div style="flex:1;min-width:0"><div class="fw-600" style="margin-bottom:4px">เปิดการแจ้งเตือน</div><div class="text-muted" style="font-size:12px">เตือนถ้ายังไม่บันทึกข้อมูลวันนั้น</div></div>
+      <div class="section-sub" style="display:flex;align-items:center;gap:6px">${I.bell} DAILY REMINDERS</div>
+      <div class="flex-between" style="margin-bottom:16px">
+        <div style="flex:1;min-width:0"><div class="fw-600" style="margin-bottom:4px;color:var(--text)">Enable Reminders</div><div class="text-muted" style="font-size:12px">Alert if no log is added today.</div></div>
         <label class="toggle-switch"><input type="checkbox" id="reminder-toggle" ${reminderS.enabled?'checked':''} onchange="toggleReminder()"><span class="toggle-slider"></span></label>
       </div>
-      <div class="form-group" style="margin-bottom:6px"><label>เวลาแจ้งเตือน</label><input type="time" id="reminder-time" value="${reminderS.time||'20:00'}" onchange="changeReminderTime()"></div>
-      <button class="btn-export" style="width:100%;justify-content:center;padding:10px;margin-top:8px" onclick="testReminder()">🧪 ทดสอบการแจ้งเตือนตอนนี้</button>
-      ${notifPerm==='denied'?'<p class="field-hint" style="color:var(--orange);margin-top:8px">⚠ การแจ้งเตือนถูกบล็อก — กรุณาเปิดในการตั้งค่าเบราว์เซอร์</p>':notifPerm==='unsupported'?'<p class="field-hint" style="color:var(--orange);margin-top:8px">⚠ เบราว์เซอร์ไม่รองรับการแจ้งเตือน</p>':'<p class="field-hint" style="margin-top:8px">💡 เปิดแท็บ FitFuel ทิ้งไว้เพื่อให้แจ้งเตือนทำงาน</p>'}
+      <div class="form-group" style="margin-bottom:12px"><label>Reminder Time</label><input type="time" id="reminder-time" value="${reminderS.time||'20:00'}" onchange="changeReminderTime()"></div>
+      <button class="btn-export" style="width:100%;justify-content:center;padding:12px;margin-top:8px" onclick="testReminder()">Test Notification</button>
+      ${notifPerm==='denied'?'<p class="field-hint" style="color:var(--orange);margin-top:12px">Notifications blocked by browser settings.</p>':notifPerm==='unsupported'?'<p class="field-hint" style="color:var(--orange);margin-top:12px">Browser unsupported.</p>':''}
     </div>
+    
     <div class="card">
-      <div class="section-sub">ข้อมูลทั่วไป</div>
-      <div class="form-group"><label>Username</label><input type="text" id="info-username" value="${currentUser.username||''}" placeholder="เช่น somchai99" autocomplete="username"><p class="field-hint">ภาษาอังกฤษ ตัวเลข หรือ _ เท่านั้น (3-30 ตัว)</p></div>
-      <div class="form-group"><label>ชื่อ-นามสกุล</label><input type="text" id="info-name" value="${currentUser.name}"></div>
+      <div class="section-sub">GENERAL INFO</div>
+      <div class="form-group"><label>Username</label><input type="text" id="info-username" value="${currentUser.username||''}" placeholder="somchai99" autocomplete="username"></div>
+      <div class="form-group"><label>Full Name</label><input type="text" id="info-name" value="${currentUser.name}"></div>
       <div class="form-row">
-        <div class="form-group"><label>อายุ</label><input type="number" id="info-age" value="${currentUser.age}"></div>
-        <div class="form-group"><label>เพศ</label><select id="info-gender"><option value="ชาย" ${currentUser.gender==='ชาย'?'selected':''}>ชาย</option><option value="หญิง" ${currentUser.gender==='หญิง'?'selected':''}>หญิง</option><option value="ไม่ระบุ" ${currentUser.gender==='ไม่ระบุ'?'selected':''}>ไม่ระบุ</option></select></div>
+        <div class="form-group"><label>Age</label><input type="number" id="info-age" value="${currentUser.age}"></div>
+        <div class="form-group"><label>Gender</label><select id="info-gender"><option value="ชาย" ${currentUser.gender==='ชาย'?'selected':''}>Male</option><option value="หญิง" ${currentUser.gender==='หญิง'?'selected':''}>Female</option><option value="ไม่ระบุ" ${currentUser.gender==='ไม่ระบุ'?'selected':''}>Other</option></select></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>ส่วนสูง (cm)</label><input type="number" id="info-height" value="${currentUser.height}"></div>
-        <div class="form-group"><label>น้ำหนักเป้า (kg)</label><input type="number" id="info-target" step="0.5" value="${currentUser.targetWeight||''}"></div>
+        <div class="form-group"><label>Height (cm)</label><input type="number" id="info-height" value="${currentUser.height}"></div>
+        <div class="form-group"><label>Target (kg)</label><input type="number" id="info-target" step="0.5" value="${currentUser.targetWeight||''}"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>เป้าการนอน (ชม.)</label><input type="number" id="info-sleep-target" step="0.5" value="${currentUser.sleepTarget||7.5}"></div>
-        <div class="form-group"><label>เป้าออกกำลัง (นาที)</label><input type="number" id="info-ex-target" step="10" value="${currentUser.weeklyExerciseTarget||150}"></div>
+        <div class="form-group"><label>Sleep Goal (hrs)</label><input type="number" id="info-sleep-target" step="0.5" value="${currentUser.sleepTarget||7.5}"></div>
+        <div class="form-group"><label>Ex. Goal (min)</label><input type="number" id="info-ex-target" step="10" value="${currentUser.weeklyExerciseTarget||150}"></div>
       </div>
-      <div class="form-group"><label>เป้าหมายหลัก</label><select id="info-goal">${['ลดน้ำหนัก','เพิ่มกล้ามเนื้อ','รักษาน้ำหนัก','ปรับปรุงสุขภาพโดยรวม'].map(g=>`<option ${currentUser.goalType===g?'selected':''}>${g}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Main Goal</label><select id="info-goal">${['ลดน้ำหนัก','เพิ่มกล้ามเนื้อ','รักษาน้ำหนัก','ปรับปรุงสุขภาพโดยรวม'].map(g=>`<option ${currentUser.goalType===g?'selected':''}>${g}</option>`).join('')}</select></div>
       <p class="error-msg" id="info-error"></p>
-      <button class="btn btn-primary" id="btn-save-info" onclick="saveInfo()">บันทึก</button>
+      <button class="btn btn-primary" id="btn-save-info" onclick="saveInfo()" style="margin-top:16px">SAVE CHANGES</button>
     </div>
   `;
 }
 async function removePhoto(){
-  if(!confirm('ลบรูปโปรไฟล์?'))return;
+  if(!confirm('Remove profile photo?'))return;
   await supaClient.from('users').update({photo:null}).eq('id',currentUser.id);
   currentUser.photo=null;
   const u=USERS.find(x=>x.id===currentUser.id);if(u)u.photo=null;
-  await logActivity('update','ลบรูปโปรไฟล์',currentUser.id,'user');
-  updateAvatar();showToast('🗑 ลบรูปแล้ว');renderApp('settings-info');
+  await logActivity('update','Removed profile photo',currentUser.id,'user');
+  updateAvatar();showToast('Photo removed');renderApp('settings-info');
 }
 async function saveInfo(){
   const username=document.getElementById('info-username').value.trim().toLowerCase();
@@ -1271,178 +1247,148 @@ async function saveInfo(){
   const sleepTarget=parseFloat(document.getElementById('info-sleep-target').value);
   const exTarget=parseInt(document.getElementById('info-ex-target').value);
   const err=document.getElementById('info-error');const btn=document.getElementById('btn-save-info');
-  if(!name||!age||!gender||!height||!target||!goal||!sleepTarget||!exTarget){err.textContent='กรุณากรอกให้ครบ';return;}
-  if(username&&!/^[a-z0-9_]{3,30}$/.test(username)){err.textContent='Username ต้องเป็นภาษาอังกฤษ ตัวเลข หรือ _ (3-30 ตัว)';return;}
-  err.textContent='';btn.innerHTML='<span class="spinner"></span> กำลังบันทึก...';btn.disabled=true;
+  if(!name||!age||!gender||!height||!target||!goal||!sleepTarget||!exTarget){err.textContent='Please fill all fields';return;}
+  err.textContent='';btn.innerHTML='<span class="spinner"></span> SAVING...';btn.disabled=true;
   const updates={username:username||null,name,age,gender,height,target_weight:target,goal_type:goal,sleep_target:sleepTarget,weekly_exercise_target:exTarget};
   const{error:saveErr}=await supaClient.from('users').update(updates).eq('id',currentUser.id);
   if(saveErr){
-    if(saveErr.code==='23505'&&saveErr.message.includes('username'))err.textContent='❌ Username นี้ถูกใช้ไปแล้ว กรุณาเลือกใหม่';
-    else err.textContent='เกิดข้อผิดพลาด: '+saveErr.message;
-    btn.innerHTML='💾 บันทึก';btn.disabled=false;return;
+    if(saveErr.code==='23505')err.textContent='Username taken';else err.textContent=saveErr.message;
+    btn.innerHTML='SAVE CHANGES';btn.disabled=false;return;
   }
   const u=USERS.find(x=>x.id===currentUser.id);
   Object.assign(u,{username,name,age,gender,height,targetWeight:target,goalType:goal,sleepTarget,weeklyExerciseTarget:exTarget});
   Object.assign(currentUser,{username,name,age,gender,height,targetWeight:target,goalType:goal,sleepTarget,weeklyExerciseTarget:exTarget});
-  await logActivity('update','แก้ไขข้อมูลส่วนตัว',currentUser.id,'user');
-  updateAvatar();showToast('✅ บันทึกสำเร็จ');
+  await logActivity('update','Updated profile info',currentUser.id,'user');
+  updateAvatar();showToast('Saved successfully');
   setTimeout(()=>navTo('profile'),500);
 }
 
-// ═════ ADMIN VIEW ═════
-function adminBackBtn(){return`<div class="mode-switch"><div><div style="font-size:11px;color:var(--text2);text-transform:uppercase">Admin Panel</div><div style="font-weight:600">🛡 ${currentUser.name}</div></div><button class="mode-btn" style="background:var(--card);color:var(--text);border:1px solid var(--border)" onclick="switchView('user')">← User</button></div>`;}
+// ═════ ADMIN VIEWS ═════
+function adminBackBtn(){return`<div class="mode-switch"><div><div style="font-size:11px;color:var(--text2);text-transform:uppercase">Admin Panel</div><div style="font-weight:600;color:var(--blue);display:flex;align-items:center;gap:6px">${I.shield} ${currentUser.name}</div></div><button class="mode-btn" style="background:var(--card2);color:var(--text);border:1px solid var(--border)" onclick="switchView('user')">Back to User</button></div>`;}
 function renderAdminDashboard(){
   const total=USERS.filter(u=>u.role==='user').length;
   const totalL=LOGS.length;
   const highRisk=LOGS.filter(l=>{const u=USERS.find(x=>x.id===l.userId);return u&&calcHealthScore(l,u)<50;}).length;
   const avg=LOGS.reduce((s,l)=>{const u=USERS.find(x=>x.id===l.userId);return s+(u?calcHealthScore(l,u):0);},0)/(LOGS.length||1);
-  const sc=s=>s>=80?'#C8F000':s>=50?'#FF8C42':'#FF4757';
+  const sc=s=>s>=80?'var(--lime)':s>=50?'var(--orange)':'var(--red)';
   return`${adminBackBtn()}
-    <div class="section-title">📊 Dashboard</div>
-    <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">ภาพรวม · อัพเดท ${new Date().toLocaleTimeString('th-TH')}</p>
+    <div class="section-title">DASHBOARD</div>
     <div class="metrics-grid">
-      <div class="metric-chip lime"><div class="chip-label">Users</div><div class="chip-value">${total}</div></div>
-      <div class="metric-chip teal"><div class="chip-label">Logs</div><div class="chip-value">${totalL}</div></div>
-      <div class="metric-chip orange"><div class="chip-label">High Risk</div><div class="chip-value" style="color:var(--red)">${highRisk}</div></div>
-      <div class="metric-chip blue"><div class="chip-label">Avg Score</div><div class="chip-value" style="color:${sc(avg)}">${avg.toFixed(0)}</div></div>
+      <div class="metric-chip lime"><div class="chip-label">${I.user} Users</div><div class="chip-value">${total}</div></div>
+      <div class="metric-chip teal"><div class="chip-label">${I.log} Logs</div><div class="chip-value">${totalL}</div></div>
+      <div class="metric-chip orange"><div class="chip-label">${I.alert} High Risk</div><div class="chip-value" style="color:var(--red)">${highRisk}</div></div>
+      <div class="metric-chip blue"><div class="chip-label">${I.star} Avg Score</div><div class="chip-value" style="color:${sc(avg)}">${avg.toFixed(0)}</div></div>
     </div>
-    <div class="section-title" style="margin-top:8px">⚡ กิจกรรมล่าสุด</div>
+    <div class="section-title">RECENT ACTIVITY</div>
     ${ACTIVITIES.slice(0,5).map(a=>renderActivityItem(a)).join('')}
-    <div class="section-title" style="margin-top:16px">สรุปรายผู้ใช้</div>
-    ${USERS.filter(u=>u.role==='user').map(u=>{
-      const ul=LOGS.filter(l=>l.userId===u.id);
-      const avgS=ul.reduce((s,l)=>s+calcHealthScore(l,u),0)/(ul.length||1);
-      const latest=[...ul].sort((a,b)=>b.date.localeCompare(a.date))[0];
-      const bmi=latest?calcBMI(latest.weight,u.height):null;
-      const photoBg=u.photo?`background-image:url('${u.photo}')`:'';
-      return`<div class="card" style="margin-bottom:12px">
-        <div class="flex-between" style="margin-bottom:12px">
-          <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
-            <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;background-size:cover;background-position:center;${photoBg}">${!u.photo?u.name[0]:''}</div>
-            <div style="min-width:0"><div class="fw-600">${u.name}</div>${u.email?`<div style="font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis">📧 ${u.email}</div>`:''}</div>
-          </div>
-          <div style="text-align:right;flex-shrink:0"><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:${sc(avgS)}">${avgS.toFixed(0)}</div><div class="text-muted" style="font-size:11px">avg</div></div>
-        </div>
-        <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px"><span class="text-muted">📋 <b style="color:var(--text)">${ul.length}</b></span><span class="text-muted">📅 <b style="color:var(--text)">${latest?latest.date:'-'}</b></span><span class="text-muted">🎯 ${u.goalType}</span>${bmi?`<span class="text-muted">BMI <b style="color:var(--text)">${bmi.toFixed(1)}</b></span>`:''}</div>
-      </div>`;
-    }).join('')}`;
+  `;
 }
 function renderAdminUsers(){
   const realUsers=USERS.filter(u=>u.role!=='master');
   return`${adminBackBtn()}
-    <div class="section-flex"><div class="section-title">👥 ผู้ใช้</div><button class="btn-export" onclick="exportAllUsersCSV()">📥 Export</button></div>
-    <p class="text-muted" style="margin-top:-10px;margin-bottom:16px">${realUsers.length} คน</p>
+    <div class="section-flex"><div class="section-title">USERS</div><button class="btn-export" onclick="exportAllUsersCSV()">${I.download} Export</button></div>
     ${realUsers.map(u=>{
-      const cnt=LOGS.filter(l=>l.userId===u.id).length;
       const ul=LOGS.filter(l=>l.userId===u.id);
       const avg=ul.reduce((s,l)=>s+calcHealthScore(l,u),0)/(ul.length||1);
       const sc=avg>=80?'var(--lime)':avg>=50?'var(--orange)':'var(--red)';
       const photoBg=u.photo?`background-image:url('${u.photo}')`:'';
-      return`<div class="log-item"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px"><div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;font-size:14px;background-size:cover;background-position:center;${photoBg}">${!u.photo?u.name[0]:''}</div><div style="min-width:0;flex:1"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="fw-600">${u.name}</span><span class="role-badge role-${u.role}">${u.role.toUpperCase()}</span></div><div class="text-muted" style="font-size:12px;margin-top:2px">${u.gender} · ${u.age}ปี · ${u.height}cm</div>${u.email?`<div style="font-size:11px;color:var(--blue);margin-top:2px;overflow:hidden;text-overflow:ellipsis">📧 ${u.email}</div>`:''}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${sc}">${avg.toFixed(0)}</div><div style="font-size:10px;color:var(--text2)">${cnt} logs</div></div></div><div style="font-size:12px;color:var(--text2)">🎯 ${u.goalType} · เป้า ${u.targetWeight||'-'} kg</div></div>`;
+      return`<div class="log-item"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px"><div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0"><div style="width:36px;height:36px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;font-size:14px;background-size:cover;background-position:center;${photoBg}">${!u.photo?u.name[0]:''}</div><div style="min-width:0;flex:1"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="fw-600">${u.name}</span><span class="role-badge role-${u.role}">${u.role.toUpperCase()}</span></div><div class="text-muted" style="font-size:12px;margin-top:2px">${u.gender} · ${u.age}y</div>${u.email?`<div style="font-size:11px;color:var(--blue);margin-top:2px;overflow:hidden;text-overflow:ellipsis">${u.email}</div>`:''}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${sc}">${ul.length?avg.toFixed(0):'-'}</div><div style="font-size:10px;color:var(--text2)">${ul.length} logs</div></div></div></div>`;
     }).join('')}`;
 }
 function renderAdminLogs(){
   const all=[...LOGS].sort((a,b)=>b.date.localeCompare(a.date));
   return`${adminBackBtn()}
-    <div class="section-flex"><div class="section-title">📋 Logs</div><button class="btn-export" onclick="exportAllLogsCSV()">📥 Export</button></div>
-    <p class="text-muted" style="margin-top:-10px;margin-bottom:16px">${all.length} รายการ</p>
-    ${all.map(l=>{const u=USERS.find(x=>x.id===l.userId);if(!u)return'';const bmi=calcBMI(l.weight,u.height);const score=calcHealthScore(l,u);const rc=score>=80?'risk-low':score>=50?'risk-medium':'risk-high';const ee=l.energyLevel?energyInfo(l.energyLevel).emoji:'';
-      return`<div class="log-item"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px"><span class="fw-600">${u.name}</span><span class="risk-badge ${rc}">${score}pts</span></div><div class="text-muted" style="font-size:12px;margin-bottom:8px">📅 ${l.date}</div><div class="log-stats"><div class="log-stat">⚖️ <span>${l.weight}kg</span></div><div class="log-stat">BMI <span>${bmi.toFixed(1)}</span></div><div class="log-stat">🌙 <span>${l.sleep}h</span></div><div class="log-stat">💧 <span>${l.water}L</span></div><div class="log-stat">🏃 <span>${l.exercise}m</span></div>${l.energyLevel?`<div class="log-stat">⚡ <span>${l.energyLevel}/10 ${ee}</span></div>`:''}</div></div>`;
+    <div class="section-flex"><div class="section-title">LOGS</div><button class="btn-export" onclick="exportAllLogsCSV()">${I.download} Export</button></div>
+    ${all.map(l=>{const u=USERS.find(x=>x.id===l.userId);if(!u)return'';const score=calcHealthScore(l,u);const rc=score>=80?'risk-low':score>=50?'risk-medium':'risk-high';
+      return`<div class="log-item"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="fw-600">${u.name}</span><span class="risk-badge ${rc}">${score}pts</span></div><div class="text-muted" style="font-size:12px;margin-bottom:8px">${I.calendar} ${l.date}</div><div class="log-stats"><div class="log-stat">${I.weight} <span>${l.weight}kg</span></div><div class="log-stat">${I.sleep} <span>${l.sleep}h</span></div></div></div>`;
     }).join('')}`;
 }
 function renderActivityItem(a){
-  const icons={create:'➕',update:'✏️',delete:'🗑',role:'🛡',log:'📝'};
-  const time=new Date(a.timestamp).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'});
-  return`<div class="activity-item"><div class="activity-icon">${icons[a.type]||'📌'}</div><div style="flex:1;min-width:0"><div style="font-size:13px;line-height:1.5;word-break:break-word">${a.msg}</div><div class="activity-time">${time} · by ${a.actorName||'system'}</div></div></div>`;
+  const icons={create:I.add,update:I.edit,delete:I.delete,role:I.shield,log:I.log};
+  const time=new Date(a.timestamp).toLocaleString('en-US',{dateStyle:'short',timeStyle:'short'});
+  return`<div class="activity-item"><div class="activity-icon">${icons[a.type]||I.info}</div><div style="flex:1;min-width:0"><div style="font-size:13px;line-height:1.5;word-break:break-word">${a.msg}</div><div class="activity-time">${time} · by ${a.actorName||'system'}</div></div></div>`;
 }
 function renderAdminActivity(){
   const back=currentView==='master'?masterBackBtn():adminBackBtn();
   return`${back}
-    <div class="section-flex"><div class="section-title">⚡ Activity Log</div><button class="btn-export" onclick="exportActivityCSV()">📥 Export</button></div>
-    <p class="text-muted" style="margin-top:-10px;margin-bottom:16px">การเปลี่ยนแปลง · ${ACTIVITIES.length} รายการ</p>
-    ${ACTIVITIES.length===0?'<div class="empty-state"><p>ยังไม่มีกิจกรรม</p></div>':ACTIVITIES.map(a=>renderActivityItem(a)).join('')}
+    <div class="section-flex"><div class="section-title">ACTIVITY LOG</div><button class="btn-export" onclick="exportActivityCSV()">${I.download} Export</button></div>
+    ${ACTIVITIES.length===0?'<div class="empty-state"><p>No activity</p></div>':ACTIVITIES.map(a=>renderActivityItem(a)).join('')}
   `;
 }
 function renderAdminAlerts(){
   const alerts=LOGS.map(l=>{const u=USERS.find(x=>x.id===l.userId);if(!u||u.role!=='user')return null;const score=calcHealthScore(l,u);const userLogs=LOGS.filter(x=>x.userId===u.id).sort((a,b)=>b.date.localeCompare(a.date));const recs=generateRecommendations(l,u,userLogs).filter(r=>r.severity==='high');return{l,u,score,recs};}).filter(x=>x&&x.score<70).sort((a,b)=>a.score-b.score);
-  if(!alerts.length)return`${adminBackBtn()}<div class="section-title">🚨 Alerts</div><div class="empty-state"><span class="empty-icon">✅</span><p>ไม่มีการแจ้งเตือน</p></div>`;
+  if(!alerts.length)return`${adminBackBtn()}<div class="section-title">ALERTS</div><div class="empty-state"><span class="empty-icon">${I.check}</span><p>All clear!</p></div>`;
   return`${adminBackBtn()}
-    <div class="section-title">🚨 Alerts</div>
-    <p class="text-muted" style="margin-top:-10px;margin-bottom:16px">พบ ${alerts.length} รายการที่ต้องดูแล</p>
-    ${alerts.map(a=>`<div class="card" style="border-color:${a.score<50?'rgba(255,71,87,.3)':'rgba(255,140,66,.3)'}"><div class="flex-between" style="margin-bottom:12px"><div><div class="fw-600">${a.u.name}</div><div class="text-muted" style="font-size:12px">📅 ${a.l.date}</div>${a.u.email?`<div style="font-size:12px;color:var(--blue)">📧 ${a.u.email}</div>`:''}</div><span class="risk-badge ${a.score<50?'risk-high':'risk-medium'}">Score: ${a.score}</span></div>${a.recs.map(r=>`<div class="rec-box high"><div class="rec-label">${r.icon} ${r.title}</div><p>${r.msg}</p>${r.action?`<div class="rec-action">📋 ${r.action}</div>`:''}</div>`).join('')}</div>`).join('')}`;
+    <div class="section-title">ALERTS</div>
+    ${alerts.map(a=>`<div class="card" style="border-color:${a.score<50?'rgba(255,71,87,.3)':'rgba(255,140,66,.3)'}"><div class="flex-between" style="margin-bottom:12px"><div><div class="fw-600">${a.u.name}</div><div class="text-muted" style="font-size:12px">${I.calendar} ${a.l.date}</div></div><span class="risk-badge ${a.score<50?'risk-high':'risk-medium'}">Score: ${a.score}</span></div>${a.recs.map(r=>`<div class="rec-box high"><div class="rec-icon">${r.icon}</div><div class="rec-content"><h4>${r.title}</h4><p>${r.msg}</p></div></div>`).join('')}</div>`).join('')}`;
 }
 
-// ═════ MASTER VIEW ═════
-function masterBackBtn(){return`<div class="mode-switch"><div><div style="font-size:11px;color:var(--text2);text-transform:uppercase">Master Control</div><div style="font-weight:600;color:var(--gold)">⚙ ${currentUser.name}</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="mode-btn" style="background:var(--card);color:var(--text);border:1px solid var(--border)" onclick="switchView('user')">← User</button><button class="mode-btn mode-btn-admin" onclick="switchView('admin')">🛡 Admin</button></div></div>`;}
+// ═════ MASTER VIEWS ═════
+function masterBackBtn(){return`<div class="mode-switch"><div><div style="font-size:11px;color:var(--text2);text-transform:uppercase">Master Control</div><div style="font-weight:600;color:var(--gold);display:flex;align-items:center;gap:6px">${I.settings} ${currentUser.name}</div></div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="mode-btn" style="background:var(--card2);color:var(--text);border:1px solid var(--border)" onclick="switchView('user')">User</button><button class="mode-btn mode-btn-admin" onclick="switchView('admin')">Admin</button></div></div>`;}
 function renderMasterControl(){
   const total=USERS.filter(u=>u.role==='user').length;
   const totalAdmins=USERS.filter(u=>u.role==='admin').length;
   return`${masterBackBtn()}
-    <div class="section-title" style="color:var(--gold)">⚙ Master Control</div>
-    <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">ภาพรวมระบบทั้งหมด</p>
+    <div class="section-title" style="color:var(--gold)">MASTER CONTROL</div>
     <div class="metrics-grid">
-      <div class="metric-chip lime"><div class="chip-label">Users</div><div class="chip-value">${total}</div></div>
-      <div class="metric-chip blue"><div class="chip-label">Admins</div><div class="chip-value" style="color:var(--blue)">${totalAdmins}</div></div>
-      <div class="metric-chip teal"><div class="chip-label">Logs</div><div class="chip-value">${LOGS.length}</div></div>
-      <div class="metric-chip orange"><div class="chip-label">Activities</div><div class="chip-value" style="color:var(--gold)">${ACTIVITIES.length}</div></div>
+      <div class="metric-chip lime"><div class="chip-label">${I.user} Users</div><div class="chip-value">${total}</div></div>
+      <div class="metric-chip blue"><div class="chip-label">${I.shield} Admins</div><div class="chip-value" style="color:var(--blue)">${totalAdmins}</div></div>
+      <div class="metric-chip teal"><div class="chip-label">${I.log} Logs</div><div class="chip-value">${LOGS.length}</div></div>
+      <div class="metric-chip orange"><div class="chip-label">${I.activity} Activity</div><div class="chip-value" style="color:var(--gold)">${ACTIVITIES.length}</div></div>
     </div>
-    <div class="section-title" style="color:var(--gold);margin-top:8px">⚡ กิจกรรมล่าสุด</div>
-    ${ACTIVITIES.slice(0,8).map(a=>renderActivityItem(a)).join('')}
   `;
 }
 function renderMasterRoles(){
   const realUsers=USERS.filter(u=>u.id!==currentUser.id);
   return`${masterBackBtn()}
-    <div class="section-flex"><div class="section-title" style="color:var(--gold)">🛡 จัดการ Roles</div><button class="btn-export" onclick="exportAllUsersCSV()">📥 Export</button></div>
-    <p class="text-muted" style="margin-top:-10px;margin-bottom:16px">เปลี่ยน role / ลบบัญชี</p>
-    ${realUsers.length===0?'<div class="empty-state"><p>ยังไม่มีผู้ใช้งานคนอื่น</p></div>':realUsers.map(u=>{const cnt=LOGS.filter(l=>l.userId===u.id).length;const photoBg=u.photo?`background-image:url('${u.photo}')`:'';
-      return`<div class="card" style="margin-bottom:10px"><div class="flex-between" style="margin-bottom:12px"><div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;background-size:cover;background-position:center;${photoBg}">${!u.photo?u.name[0]:''}</div><div style="min-width:0;flex:1"><div class="fw-600">${u.name}</div><div class="text-muted" style="font-size:12px">${cnt} logs</div>${u.email?`<div style="font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis">${u.email}</div>`:''}</div></div><span class="role-badge role-${u.role}">${u.role.toUpperCase()}</span></div><div style="display:flex;gap:6px;flex-wrap:wrap">${u.role!=='user'?`<button class="btn-sm" style="flex:1;min-width:90px" onclick="setRole('${u.id}','user')">⬇ User</button>`:''}${u.role!=='admin'?`<button class="btn-sm" style="flex:1;min-width:90px;background:var(--blue);color:white" onclick="setRole('${u.id}','admin')">⬆ Admin</button>`:''}${u.role!=='master'?`<button class="btn-sm" style="flex:1;min-width:90px;background:var(--gold);color:black" onclick="setRole('${u.id}','master')">⬆ Master</button>`:''}<button class="btn-danger" style="flex-shrink:0;padding:9px 14px" onclick="deleteUser('${u.id}')">🗑</button></div></div>`;
+    <div class="section-flex"><div class="section-title" style="color:var(--gold)">MANAGE ROLES</div></div>
+    ${realUsers.length===0?'<div class="empty-state"><p>No other users</p></div>':realUsers.map(u=>{const photoBg=u.photo?`background-image:url('${u.photo}')`:'';
+      return`<div class="card" style="margin-bottom:12px"><div class="flex-between" style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0"><div style="width:40px;height:40px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);flex-shrink:0;background-size:cover;background-position:center;${photoBg}">${!u.photo?u.name[0]:''}</div><div style="min-width:0;flex:1"><div class="fw-600">${u.name}</div>${u.email?`<div style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis">${u.email}</div>`:''}</div></div><span class="role-badge role-${u.role}">${u.role.toUpperCase()}</span></div><div style="display:flex;gap:8px;flex-wrap:wrap">${u.role!=='user'?`<button class="btn-sm" style="flex:1" onclick="setRole('${u.id}','user')">Set User</button>`:''}${u.role!=='admin'?`<button class="btn-sm" style="flex:1;background:var(--blue);color:white;border:none" onclick="setRole('${u.id}','admin')">Set Admin</button>`:''}${u.role!=='master'?`<button class="btn-sm" style="flex:1;background:var(--gold);color:black;border:none" onclick="setRole('${u.id}','master')">Set Master</button>`:''}<button class="btn-danger" style="flex-shrink:0;padding:9px 14px" onclick="deleteUser('${u.id}')">${I.delete}</button></div></div>`;
     }).join('')}
   `;
 }
 function renderMasterBackup(){
   return`${masterBackBtn()}
-    <div class="section-title" style="color:var(--gold)">💾 Backup & Export</div>
-    <p class="text-muted" style="margin-top:-10px;margin-bottom:20px">ดาวน์โหลดข้อมูลทั้งหมด</p>
+    <div class="section-title" style="color:var(--gold)">BACKUP & RESET</div>
     <div class="card">
-      <div class="section-sub">Export ข้อมูลแยกหมวด</div>
-      <div style="display:grid;gap:8px">
-        <button class="btn-export" style="justify-content:center;padding:12px" onclick="exportAllUsersCSV()">📥 Users.csv (${USERS.length} คน)</button>
-        <button class="btn-export" style="justify-content:center;padding:12px" onclick="exportAllLogsCSV()">📥 Logs.csv (${LOGS.length} รายการ)</button>
-        <button class="btn-export" style="justify-content:center;padding:12px" onclick="exportActivityCSV()">📥 Activity.csv (${ACTIVITIES.length} รายการ)</button>
+      <div class="section-sub">Export Data</div>
+      <div style="display:grid;gap:12px">
+        <button class="btn-export" style="justify-content:center;padding:14px" onclick="exportAllUsersCSV()">${I.download} Users.csv (${USERS.length})</button>
+        <button class="btn-export" style="justify-content:center;padding:14px" onclick="exportAllLogsCSV()">${I.download} Logs.csv (${LOGS.length})</button>
+        <button class="btn-export" style="justify-content:center;padding:14px" onclick="exportActivityCSV()">${I.download} Activity.csv (${ACTIVITIES.length})</button>
       </div>
     </div>
     <div class="card" style="border-color:rgba(255,71,87,.3)">
-      <div class="section-sub" style="color:var(--red)">⚠ อันตราย</div>
-      <button class="btn-danger" style="width:100%" onclick="resetSystem()">🗑 รีเซ็ตข้อมูลทั้งหมดใน Database</button>
+      <div class="section-sub" style="color:var(--red)">DANGER ZONE</div>
+      <button class="btn-danger" style="width:100%;padding:14px" onclick="resetSystem()">${I.delete} Factory Reset DB</button>
     </div>
   `;
 }
 async function setRole(userId,newRole){
-  const u=USERS.find(x=>x.id===userId);if(!u){showToast('❌ ไม่พบบัญชี');return;}
-  if(!confirm(`เปลี่ยน role ของ ${u.name}\nจาก ${u.role.toUpperCase()} → ${newRole.toUpperCase()}?`))return;
+  const u=USERS.find(x=>x.id===userId);if(!u)return;
+  if(!confirm(`Change role of ${u.name} to ${newRole.toUpperCase()}?`))return;
   await supaClient.from('users').update({role:newRole}).eq('id',userId);
   const oldRole=u.role;u.role=newRole;
-  await logActivity('role',`เปลี่ยน Role: ${u.name} (${oldRole.toUpperCase()} → ${newRole.toUpperCase()})`,userId,'user');
-  showToast(`✅ ${u.name} เป็น ${newRole.toUpperCase()} แล้ว`);renderApp('roles');
+  await logActivity('role',`Role change: ${u.name} (${oldRole.toUpperCase()} -> ${newRole.toUpperCase()})`,userId,'user');
+  showToast('Role updated');renderApp('roles');
 }
 async function deleteUser(userId){
   const u=USERS.find(x=>x.id===userId);if(!u)return;
-  if(!confirm(`ลบบัญชี ${u.name} และ logs ทั้งหมด?`))return;
+  if(!confirm(`Delete ${u.name} completely?`))return;
   await supaClient.from('users').delete().eq('id',userId);
   USERS=USERS.filter(x=>x.id!==userId);LOGS=LOGS.filter(l=>l.userId!==userId);
-  await logActivity('delete',`ลบบัญชี: ${u.name}`,userId,'user');
-  showToast('🗑 ลบบัญชีสำเร็จ');renderApp('roles');
+  await logActivity('delete',`Deleted user: ${u.name}`,userId,'user');
+  showToast('User deleted');renderApp('roles');
 }
 async function resetSystem(){
-  if(!confirm('⚠ รีเซ็ตข้อมูลทั้งระบบ?'))return;
-  if(!confirm('แน่ใจอีกครั้ง? ข้อมูลทั้งหมดจะถูกลบ'))return;
-  await supaClient.from('users').delete().neq('name','impossible_string');
-  showToast('🔄 กำลังรีเซ็ต...');
+  if(!confirm('FACTORY RESET: Wipe all data?'))return;
+  if(!confirm('Are you absolutely sure?'))return;
+  await supaClient.from('users').delete().neq('name','impossible');
+  showToast('Resetting...');
   setTimeout(()=>location.reload(),1000);
 }
 
-// ═════ EXPORT ═════
+// ═════ CSV EXPORTS ═════
 function downloadCSV(filename,rows){
   const BOM='\uFEFF';
   const csv=BOM+rows.map(r=>r.map(c=>{const s=String(c==null?'':c);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(',')).join('\n');
@@ -1454,32 +1400,29 @@ function downloadCSV(filename,rows){
 function exportUserCSV(userId){
   const u=USERS.find(x=>x.id===userId);if(!u)return;
   const userLogs=LOGS.filter(l=>l.userId===userId).sort((a,b)=>a.date.localeCompare(b.date));
-  const rows=[['FitFuel - User Report'],['ชื่อ',u.name],['Email',u.email||''],['อายุ',u.age],['เพศ',u.gender],['ส่วนสูง',u.height],['น้ำหนักเป้า',u.targetWeight||''],['เป้าหมาย',u.goalType],['สร้างบัญชี',u.createdAt],[],['── Daily Logs ──'],['วันที่','น้ำหนัก','BMI','BMI Cat','Score','นอน','น้ำ','ออกกำลังกาย','พลังงาน','บันทึกเมื่อ'],
+  const rows=[['FitFuel - User Report'],['Name',u.name],['Email',u.email||''],['Age',u.age],['Gender',u.gender],['Height',u.height],['Target',u.targetWeight||''],['Goal',u.goalType],['Joined',u.createdAt],[],['── Daily Logs ──'],['Date','Weight','BMI','BMI Cat','Score','Sleep','Water','Exercise','Energy','Logged At'],
     ...userLogs.map(l=>{const bmi=calcBMI(l.weight,u.height);return[l.date,l.weight,bmi.toFixed(1),bmiCategory(bmi).label,calcHealthScore(l,u),l.sleep,l.water,l.exercise,l.energyLevel||'-',l.createdAt||''];})
   ];
   downloadCSV(`FitFuel_${u.name}_${new Date().toISOString().split('T')[0]}.csv`,rows);
-  showToast('📥 ดาวน์โหลดสำเร็จ!');
+  showToast('Download started');
 }
 function exportAllUsersCSV(){
-  const rows=[['FitFuel - All Users'],['Generated',new Date().toLocaleString('th-TH')],[],['ID','ชื่อ','Email','Role','อายุ','เพศ','สูง','เป้า','เป้าหมาย','Logs','AvgScore','สร้างเมื่อ'],
+  const rows=[['FitFuel - All Users'],['Generated',new Date().toLocaleString('en-US')],[],['ID','Name','Email','Role','Age','Gender','Height','Target','Goal','LogsCount','AvgScore','Joined'],
     ...USERS.map(u=>{const ul=LOGS.filter(l=>l.userId===u.id);const avg=ul.length?ul.reduce((s,l)=>s+calcHealthScore(l,u),0)/ul.length:0;return[u.id,u.name,u.email||'',u.role,u.age,u.gender,u.height,u.targetWeight||'',u.goalType,ul.length,avg.toFixed(0),u.createdAt||''];})
   ];
-  downloadCSV(`FitFuel_All_Users_${new Date().toISOString().split('T')[0]}.csv`,rows);
-  showToast('📥 ดาวน์โหลด Users.csv!');
+  downloadCSV(`FitFuel_Users.csv`,rows);showToast('Download started');
 }
 function exportAllLogsCSV(){
-  const rows=[['FitFuel - All Logs'],['Generated',new Date().toLocaleString('th-TH')],[],['LogID','UserID','ชื่อ','วันที่','น้ำหนัก','BMI','BMI Cat','Score','นอน','น้ำ','ออกกำลังกาย','พลังงาน','บันทึกเมื่อ'],
+  const rows=[['FitFuel - All Logs'],['Generated',new Date().toLocaleString('en-US')],[],['LogID','UserID','Name','Date','Weight','BMI','BMI Cat','Score','Sleep','Water','Exercise','Energy','Logged At'],
     ...[...LOGS].sort((a,b)=>b.date.localeCompare(a.date)).map(l=>{const u=USERS.find(x=>x.id===l.userId);if(!u)return null;const bmi=calcBMI(l.weight,u.height);return[l.id,u.id,u.name,l.date,l.weight,bmi.toFixed(1),bmiCategory(bmi).label,calcHealthScore(l,u),l.sleep,l.water,l.exercise,l.energyLevel||'-',l.createdAt||''];}).filter(Boolean)
   ];
-  downloadCSV(`FitFuel_All_Logs_${new Date().toISOString().split('T')[0]}.csv`,rows);
-  showToast('📥 ดาวน์โหลด Logs.csv!');
+  downloadCSV(`FitFuel_Logs.csv`,rows);showToast('Download started');
 }
 function exportActivityCSV(){
-  const rows=[['FitFuel - Activity'],['Generated',new Date().toLocaleString('th-TH')],[],['ID','Type','Target','Message','Actor','Timestamp'],
+  const rows=[['FitFuel - Activity Log'],['Generated',new Date().toLocaleString('en-US')],[],['ID','Type','Target','Message','Actor','Timestamp'],
     ...ACTIVITIES.map(a=>[a.id,a.type,a.target,a.msg,a.actorName||a.actorId,a.timestamp])
   ];
-  downloadCSV(`FitFuel_Activity_${new Date().toISOString().split('T')[0]}.csv`,rows);
-  showToast('📥 ดาวน์โหลด Activity.csv!');
+  downloadCSV(`FitFuel_Activity.csv`,rows);showToast('Download started');
 }
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}

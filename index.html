@@ -21,6 +21,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bk);color:var(--tx);min-h
 .screen.active{display:flex;animation:sIn .2s ease}
 @keyframes sIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
+/* แก้ไขให้รองรับการ Scroll บน Mobile/iOS ได้ดีขึ้น */
+#screen-main { height: 100vh; overflow: hidden; }
+
+/* ควบคุมขนาด SVG ในปุ่มทั้งหมด */
+button svg { width: 14px; height: 14px; }
+
 /* TOPBAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--dark);border-bottom:1px solid var(--br);position:sticky;top:0;z-index:100}
 .tb-brand{display:flex;align-items:center;gap:9px}
@@ -36,7 +42,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bk);color:var(--tx);min-h
 .rb.master{background:rgba(255,215,0,.1);color:var(--gold);border-color:rgba(255,215,0,.22)}
 
 /* LAYOUT */
-.content{flex:1;overflow-y:auto;padding:18px 18px 96px}
+.content{flex:1;overflow-y:auto;padding:18px 18px 96px;-webkit-overflow-scrolling:touch}
 .bnav{position:fixed;bottom:0;left:0;right:0;background:var(--dark);border-top:1px solid var(--br);display:flex;padding:6px 0 18px;z-index:100}
 .ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:5px 2px;color:var(--tx3);font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;background:none;border:none;transition:color .18s}
 .ni.active{color:var(--lime)}
@@ -482,7 +488,7 @@ select.fi option{background:var(--card2)}
       <div><div class="tb-name">FITFUEL</div><div class="tb-sub">Health · OS</div></div>
     </div>
     <div class="tb-right">
-      <span class="rb" id="topbar-role">USER</span>
+      <span class="rb" id="topbar-role" onclick="cycleRole()" style="cursor:pointer" title="กดเพื่อสลับโหมด">USER</span>
       <div class="av" id="user-avatar">U</div>
     </div>
   </div>
@@ -644,8 +650,8 @@ async function logout(){
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');}
 function enterApp(){
   updAv();
-  document.getElementById('topbar-role').className='rb '+CU.role;
-  document.getElementById('topbar-role').textContent=CU.role.toUpperCase();
+  document.getElementById('topbar-role').className='rb '+CV;
+  document.getElementById('topbar-role').textContent=CV.toUpperCase();
   initReminder();renderApp('home');showScreen('main');
 }
 function updAv(){
@@ -658,6 +664,26 @@ async function logAct(type,msg,userId=null,target='log'){
   if(!supa||!CU)return;
   const{data}=await supa.from('activities').insert([{type,target,user_id:userId,actor_id:CU.id,actor_name:CU.name,msg}]).select().single();
   if(data)ACTS.unshift(mA(data));
+}
+
+// ═══ CYCLE ROLE FUNCTION ═══
+function cycleRole() {
+  if(!CU) return;
+  const roles = ['user'];
+  if(CU.role === 'admin' || CU.role === 'master') roles.push('admin');
+  if(CU.role === 'master') roles.push('master');
+  
+  if(roles.length <= 1) {
+    showToast('คุณมีสิทธิ์เข้าถึงแค่โหมด USER เท่านั้น');
+    return;
+  }
+  
+  let currIdx = roles.indexOf(CV);
+  let nextIdx = (currIdx + 1) % roles.length;
+  let nextView = roles[nextIdx];
+  
+  switchView(nextView);
+  showToast('สลับเป็นโหมด ' + nextView.toUpperCase());
 }
 
 // ═══ CALCULATIONS ═══
@@ -933,20 +959,22 @@ function renderNav(){
   nav.innerHTML=items.map((it,i)=>`<button class="ni${i===ai?' active':''}" onclick="navTo('${it.p}',this)"><span>${it.i}</span>${it.l}</button>`).join('');
 }
 function navTo(p,el){document.querySelectorAll('.bnav .ni').forEach(n=>n.classList.remove('active'));if(el)el.classList.add('active');renderApp(p);}
-function switchView(v){CV=v;renderApp({user:'home',admin:'dashboard',master:'control'}[v]);}
-function modeBanner(){
-  if(CV!=='user')return'';
-  if(CU.role==='admin')return`<div class="mode-banner"><div class="mb-l"><div class="mb-t">โหมดปัจจุบัน</div><div class="mb-n">User Mode</div></div><button class="mb-btn mb-ba" onclick="switchView('admin')">Admin Panel</button></div>`;
-  if(CU.role==='master')return`<div class="mode-banner"><div class="mb-l"><div class="mb-t">โหมดปัจจุบัน</div><div class="mb-n">User Mode</div></div><div class="mb-btns"><button class="mb-btn mb-ba" onclick="switchView('admin')">Admin</button><button class="mb-btn mb-bm" onclick="switchView('master')">Master</button></div></div>`;
-  return'';
+function switchView(v){
+  CV=v;
+  const tb = document.getElementById('topbar-role');
+  if(tb){
+    tb.className='rb '+v;
+    tb.textContent=v.toUpperCase();
+  }
+  renderApp({user:'home',admin:'dashboard',master:'control'}[v]);
 }
 
 // ═══ HOME PAGE ═══
 function renderHome(){
   const logs=LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>b.date.localeCompare(a.date));
   const lt=logs[0];
-  const banner=modeBanner();
-  if(!lt)return`${banner}<div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:3px">${greeting()},</div><div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;color:var(--lime);line-height:1;margin-bottom:20px">${CU.name.split(' ')[0].toUpperCase()}</div>
+  
+  if(!lt)return`<div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:3px">${greeting()},</div><div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;color:var(--lime);line-height:1;margin-bottom:20px">${CU.name.split(' ')[0].toUpperCase()}</div>
     <div class="empty-s">${IC.plus}<div class="empty-t">ยังไม่มีข้อมูล</div><div class="empty-d">กดปุ่ม Log เพื่อเริ่มบันทึก</div></div>`;
 
   const B=bmi(lt.weight,CU.height);const cat=bmiCat(B);const score=hScore(lt,CU);
@@ -978,7 +1006,7 @@ function renderHome(){
     </div>
   </div>`:'';
 
-  return`${banner}
+  return`
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
     <div>
       <div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:2px">${greeting()},</div>
@@ -1524,12 +1552,11 @@ async function applyCropper(){
 }
 
 // ═══ ADMIN VIEW ═══
-function aBk(){return`<div class="mode-banner"><div class="mb-l"><div class="mb-t">Admin Panel</div><div class="mb-n">${CU.name}</div></div><button class="mb-btn mb-bg" onclick="switchView('user')">← User</button></div>`;}
 function renderADash(){
   const tu=USERS.filter(u=>u.role==='user').length,hr=LOGS.filter(l=>{const u=USERS.find(x=>x.id===l.userId);return u&&hScore(l,u)<50;}).length;
   const avg=LOGS.reduce((s,l)=>{const u=USERS.find(x=>x.id===l.userId);return s+(u?hScore(l,u):0);},0)/(LOGS.length||1);
   const sc=s=>s>=80?'var(--lime)':s>=50?'var(--og)':'var(--red)';
-  return`${aBk()}<div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--lime);margin-bottom:12px">Dashboard</div>
+  return`<div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--lime);margin-bottom:12px">Dashboard</div>
   <div class="admin-m"><div class="amc"><div class="amc-l">Users</div><div class="amc-v">${tu}</div></div><div class="amc"><div class="amc-l">Logs</div><div class="amc-v">${LOGS.length}</div></div><div class="amc"><div class="amc-l">High Risk</div><div class="amc-v" style="color:var(--red)">${hr}</div></div><div class="amc"><div class="amc-l">Avg Score</div><div class="amc-v" style="color:${sc(avg)}">${avg.toFixed(0)}</div></div></div>
   <div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:8px">กิจกรรมล่าสุด</div>
   ${ACTS.slice(0,5).map(a=>acItem(a)).join('')}
@@ -1539,14 +1566,14 @@ function renderADash(){
   }).join('')}`;
 }
 function renderAUsers(){
-  return`${aBk()}<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Users</div><button onclick="expAllUsers()" class="be">Export</button></div>
+  return`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Users</div><button onclick="expAllUsers()" class="be">Export</button></div>
   ${USERS.filter(u=>u.role!=='master').map(u=>{const cnt=LOGS.filter(l=>l.userId===u.id).length;const ul=LOGS.filter(l=>l.userId===u.id);const avg=ul.reduce((s,l)=>s+hScore(l,u),0)/(ul.length||1);const pb=u.photo?`background-image:url('${u.photo}')`:'';const sc=avg>=80?'var(--lime)':avg>=50?'var(--og)':'var(--red)';
     return`<div class="li"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div style="display:flex;align-items:center;gap:9px;flex:1;min-width:0"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--tl));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--bk);flex-shrink:0;font-size:12px;background-size:cover;background-position:center;${pb}">${!u.photo?u.name[0]:''}</div><div style="min-width:0;flex:1"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-weight:600;font-size:12px">${u.name}</span><span class="rb ${u.role}">${u.role.toUpperCase()}</span></div><div style="font-size:9px;color:var(--tx2)">${u.gender}·${u.age}y·${u.height}cm</div></div></div><div style="text-align:right;flex-shrink:0"><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:${sc}">${avg.toFixed(0)}</div><div style="font-size:8px;color:var(--tx3)">${cnt} logs</div></div></div><div style="font-size:9px;color:var(--tx3);margin-top:5px">${u.goalType}</div></div>`;
   }).join('')}`;
 }
 function renderALogs(){
   const all=[...LOGS].sort((a,b)=>b.date.localeCompare(a.date));
-  return`${aBk()}<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Logs</div><button onclick="expAllLogs()" class="be">Export</button></div>
+  return`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Logs</div><button onclick="expAllLogs()" class="be">Export</button></div>
   ${all.map(l=>{const u=USERS.find(x=>x.id===l.userId);if(!u)return'';const s=hScore(l,u);const rc=s>=80?'rl':s>=50?'rm':'rh';
     return`<div class="li"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-weight:600;font-size:11px">${u.name}</span><span class="rib ${rc}">${s}pts</span></div><div style="font-size:9px;color:var(--tx3);font-family:'JetBrains Mono',monospace;margin-bottom:5px">${l.date}</div><div class="ls"><div class="ls-i">W <span>${l.weight}kg</span></div><div class="ls-i">BMI <span>${bmi(l.weight,u.height).toFixed(1)}</span></div><div class="ls-i">Sleep <span>${l.sleep}h</span></div><div class="ls-i">Water <span>${l.water}L</span></div><div class="ls-i">Ex <span>${l.exercise}m</span></div>${l.energyLevel?`<div class="ls-i">E <span>${l.energyLevel}/10</span></div>`:''}</div></div>`;
   }).join('')}`;
@@ -1557,35 +1584,33 @@ function acItem(a){
   return`<div class="ac-i"><div class="ac-ic">${ics[a.type]||IC.bolt}</div><div style="flex:1;min-width:0"><div style="font-size:11px;line-height:1.5;word-break:break-word">${a.msg}</div><div class="ac-ti">${t} · ${a.actorName||'system'}</div></div></div>`;
 }
 function renderActivity(){
-  const bk=CV==='master'?mBk():aBk();
-  return`${bk}<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Activity Log</div><button onclick="expActs()" class="be">Export</button></div>
+  return`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Activity Log</div><button onclick="expActs()" class="be">Export</button></div>
   ${ACTS.length===0?`<div class="empty-s">${IC.zap}<div class="empty-t">ยังไม่มีกิจกรรม</div></div>`:ACTS.map(a=>acItem(a)).join('')}`;
 }
 function renderAlerts(){
   const al=LOGS.map(l=>{const u=USERS.find(x=>x.id===l.userId);if(!u||u.role!=='user')return null;const s=hScore(l,u);const rl=LOGS.filter(x=>x.userId===u.id).sort((a,b)=>b.date.localeCompare(a.date));const rs=genRecs(l,u,rl).filter(r=>r.sev==='high');return{l,u,s,rs};}).filter(x=>x&&x.s<70).sort((a,b)=>a.s-b.s);
-  if(!al.length)return`${aBk()}<div class="empty-s">${IC.check}<div class="empty-t">ไม่มีการแจ้งเตือน</div><div class="empty-d">ผู้ใช้ทุกคนอยู่ในเกณฑ์ดี</div></div>`;
-  return`${aBk()}<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--red);margin-bottom:4px">Alerts</div><div style="font-size:10px;color:var(--tx3);margin-bottom:12px">พบ ${al.length} รายการ</div>
+  if(!al.length)return`<div class="empty-s">${IC.check}<div class="empty-t">ไม่มีการแจ้งเตือน</div><div class="empty-d">ผู้ใช้ทุกคนอยู่ในเกณฑ์ดี</div></div>`;
+  return`<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--red);margin-bottom:4px">Alerts</div><div style="font-size:10px;color:var(--tx3);margin-bottom:12px">พบ ${al.length} รายการ</div>
   ${al.map(a=>`<div class="card" style="margin-bottom:8px;border-color:${a.s<50?'rgba(255,71,87,.3)':'rgba(255,140,66,.3)'}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px"><div><div style="font-weight:600;font-size:12px">${a.u.name}</div><div style="font-size:9px;color:var(--tx3);font-family:'JetBrains Mono',monospace">${a.l.date}</div></div><span class="rib ${a.s<50?'rh':'rm'}">Score ${a.s}</span></div>${a.rs.map(r=>`<div class="rec-c high"><div class="rec-ic">${IC.alert}</div><div class="rec-bd" style="flex:1;min-width:0"><div class="rec-tag">${r.title}</div><div class="rec-tx">${r.msg}</div>${r.act?`<div class="rec-act">${r.act}</div>`:''}</div></div>`).join('')}</div>`).join('')}`;
 }
 
 // ═══ MASTER VIEW ═══
-function mBk(){return`<div class="mode-banner"><div class="mb-l"><div class="mb-t">Master Control</div><div class="mb-n" style="color:var(--gold)">${CU.name}</div></div><div class="mb-btns"><button class="mb-btn mb-bg" onclick="switchView('user')">← User</button><button class="mb-btn mb-ba" onclick="switchView('admin')">Admin</button></div></div>`;}
 function renderMCtrl(){
   const tu=USERS.filter(u=>u.role==='user').length,ta=USERS.filter(u=>u.role==='admin').length;
-  return`${mBk()}<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold);margin-bottom:12px">Master Control</div>
+  return`<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold);margin-bottom:12px">Master Control</div>
   <div class="admin-m"><div class="amc"><div class="amc-l">Users</div><div class="amc-v">${tu}</div></div><div class="amc"><div class="amc-l">Admins</div><div class="amc-v" style="color:var(--bl)">${ta}</div></div><div class="amc"><div class="amc-l">Logs</div><div class="amc-v">${LOGS.length}</div></div><div class="amc"><div class="amc-l">Activities</div><div class="amc-v" style="color:var(--gold)">${ACTS.length}</div></div></div>
   <div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:8px">กิจกรรมล่าสุด</div>
   ${ACTS.slice(0,8).map(a=>acItem(a)).join('')}`;
 }
 function renderMRoles(){
   const ru=USERS.filter(u=>u.id!==CU.id);
-  return`${mBk()}<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold)">จัดการ Roles</div><button onclick="expAllUsers()" class="be">Export</button></div>
+  return`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold)">จัดการ Roles</div><button onclick="expAllUsers()" class="be">Export</button></div>
   ${ru.length===0?`<div class="empty-s">${IC.users}<div class="empty-t">ยังไม่มีผู้ใช้งานคนอื่น</div></div>`:ru.map(u=>{const cnt=LOGS.filter(l=>l.userId===u.id).length;const pb=u.photo?`background-image:url('${u.photo}')`:'';
     return`<div class="card" style="margin-bottom:8px;padding:12px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--tl));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--bk);flex-shrink:0;background-size:cover;background-position:center;font-size:13px;${pb}">${!u.photo?u.name[0]:''}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">${u.name}</div><div style="font-size:9px;color:var(--tx2)">${cnt} logs</div></div><span class="rb ${u.role}">${u.role.toUpperCase()}</span></div><div style="display:flex;gap:5px;flex-wrap:wrap">${u.role!=='user'?`<button class="bs" style="flex:1;min-width:70px;font-size:9px" onclick="setRole('${u.id}','user')">User</button>`:''}${u.role!=='admin'?`<button class="bs" style="flex:1;min-width:70px;font-size:9px;background:var(--bl);color:#fff" onclick="setRole('${u.id}','admin')">Admin</button>`:''}${u.role!=='master'?`<button class="bs" style="flex:1;min-width:70px;font-size:9px;background:var(--gold)" onclick="setRole('${u.id}','master')">Master</button>`:''}  <button class="bd" style="padding:7px 10px;font-size:9px" onclick="delUser('${u.id}')">Delete</button></div></div>`;
   }).join('')}`;
 }
 function renderMBackup(){
-  return`${mBk()}<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold);margin-bottom:12px">Backup & Export</div>
+  return`<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold);margin-bottom:12px">Backup & Export</div>
   <div class="card" style="margin-bottom:10px">
     <div class="sh">Export ข้อมูล</div>
     <div style="display:grid;gap:7px">

@@ -1463,16 +1463,51 @@ async function submitQuickLog(){
   if(logState.weight<20||logState.weight>300){err.textContent='น้ำหนักไม่ถูกต้อง';return;}
   
   err.textContent='';btn.innerHTML='<span class="sp2"></span>';btn.disabled=true;
-  const{data:logData,error}=await supa.from('daily_logs').insert([{user_id:CU.id,date,weight:logState.weight,sleep_hours:logState.sleep,water_liters:logState.water,exercise_minute:logState.exercise,energy_level:logState.energy}]).select().single();
-  if(error){err.textContent='เกิดข้อผิดพลาด';btn.innerHTML='บันทึกด่วน';btn.disabled=false;return;}
+
+  // 1. ตรวจสอบว่ามีข้อมูลของวันนี้อยู่แล้วหรือไม่
+  const { data: existing } = await supa.from('daily_logs').select('id').eq('user_id', CU.id).eq('date', date).single();
+
+  let res;
+  if (existing) {
+    // 2. ถ้ามีแล้ว ให้ทำการ Update
+    res = await supa.from('daily_logs').update({
+      weight: logState.weight,
+      sleep_hours: logState.sleep,
+      water_liters: logState.water,
+      exercise_minute: logState.exercise,
+      energy_level: logState.energy
+    }).eq('id', existing.id).select().single();
+  } else {
+    // 3. ถ้ายังไม่มี ให้ Insert ใหม่
+    res = await supa.from('daily_logs').insert([{
+      user_id: CU.id,
+      date,
+      weight: logState.weight,
+      sleep_hours: logState.sleep,
+      water_liters: logState.water,
+      exercise_minute: logState.exercise,
+      energy_level: logState.energy
+    }]).select().single();
+  }
+
+  if(res.error){
+    err.textContent='เกิดข้อผิดพลาด: ' + res.error.message;
+    btn.innerHTML='บันทึกด่วน';
+    btn.disabled=false;
+    return;
+  }
   
-  const ml=mL(logData);LOGS.push(ml);
-  await logAct('create',`Quick Log: ${date} (${logState.weight}kg)`,CU.id,'log');
+  // อัปเดต LOGS ใน memory
+  const ml=mL(res.data);
+  const idx = LOGS.findIndex(l => l.id === ml.id);
+  if (idx > -1) LOGS[idx] = ml; else LOGS.push(ml);
+
+  await logAct(existing ? 'update' : 'create', `Quick Log: ${date} (${logState.weight}kg)`, CU.id, 'log');
   
   // ล้าง Draft
   localStorage.removeItem('fitfuel_draft_' + CU.id);
   
-  closeQuickLog();showToast('บันทึกสำเร็จ!');
+  closeQuickLog();showToast(existing ? 'อัปเดตข้อมูลสำเร็จ!' : 'บันทึกสำเร็จ!');
   renderApp('home');
 }
 function updLogProg(f){

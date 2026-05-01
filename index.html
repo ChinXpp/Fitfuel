@@ -408,6 +408,42 @@ select.fi option{background:var(--card2)}
 .cr-ba{background:var(--lime);color:var(--bk)}
 .cr-rst{width:100%;text-align:center;font-size:9px;color:var(--tx3);background:none;border:none;cursor:pointer;padding:4px;text-decoration:underline;margin-top:2px}
 @media(max-width:400px){.fr,.mg,.sw-opts,.pr-grid,.admin-m{grid-template-columns:1fr}.pw .pb-pin{width:36px;height:46px;font-size:17px}.content{padding:14px 14px 96px}}
+.st-val-input {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 40px;
+  line-height: 1;
+  display: inline-block;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--tx);
+  text-align: center;
+  width: 90px;
+  outline: none;
+  transition: all 0.2s ease;
+  -moz-appearance: textfield;
+  padding: 0;
+}
+.st-val-input:focus {
+  border-bottom-color: var(--lime); /* ขีดเส้นใต้สีเขียวเวลาคลิกพิมพ์ */
+}
+.st-val-input::-webkit-outer-spin-button,
+.st-val-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* แถบ Slider ซ่อนทับบน Progress Bar */
+.pb-wrap { position: relative; }
+.pb-range {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0; /* ซ่อนรูปลักษณ์เดิมแต่ยังกด/เลื่อนได้ */
+  cursor: ew-resize;
+  margin: 0;
+  z-index: 2;
+}
 </style>
 </head>
 <body>

@@ -1080,14 +1080,17 @@ const IC={
 
 // ═══ RENDER ENGINE ═══
 let lastBotSpeak = 0;
+let lastBotMsg = '';
 function speakBot(msg, dur=5000, thinking=false, force=false){
   if(GCFG.fitbotEnabled===false) return;
   const now = Date.now();
-  // Cooldown: ห้ามพูดบ่อยเกินไป (ยกเว้นโดนบังคับหรือถูกกดเรียก)
-  if(!force && now - lastBotSpeak < 30000) return; 
+  if(!force && now - lastBotSpeak < 30000) return;
+  if(force && now - lastBotSpeak < 5000) return; // กันยิงซ้อนกันเร็วเกินไป
+  if(msg === lastBotMsg && now - lastBotSpeak < 300000) return; // ข้อความเดิมต้องรอ 5 นาที
 
   const m=document.getElementById('fb-message'), t=document.getElementById('fb-text'), b=document.getElementById('fb-badge');
   lastBotSpeak = now;
+  lastBotMsg = msg;
   
   if(thinking) {
     t.innerHTML='กำลังวิเคราะห์ข้อมูล...';

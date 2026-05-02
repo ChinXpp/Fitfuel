@@ -1059,6 +1059,10 @@ function renderNav(){
 }
 function navTo(p,el){document.querySelectorAll('.bnav .ni').forEach(n=>n.classList.remove('active'));if(el)el.classList.add('active');renderApp(p);}
 function switchView(v){
+  // Security Check: ป้องกันการแอบสลับ Mode
+  if(v === 'admin' && CU.role !== 'admin' && CU.role !== 'master') v = 'user';
+  if(v === 'master' && CU.role !== 'master') v = 'user';
+
   CV=v;
   const viewMap = {user:'home', admin:'dashboard', master:'control'};
   renderApp(viewMap[v] || 'home');
@@ -1071,10 +1075,12 @@ function switchView(v){
 }
 
 function cycleView() {
-  const roles = ['user', 'admin'];
+  const roles = ['user'];
+  if(CU.role === 'admin' || CU.role === 'master') roles.push('admin');
   if(CU.role === 'master') roles.push('master');
   
   let nextIdx = (roles.indexOf(CV) + 1) % roles.length;
+  if(nextIdx <= 0) nextIdx = roles.indexOf(CV) === -1 ? 0 : (roles.indexOf(CV) + 1) % roles.length; 
   const nextView = roles[nextIdx];
   
   switchView(nextView);
@@ -1919,7 +1925,7 @@ async function applyCropper(){
 }
 
 // ═══ ADMIN VIEW ═══
-function aBk(){return`<div class="mode-banner"><div class="mb-l"><div class="mb-t">Admin Panel</div><div class="mb-n">${CU.name}</div></div><button class="mb-btn mb-bg" onclick="switchView('user')">← User</button></div>`;}
+function aBk(){return '';}
 function renderADash(){
   const tu=USERS.filter(u=>u.role==='user').length,hr=LOGS.filter(l=>{const u=USERS.find(x=>x.id===l.userId);return u&&hScore(l,u)<50;}).length;
   const avg=LOGS.reduce((s,l)=>{const u=USERS.find(x=>x.id===l.userId);return s+(u?hScore(l,u):0);},0)/(LOGS.length||1);
@@ -2087,7 +2093,7 @@ function renderAlerts(){
 }
 
 // ═══ MASTER VIEW ═══
-function mBk(){return`<div class="mode-banner"><div class="mb-l"><div class="mb-t">Master Control</div><div class="mb-n" style="color:var(--gold)">${CU.name}</div></div><div class="mb-btns"><button class="mb-btn mb-bg" onclick="switchView('user')">← User</button><button class="mb-btn mb-ba" onclick="switchView('admin')">Admin</button></div></div>`;}
+function mBk(){return '';}
 function renderMCtrl(){
   const tu=USERS.filter(u=>u.role==='user').length,ta=USERS.filter(u=>u.role==='admin').length;
   return`${mBk()}<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--gold);margin-bottom:12px">Master Control</div>

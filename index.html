@@ -365,7 +365,7 @@ select.fi option{background:var(--card2)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* FitBot */
-.fb-wrap{position:fixed;right:18px;bottom:96px;z-index:9500;display:none;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
+.fb-wrap{position:fixed;right:18px;bottom:96px;z-index:8500;display:none;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
 .fb-wrap.active{display:flex}
 .fb-msg{background:var(--dark);border:1px solid var(--lime);padding:12px 15px;border-radius:18px 18px 2px 18px;max-width:240px;box-shadow:0 10px 25px rgba(0,0,0,.5);opacity:0;transform:translateY(10px) scale(.9);transition:all .3s cubic-bezier(.18,.89,.32,1.28);pointer-events:auto}
 .fb-msg.show{opacity:1;transform:none}
@@ -1950,7 +1950,7 @@ const t=document.getElementById('e-tip');if(t)t.innerHTML=`<strong style="color:
 }
 
 // ═══ QUICK LOG MODAL ═══
-function closeQuickLog(){document.getElementById('ql-overlay').classList.remove('remove');document.getElementById('ql-overlay').classList.remove('show');}
+function closeQuickLog(){document.getElementById('ql-overlay').classList.remove('show');}
 function adjLogE(v){
 logState.energy=parseInt(v);
 const el = document.getElementById('ql-energy-val');

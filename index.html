@@ -365,7 +365,8 @@ select.fi option{background:var(--card2)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* FitBot */
-.fb-wrap{position:fixed;right:18px;bottom:96px;z-index:9500;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
+.fb-wrap{position:fixed;right:18px;bottom:96px;z-index:9500;display:none;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
+.fb-wrap.active{display:flex}
 .fb-msg{background:var(--dark);border:1px solid var(--lime);padding:12px 15px;border-radius:18px 18px 2px 18px;max-width:240px;box-shadow:0 10px 25px rgba(0,0,0,.5);opacity:0;transform:translateY(10px) scale(.9);transition:all .3s cubic-bezier(.18,.89,.32,1.28);pointer-events:auto}
 .fb-msg.show{opacity:1;transform:none}
 .fb-txt{font-size:11px;line-height:1.5;color:var(--tx)}
@@ -737,18 +738,25 @@ async function submitOnboarding(){
 }
 async function logout(){
   document.getElementById('global-loader').style.display='flex';
+  document.getElementById('fitbot-wrap').classList.remove('active');
   stopReminder();await supa.auth.signOut();CU=null;CAU=null;CV='user';
   document.getElementById('global-loader').style.display='none';showScreen('splash');
 }
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');}
 function enterApp(){
   updAv();
+  document.getElementById('fitbot-wrap').classList.add('active');
   const rb = document.getElementById('topbar-role');
   if(rb) {
     rb.className = 'rb ' + CV;
     rb.textContent = CV.toUpperCase();
   }
   initReminder();renderApp('home');showScreen('main');
+  
+  // FitBot ทักทายเมื่อเข้าแอป
+  setTimeout(() => {
+    speakBot(`สวัสดีครับ ${dispName()}! วันนี้เตรียมตัวสุขภาพดีหรือยังครับ?`, 6000);
+  }, 1500);
 }
 function updAv(){
   const av=document.getElementById('user-avatar');
@@ -1513,11 +1521,39 @@ function toggleFitBot(){
 }
 
 async function botReact(log){
-  // วิเคราะห์ข้อมูลเพื่อตอบสนอง
-  if(log.water < GCFG.waterTarget * 0.5) speakBot(`คุณดื่มน้ำน้อยไปนิดนะครับ (เพิ่งได้ ${log.water}L) ลองจิบน้ำเพิ่มดูนะครับ!`);
-  else if(log.sleep < 6) speakBot(`เมื่อคืนนอนน้อยจังครับ (${log.sleep} ชม.) วันนี้หาเวลาพักผ่อนบ้างนะครับ`);
-  else if(log.exercise >= 60) speakBot(`สุดยอดไปเลย! ออกกำลังกายไปถึง ${log.exercise} นาที แข็งแรงแน่นอนครับ`);
-  else speakBot(`บันทึกข้อมูลเรียบร้อย! ขอบคุณที่รักษาวินัยนะครับ`);
+  // สำหรับ Admin/Master: ให้บอทสรุปสถานะระบบเบื้องต้น
+  if(CV === 'admin' || CV === 'master') {
+    const highRisk = LOGS.filter(l => {
+      const u = USERS.find(x => x.id === l.userId);
+      return u && hScore(l, u) < 50;
+    }).length;
+    
+    if(highRisk > 0) speakBot(`ตรวจพบ User กลุ่มเสี่ยง ${highRisk} รายในระบบครับ Admin ควรตรวจสอบหน้า Alerts นะครับ!`, 8000);
+    else speakBot(`สถานะระบบปกติครับ! ผู้ใช้ทุกคนมีสุขภาพเกณฑ์ดี ขอบคุณที่ช่วยดูแลระบบนะครับ`, 7000);
+    return;
+  }
+
+  // สำหรับ User ทั่วไป: วิเคราะห์เจาะลึกขึ้น
+  const u = CU;
+  const bmiVal = bmi(log.weight, u.height);
+  
+  if(log.water < GCFG.waterTarget * 0.4) {
+    speakBot(`คุณดื่มน้ำน้อยมากเลยครับ (เพิ่งได้ ${Math.round((log.water/GCFG.waterTarget)*100)}% ของเป้าหมาย) ระวังผิวแห้งและอ่อนเพลียนะครับ!`, 8000);
+  } else if(log.sleep < 5) {
+    speakBot(`นอนน้อยกว่า 5 ชม. อันตรายต่อหัวใจนะครับ คืนนี้รีบเข้านอนและงดคาเฟอีนช่วงเย็นนะครับ`, 8000);
+  } else if(log.exercise > 90) {
+    speakBot(`โห! ออกกำลังกายหนักมากครับ (${log.exercise} นาที) อย่าลืมยืดเหยียดและเติมโปรตีนหลังซ้อมด้วยนะ!`, 7000);
+  } else if(bmiVal > 30 && log.exercise === 0) {
+    speakBot(`BMI คุณอยู่ในเกณฑ์สูงนะครับ ลองเริ่มขยับตัววันละ 15 นาที เพื่อหัวใจที่แข็งแรงขึ้นครับ`, 8000);
+  } else {
+    const positiveMsgs = [
+      'บันทึกข้อมูลเรียบร้อย! ทำดีมากครับที่รักษาวินัย',
+      'รักษาระดับนี้ไว้เรื่อยๆ สุขภาพดีแน่นอนครับ!',
+      'ความสำเร็จเกิดจากสิ่งที่ทำทุกวัน ยินดีด้วยที่วันนี้ทำสำเร็จครับ!',
+      'วันนี้คุณ Chin ดูแลตัวเองได้ยอดเยี่ยมมากครับ'
+    ];
+    speakBot(positiveMsgs[Math.floor(Math.random()*positiveMsgs.length)], 6000);
+  }
 }
 
 async function submitLog(){

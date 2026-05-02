@@ -590,11 +590,25 @@ let CU=null,CAU=null,CV='user',CP='home';
 let logState={weight:70,sleep:7.5,water:0,exercise:0,energy:5,actType:null,mood:null,notes:''};
 
 // Global Configuration
-let GCFG = JSON.parse(localStorage.getItem('fitfuel_global_cfg')) || { waterTarget: 2.5, challenges: [] };
-if (GCFG.challenges) CHALLENGES = GCFG.challenges;
+let GCFG = { waterTarget: 2.5, challenges: [], fitbotEnabled: true };
+try {
+  const localCfg = localStorage.getItem('fitfuel_global_cfg');
+  if (localCfg) {
+    const parsed = JSON.parse(localCfg);
+    GCFG = { ...GCFG, ...parsed };
+    if (GCFG.challenges) CHALLENGES = GCFG.challenges;
+  }
+} catch (e) {
+  console.error('Error loading GCFG:', e);
+}
+
 function saveGCFG() { 
-  GCFG.challenges = CHALLENGES;
-  localStorage.setItem('fitfuel_global_cfg', JSON.stringify(GCFG)); 
+  try {
+    GCFG.challenges = CHALLENGES;
+    localStorage.setItem('fitfuel_global_cfg', JSON.stringify(GCFG)); 
+  } catch (e) {
+    console.error('Error saving GCFG:', e);
+  }
 }
 
 const mU=u=>!u?null:{id:u.id,name:u.name,username:u.username||'',email:u.email,age:u.age,gender:u.gender,height:u.height,targetWeight:u.target_weight,goalType:u.goal_type,sleepTarget:u.sleep_target,weeklyExerciseTarget:u.weekly_exercise_target,role:u.role,photo:u.photo,createdAt:u.created_at,reminderTime:u.reminder_time,remindersEnabled:u.reminders_enabled};
@@ -604,43 +618,82 @@ const mA=a=>({id:a.id,type:a.type,target:a.target,userId:a.user_id,actorId:a.act
 
 async function loadAll(){
   if(!supa)return;
-  const[uR,lR,rR,aR]=await Promise.all([
-    supa.from('users').select('*'),
-    supa.from('daily_logs').select('*'),
-    supa.from('recommendations').select('*'),
-    supa.from('activities').select('*').order('created_at',{ascending:false}).limit(200)
-  ]);
-  if(uR.data)USERS=uR.data.map(mU);
-  if(lR.data)LOGS=lR.data.map(mL);
-  if(rR.data)RECS=rR.data.map(mR);
-  if(aR.data)ACTS=aR.data.map(mA);
+  console.log('Starting data load...');
+  
+  // Load each table individually to prevent one failure from blocking others
+  const fetches = [
+    { name: 'users', query: supa.from('users').select('*') },
+    { name: 'daily_logs', query: supa.from('daily_logs').select('*') },
+    { name: 'recommendations', query: supa.from('recommendations').select('*') },
+    { name: 'activities', query: supa.from('activities').select('*').order('created_at',{ascending:false}).limit(200) },
+    { name: 'challenges', query: supa.from('challenges').select('*').order('created_at', {ascending: false}) }
+  ];
 
-  // Try to load challenges from Supabase if table exists, else fallback to GCFG
-  try {
-    const {data: cR} = await supa.from('challenges').select('*').order('created_at', {ascending: false});
-    if(cR && cR.length > 0) {
-      CHALLENGES = cR.map(c => ({
-        id: c.id,
-        title: c.title,
-        description: c.description,
-        reward: c.reward || '',
-        isActive: c.is_active,
-        endAt: c.end_at,
-        createdAt: c.created_at
-      }));
+  for (const f of fetches) {
+    try {
+      const { data, error } = await f.query;
+      if (error) {
+        console.warn(`Error loading ${f.name}:`, error.message);
+        continue;
+      }
+      if (!data) continue;
+
+      if (f.name === 'users') USERS = data.map(mU);
+      else if (f.name === 'daily_logs') LOGS = data.map(mL);
+      else if (f.name === 'recommendations') RECS = data.map(mR);
+      else if (f.name === 'activities') ACTS = data.map(mA);
+      else if (f.name === 'challenges') {
+        CHALLENGES = data.map(c => ({
+          id: c.id,
+          title: c.title,
+          description: c.description,
+          reward: c.reward || '',
+          isActive: c.is_active,
+          endAt: c.end_at,
+          createdAt: c.created_at
+        }));
+      }
+    } catch (e) {
+      console.error(`Exception loading ${f.name}:`, e);
     }
-  } catch(e) {
-    console.log('Challenges table not found, using local storage');
   }
+  console.log('Data load complete.');
 }
 
 window.onload=async()=>{
+  // Safety timeout: hide loader after 12 seconds no matter what
+  const loadTimeout = setTimeout(() => {
+    const loader = document.getElementById('global-loader');
+    if (loader && loader.style.display !== 'none') {
+      console.warn('Load timeout reached, hiding loader manually');
+      loader.style.display = 'none';
+      if (!CU) showScreen('splash');
+    }
+  }, 12000);
+
   try{
-    if(!supa){document.getElementById('global-loader').style.display='none';showScreen('splash');return;}
-    const{data:{session}}=await supa.auth.getSession();
-    if(session)await handleSession(session.user);
-    else{document.getElementById('global-loader').style.display='none';showScreen('splash');}
-  }catch(e){console.error(e);document.getElementById('global-loader').style.display='none';showScreen('splash');}
+    if(!supa){
+      console.error('Supabase client not initialized');
+      document.getElementById('global-loader').style.display='none';
+      showScreen('splash');
+      clearTimeout(loadTimeout);
+      return;
+    }
+    const{data:{session}, error: sessionError}=await supa.auth.getSession();
+    if (sessionError) throw sessionError;
+
+    if(session) await handleSession(session.user);
+    else {
+      document.getElementById('global-loader').style.display='none';
+      showScreen('splash');
+    }
+  }catch(e){
+    console.error('Initialization error:', e);
+    document.getElementById('global-loader').style.display='none';
+    showScreen('splash');
+  } finally {
+    clearTimeout(loadTimeout);
+  }
 };
 
 // ═══ AUTH ═══

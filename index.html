@@ -585,13 +585,17 @@ select.fi option{background:var(--card2)}
 const SU='https://gyaptfiwxvruiorczbxv.supabase.co';
 const SK='sb_publishable_phEtg4XZtjlbcz-xOz0Tjw_o-cQUJkf';
 const supa=window.supabase?window.supabase.createClient(SU,SK):null;
-let USERS=[],LOGS=[],ACTS=[],RECS=[];
+let USERS=[],LOGS=[],ACTS=[],RECS=[],CHALLENGES=[];
 let CU=null,CAU=null,CV='user',CP='home';
 let logState={weight:70,sleep:7.5,water:0,exercise:0,energy:5,actType:null,mood:null,notes:''};
 
 // Global Configuration
-let GCFG = JSON.parse(localStorage.getItem('fitfuel_global_cfg')) || { waterTarget: 2.5 };
-function saveGCFG() { localStorage.setItem('fitfuel_global_cfg', JSON.stringify(GCFG)); }
+let GCFG = JSON.parse(localStorage.getItem('fitfuel_global_cfg')) || { waterTarget: 2.5, challenges: [] };
+if (GCFG.challenges) CHALLENGES = GCFG.challenges;
+function saveGCFG() { 
+  GCFG.challenges = CHALLENGES;
+  localStorage.setItem('fitfuel_global_cfg', JSON.stringify(GCFG)); 
+}
 
 const mU=u=>!u?null:{id:u.id,name:u.name,username:u.username||'',email:u.email,age:u.age,gender:u.gender,height:u.height,targetWeight:u.target_weight,goalType:u.goal_type,sleepTarget:u.sleep_target,weeklyExerciseTarget:u.weekly_exercise_target,role:u.role,photo:u.photo,createdAt:u.created_at,reminderTime:u.reminder_time,remindersEnabled:u.reminders_enabled};
 const mL=l=>({id:l.id,userId:l.user_id,date:l.date,weight:l.weight,sleep:l.sleep_hours,water:l.water_liters,exercise:l.exercise_minute,energyLevel:l.energy_level,createdAt:l.created_at});
@@ -610,6 +614,24 @@ async function loadAll(){
   if(lR.data)LOGS=lR.data.map(mL);
   if(rR.data)RECS=rR.data.map(mR);
   if(aR.data)ACTS=aR.data.map(mA);
+
+  // Try to load challenges from Supabase if table exists, else fallback to GCFG
+  try {
+    const {data: cR} = await supa.from('challenges').select('*').order('created_at', {ascending: false});
+    if(cR && cR.length > 0) {
+      CHALLENGES = cR.map(c => ({
+        id: c.id,
+        title: c.title,
+        description: c.description,
+        reward: c.reward || '',
+        isActive: c.is_active,
+        endAt: c.end_at,
+        createdAt: c.created_at
+      }));
+    }
+  } catch(e) {
+    console.log('Challenges table not found, using local storage');
+  }
 }
 
 window.onload=async()=>{
@@ -1257,11 +1279,76 @@ function modeBanner(){
   return '';
 }
 
+function renderChallengeCard() {
+  const active = CHALLENGES.find(c => c.isActive);
+  if (!active) return '';
+
+  const now = new Date();
+  const end = new Date(active.endAt || active.createdAt);
+  if (active.endAt) end.setTime(new Date(active.endAt).getTime());
+  else end.setDate(end.getDate() + 7); // Default 7 days if no endAt
+  
+  const diff = end - now;
+  const daysLeft = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+
+  // Calculate full rankings
+  const allRankings = USERS.map(u => {
+    const p = calcProg(u);
+    return { id: u.id, name: u.name, streak: p ? p.streak : 0, photo: u.photo };
+  }).sort((a, b) => b.streak - a.streak).filter(l => l.streak > 0);
+
+  const top3 = allRankings.slice(0, 3);
+  const myRank = allRankings.findIndex(r => r.id === CU.id) + 1;
+
+  let leaderboardHTML = '';
+  if (top3.length > 0) {
+    leaderboardHTML = `
+    <div style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(200,240,0,.1);">
+      <div style="font-size:7px; color:var(--tx3); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; display:flex; justify-content:space-between;">
+        <span>LEADERBOARD · อันดับผู้นำ</span>
+        ${myRank > 0 ? `<span style="color:var(--lime)">YOUR RANK: #${myRank}</span>` : ''}
+      </div>
+      <div style="display:flex; flex-direction:column; gap:7px;">
+        ${top3.map((l, i) => {
+          const isMe = l.id === CU.id;
+          return `
+          <div style="display:flex; align-items:center; gap:9px; ${isMe ? 'background:rgba(200,240,0,.04); border-radius:6px; padding:4px; margin:0 -4px;' : ''}">
+            <div style="font-family:\'JetBrains Mono\',monospace; font-size:9px; color:${i === 0 ? 'var(--gold)' : 'var(--lime)'}; width:12px; font-weight:700;">${i + 1}</div>
+            <div style="width:20px; height:20px; border-radius:50%; background:var(--card2); background-size:cover; background-position:center; ${l.photo ? `background-image:url(\'${l.photo}\')` : ''}; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; border:1px solid ${isMe ? 'var(--lime)' : 'var(--br)'}">${!l.photo ? l.name[0] : ''}</div>
+            <div style="flex:1; font-size:10px; font-weight:${isMe ? '700' : '500'}; color:${isMe ? 'var(--lime)' : 'var(--tx)'}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${l.name} ${isMe ? '(YOU)' : ''}</div>
+            <div style="font-size:11px; font-family:\'Bebas Neue\',sans-serif; color:var(--og); letter-spacing:0.5px;">${l.streak} DAYS</div>
+          </div>`;
+        }).join('')}
+      </div>
+      ${myRank > 3 ? `<div style="margin-top:8px; text-align:center; font-size:8px; color:var(--tx3); font-family:\'JetBrains Mono\',monospace;">YOU ARE AT <span style="color:var(--lime)">#${myRank}</span></div>` : ''}
+    </div>
+    `;
+  }
+
+  const trophyLarge = IC.trophy.replace('<svg ', '<svg width="80" height="80" ');
+
+  return `
+  <div class="card" style="background: linear-gradient(135deg, rgba(200,240,0,.08), rgba(45,212,191,.04)); border-color: rgba(200,240,0,.2); margin-bottom: 10px; position:relative; overflow:hidden;">
+    <div style="position:absolute; top:-10px; right:-10px; opacity:0.03; color:var(--lime); transform:rotate(15deg); pointer-events:none;">${trophyLarge}</div>
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; position:relative;">
+      <div style="font-size:8px; text-transform:uppercase; letter-spacing:2px; color:var(--tx2); font-weight:600;">CHALLENGE · ${daysLeft} DAYS LEFT</div>
+      <div style="width:20px; height:20px; border-radius:50%; background:var(--ld); display:flex; align-items:center; justify-content:center; color:var(--lime);">${IC.trophy}</div>
+    </div>
+    <div style="font-family:\'Bebas Neue\',sans-serif; font-size:22px; color:var(--lime); line-height:1.1; margin-bottom:4px; position:relative;">${active.title}</div>
+    <div style="font-size:11px; color:var(--tx2); line-height:1.4; position:relative; margin-bottom:8px;">${active.description}</div>
+    <div style="display:flex; align-items:center; gap:6px; position:relative;">
+      <div style="padding:4px 8px; background:rgba(255,215,0,.1); border:1px solid rgba(255,215,0,.2); border-radius:4px; font-size:9px; color:var(--gold); font-weight:700; letter-spacing:1px;">REWARD: ${active.reward ? active.reward.toUpperCase() : 'HEALTH & GLORY'}</div>
+    </div>
+    ${leaderboardHTML}
+  </div>
+  `;
+}
+
 // ═══ HOME PAGE ═══
 function renderHome(){
   const logs=LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>b.date.localeCompare(a.date));
   const lt=logs[0];
-  if(!lt)return`<div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:3px">${greeting()},</div><div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;color:var(--lime);line-height:1;margin-bottom:20px">${dispName()}</div>
+  if(!lt)return`<div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:3px">${greeting()},</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:38px;letter-spacing:2px;color:var(--lime);line-height:1;margin-bottom:20px">${dispName()}</div>
     <div class="empty-s">${IC.plus}<div class="empty-t">ยังไม่มีข้อมูล</div><div class="empty-d">กดปุ่ม Log เพื่อเริ่มบันทึก</div></div>`;
 
   const B=bmi(lt.weight,CU.height);const cat=bmiCat(B);const score=hScore(lt,CU);
@@ -1271,7 +1358,7 @@ function renderHome(){
   const recent5=logs.slice(0,5).reverse();
   const wVals=recent5.map(l=>l.weight);const slVals=recent5.map(l=>l.sleep);
   const waVals=recent5.map(l=>l.water);const exVals=recent5.map(l=>l.exercise);
-  const wDl=delta(logs,'weight'),slDl=delta(logs,'sleep'),waDl=delta(logs,'water'),exDl=delta(logs,'exercise');
+  const wDl=delta(logs,\'weight\'),slDl=delta(logs,\'sleep\'),waDl=delta(logs,\'water\'),exDl=delta(logs,\'exercise\');
   
   // ปรับ logic สีตัวเลข: 
   // Weight: ลดลง (-) = เขียว (pos), เพิ่มขึ้น (+) = แดง (neg)
@@ -1282,23 +1369,23 @@ function renderHome(){
     if(type==='weight') isPos = v < 0; // นน. ลดคือดี
     else isPos = v > 0; // อื่นๆ เพิ่มคือดี
     
-    const cls = v === 0 ? 'neu' : (isPos ? 'pos' : 'neg');
-    const sign = v > 0 ? '+' : '';
-    const val = typeof v === 'number' && !Number.isInteger(v) ? v.toFixed(1) : v;
+    const cls = v === 0 ? \'neu\' : (isPos ? \'pos\' : \'neg\');
+    const sign = v > 0 ? \'+\' : \'\';
+    const val = typeof v === \'number\' && !Number.isInteger(v) ? v.toFixed(1) : v;
     return `<span class="mc-dl ${cls}">${sign}${val}</span>`;
   };
 
   const bmiPct=Math.min(100,Math.max(0,((B-15)/(40-15))*100));
   const savedRecs=RECS.filter(r=>r.logId===lt.id);
-  const recList=savedRecs.length>0?savedRecs.map(r=>({sev:r.severity,title:r.rectype,msg:r.message,act:r.action,rt:''})):genRecs(lt,CU,logs);
-  const recHTML=recList.map(r=>`<div class="rec-c ${r.sev}"><div class="rec-ic">${r.sev==='high'?IC.alert:r.sev==='medium'?IC.info:IC.check}</div><div style="flex:1;min-width:0"><div class="rec-tag">${r.title}</div><div class="rec-tx">${r.msg}</div>${r.act?`<div class="rec-act">${r.act}</div>`:''}</div><div class="rec-rt">${r.rt||''}</div></div>`).join('');
+  const recList=savedRecs.length>0?savedRecs.map(r=>({sev:r.severity,title:r.rectype,msg:r.message,act:r.action,rt:\'\'})):genRecs(lt,CU,logs);
+  const recHTML=recList.map(r=>`<div class="rec-c ${r.sev}"><div class="rec-ic">${r.sev===\'high\'?IC.alert:r.sev===\'medium\'?IC.info:IC.check}</div><div style="flex:1;min-width:0"><div class="rec-tag">${r.title}</div><div class="rec-tx">${r.msg}</div>${r.act?`<div class="rec-act">${r.act}</div>`:\'\'}</div><div class="rec-rt">${r.rt||\'\'}</div></div>`).join(\'\');
 
-  const streakDots=Array.from({length:5}).map((_,i)=>`<div class="sdot${i<Math.min(prog?.streak||0,5)?' on':''}"></div>`).join('');
+  const streakDots=Array.from({length:5}).map((_,i)=>`<div class="sdot${i<Math.min(prog?.streak||0,5)?\' on\':\'\'}"></div>`).join(\'\');
   const weekHTML=week?`<div class="wk-card">
     <div class="wk-period">${week.ws} – ${week.we}</div>
     <div class="wk-head">
-      <div class="wk-title">${week.daysLogged>=5?'YOU\'RE ON TRACK':'KEEP GOING'}</div>
-      ${week.hasComp?`<div class="wk-badge">${week.scoreDelta>=0?'+':''}${week.scoreDelta}%<br><span style="font-size:11px;letter-spacing:0">${week.avgScore}</span></div>`:''}
+      <div class="wk-title">${week.daysLogged>=5?\'YOU\\\'RE ON TRACK\':\'KEEP GOING\'}</div>
+      ${week.hasComp?`<div class="wk-badge">${week.scoreDelta>=0?\'+\':\'\'}${week.scoreDelta}%<br><span style="font-size:11px;letter-spacing:0">${week.avgScore}</span></div>`:\'\'}
     </div>
     <div class="wk-bars">${weekBarsHTML(CU)}</div>
     <div class="wk-stats">
@@ -1306,16 +1393,16 @@ function renderHome(){
       <div><div class="wk-sl">Logs</div><div class="wk-sv">${week.daysLogged}/7</div></div>
       <div><div class="wk-sl">Best Day</div><div class="wk-sv">${week.bestScore}</div></div>
     </div>
-  </div>`:'';
+  </div>`:\'\';
 
   return `
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
     <div>
       <div style="font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase;margin-bottom:2px">${greeting()},</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--lime);line-height:1">${dispName()}</div>
-      <div style="font-size:9px;color:var(--tx3);font-family:'JetBrains Mono',monospace;margin-top:2px">${thDay()} · ${now12()}</div>
+      <div style="font-family:\'Bebas Neue\',sans-serif;font-size:36px;letter-spacing:2px;color:var(--lime);line-height:1">${dispName()}</div>
+      <div style="font-size:9px;color:var(--tx3);font-family:\'JetBrains Mono\',monospace;margin-top:2px">${thDay()} · ${now12()}</div>
     </div>
-    <button onclick="openQuickLog()" style="background:var(--lime);color:var(--bk);border:none;border-radius:var(--rs);padding:9px 13px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;margin-top:4px">
+    <button onclick="openQuickLog()" style="background:var(--lime);color:var(--bk);border:none;border-radius:var(--rs);padding:9px 13px;font-family:\'Bebas Neue\',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;margin-top:4px">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="13" height="13"><path d="M12 5v14M5 12h14"/></svg>
       Quick Log
     </button>
@@ -1336,7 +1423,7 @@ function renderHome(){
         <div class="score-tag">Health Score · คะแนนสุขภาพ</div>
         <div class="score-level" style="color:${lv.c}">${lv.l}</div>
         <div class="score-live"><div class="live-dot"></div>Live · อัพเดทล่าสุดแล้ว</div>
-        ${prog?`<div class="score-dl ${parseFloat(prog.weightDelta)===0?'neu':parseFloat(prog.weightDelta)<0&&CU.goalType==='ลดน้ำหนัก'?'pos':'neg'}">${parseFloat(prog.weightDelta)>0?'+':''}${prog.weightDelta} kg จากจุดเริ่ม</div>`:'' }
+        ${prog?`<div class="score-dl ${parseFloat(prog.weightDelta)===0?\'neu\':parseFloat(prog.weightDelta)<0&&CU.goalType===\'ลดน้ำหนัก\'?\'pos\':\'neg\'}">${parseFloat(prog.weightDelta)>0?\'+\':\'\'}${prog.weightDelta} kg จากจุดเริ่ม</div>`:\'\' }
         <div class="score-meta">เป้า ${CU.goalType}</div>
       </div>
     </div>
@@ -1347,8 +1434,9 @@ function renderHome(){
       <div class="ss-item"><div class="ss-val" style="color:var(--pu)">${sub.recovery}</div><div class="ss-lbl">Recovery</div></div>
     </div>
   </div>
-  ${prog&&prog.streak>1?`<div class="streak-card"><div class="streak-ic">${IC.flame}</div><div style="flex:1"><div style="display:flex;align-items:baseline;gap:6px"><span class="streak-num">${prog.streak}</span><span style="font-size:11px;color:var(--og);font-weight:600">Day Streak</span></div><div style="font-size:10px;color:var(--tx2);margin-bottom:4px">บันทึกต่อเนื่อง · keep going to hit ${Math.ceil(prog.streak/10)*10}</div><div class="streak-dots">${streakDots}</div></div></div>`:''}
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);font-weight:600">TODAY'S METRICS</div><div style="font-size:9px;color:var(--tx3)">เมตริกวันนี้</div></div>
+  ${renderChallengeCard()}
+  ${prog&&prog.streak>1?`<div class="streak-card"><div class="streak-ic">${IC.flame}</div><div style="flex:1"><div style="display:flex;align-items:baseline;gap:6px"><span class="streak-num">${prog.streak}</span><span style="font-size:11px;color:var(--og);font-weight:600">Day Streak</span></div><div style="font-size:10px;color:var(--tx2);margin-bottom:4px">บันทึกต่อเนื่อง · keep going to hit ${Math.ceil(prog.streak/10)*10}</div><div class="streak-dots">${streakDots}</div></div></div>`:\'\'}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);font-weight:600">TODAY\'S METRICS</div><div style="font-size:9px;color:var(--tx3)">เมตริกวันนี้</div></div>
   <div class="mg">
     <div class="mc">
       <div class="mc-head"><div class="mc-lbl">${IC.weight}<span>น้ำหนัก</span></div><div class="mc-rt">Weight</div></div>
@@ -2262,20 +2350,193 @@ async function applyCropper(){
   }catch(e){console.error(e);showToast('เกิดข้อผิดพลาด: '+e.message);btn.innerHTML='ใช้';btn.disabled=false;}
 }
 
+async function addChallenge() {
+  const title = document.getElementById('ch-title').value.trim();
+  const desc = document.getElementById('ch-desc').value.trim();
+  const reward = document.getElementById('ch-reward').value.trim();
+  const days = parseInt(document.getElementById('ch-days').value) || 7;
+  
+  if(!title || !desc) { showToast('กรุณากรอกข้อมูลให้ครบ'); return; }
+  
+  const endAt = new Date();
+  endAt.setDate(endAt.getDate() + days);
+  
+  const newCh = {
+    id: 'ch_' + Date.now(),
+    title,
+    description: desc,
+    reward: reward || 'Health & Glory',
+    isActive: true,
+    endAt: endAt.toISOString(),
+    createdAt: new Date().toISOString()
+  };
+  
+  CHALLENGES.forEach(c => c.isActive = false);
+  CHALLENGES.unshift(newCh);
+  
+  if(supa) {
+    try {
+      await supa.from('challenges').insert([{
+        id: newCh.id,
+        title: newCh.title,
+        description: newCh.description,
+        reward: newCh.reward,
+        is_active: true,
+        end_at: newCh.endAt
+      }]);
+      await supa.from('challenges').update({is_active: false}).neq('id', newCh.id);
+    } catch(e) {}
+  }
+  
+  saveGCFG();
+  await logAct('create', `Launch Challenge: ${title}`, CU.id, 'challenge');
+  showToast('Challenge Launched!');
+  renderApp('dashboard');
+}
+
+async function endChallenge(id) {
+  const ch = CHALLENGES.find(c => c.id === id);
+  if(!ch || !ch.isActive) return;
+  
+  if(!confirm('จบ Challenge และประกาศผลผู้ชนะ?')) return;
+  
+  const leaders = USERS.map(u => {
+    const p = calcProg(u);
+    return { name: u.name, streak: p ? p.streak : 0 };
+  }).sort((a, b) => b.streak - a.streak).filter(l => l.streak > 0).slice(0, 3);
+  
+  const winnerNames = leaders.map((l, i) => `#${i+1} ${l.name}`).join(', ');
+  const msg = `Challenge Ended: ${ch.title}. Winners: ${winnerNames || 'None'}`;
+  
+  ch.isActive = false;
+  
+  if(supa) {
+    try { await supa.from('challenges').update({is_active: false}).eq('id', id); } catch(e) {}
+  }
+  
+  saveGCFG();
+  await logAct('log', msg, CU.id, 'challenge');
+  showToast('ปิด Challenge และประกาศผลแล้ว');
+  renderApp('dashboard');
+}
+
+async function toggleChallenge(id) {
+  const ch = CHALLENGES.find(c => c.id === id);
+  if(!ch) return;
+  
+  if(!ch.isActive) {
+    // Activating: deactivate others
+    CHALLENGES.forEach(c => c.isActive = false);
+    ch.isActive = true;
+    if(supa) {
+      try {
+        await supa.from('challenges').update({is_active: false});
+        await supa.from('challenges').update({is_active: true}).eq('id', id);
+      } catch(e) {}
+    }
+  } else {
+    // Deactivating: just deactivate this one
+    ch.isActive = false;
+    if(supa) {
+      try { await supa.from('challenges').update({is_active: false}).eq('id', id); } catch(e) {}
+    }
+  }
+  
+  saveGCFG();
+  showToast(ch.isActive ? 'เปิดใช้งาน Challenge' : 'ปิดใช้งาน Challenge');
+  renderApp('dashboard');
+}
+
+async function delChallenge(id) {
+  if(!confirm('ยืนยันการลบ Challenge นี้?')) return;
+  const ch = CHALLENGES.find(c => c.id === id);
+  CHALLENGES = CHALLENGES.filter(c => c.id !== id);
+  
+  if(supa) {
+    try { await supa.from('challenges').delete().eq('id', id); } catch(e) {}
+  }
+  
+  saveGCFG();
+  await logAct('delete', `ลบ Challenge: ${ch?.title}`, CU.id, 'challenge');
+  showToast('ลบ Challenge สำเร็จ');
+  renderApp('dashboard');
+}
+
+function editChallenge(id) {
+  const ch = CHALLENGES.find(c => c.id === id);
+  if(!ch) return;
+  
+  const title = prompt('แก้ไขชื่อ Challenge', ch.title);
+  if(title === null) return;
+  const desc = prompt('แก้ไขรายละเอียด', ch.description);
+  if(desc === null) return;
+  const reward = prompt('แก้ไขรางวัล (Reward)', ch.reward || '');
+  if(reward === null) return;
+  
+  ch.title = title;
+  ch.description = desc;
+  ch.reward = reward;
+  
+  if(supa) {
+    try {
+      supa.from('challenges').update({title, description: desc, reward}).eq('id', id).then();
+    } catch(e) {}
+  }
+  
+  saveGCFG();
+  showToast('แก้ไขสำเร็จ');
+  renderApp('dashboard');
+}
+
 // ═══ ADMIN VIEW ═══
 function aBk(){return '';}
+function renderAChallenges() {
+  return `
+  <div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime);margin:15px 0 8px">Challenges</div>
+  <div class="card" style="margin-bottom:12px;">
+    <div class="sh">สร้าง Challenge ใหม่</div>
+    <div class="fg"><label class="fl">ชื่อ Challenge</label><input type="text" id="ch-title" class="fi" placeholder="เช่น ดื่มน้ำ 3 ลิตร 7 วัน"></div>
+    <div class="fg"><label class="fl">รายละเอียด</label><textarea id="ch-desc" class="fi" rows="2" placeholder="รายละเอียดเงื่อนไข..."></textarea></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">รางวัล (Reward)</label><input type="text" id="ch-reward" class="fi" placeholder="เช่น Coffee, Badge"></div>
+      <div class="fg"><label class="fl">ระยะเวลา (วัน)</label><input type="number" id="ch-days" class="fi" value="7"></div>
+    </div>
+    <button class="bs" style="width:100%; padding:10px;" onclick="addChallenge()">Launch Challenge</button>
+  </div>
+  ${CHALLENGES.map(c => `
+    <div class="li" style="border-color:${c.isActive ? \'var(--lime)\' : \'var(--br)\'}">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <div style="font-weight:600; font-size:13px; color:${c.isActive ? \'var(--lime)\' : \'var(--tx)\'}">${c.title}</div>
+        <div class="rb ${c.isActive ? \'admin\' : \'\'}" style="cursor:pointer;" onclick="toggleChallenge(\'${c.id}\')">${c.isActive ? \'ACTIVE\' : \'INACTIVE\'}</div>
+      </div>
+      <div style="font-size:10px; color:var(--tx2); margin-bottom:8px;">${c.description}</div>
+      <div style="display:flex; gap:10px; font-size:9px; margin-bottom:10px;">
+        <span style="color:var(--gold)">Reward: ${c.reward || 'Health'}</span>
+        <span style="color:var(--tx3)">End: ${c.endAt ? new Date(c.endAt).toLocaleDateString() : '-'}</span>
+      </div>
+      <div style="display:flex; gap:6px;">
+        ${c.isActive ? `<button class="bs" style="font-size:9px; padding:4px 8px; background:var(--og)" onclick="endChallenge(\'${c.id}\')">End & Announce</button>` : ''}
+        <button class="be" style="font-size:9px; padding:4px 8px;" onclick="editChallenge(\'${c.id}\')">Edit</button>
+        <button class="bd" style="font-size:9px; padding:4px 8px;" onclick="delChallenge(\'${c.id}\')">Delete</button>
+      </div>
+    </div>
+  `).join(\'\')}
+  `;
+}
+
 function renderADash(){
   const tu=USERS.filter(u=>u.role==='user').length,hr=LOGS.filter(l=>{const u=USERS.find(x=>x.id===l.userId);return u&&hScore(l,u)<50;}).length;
   const avg=LOGS.reduce((s,l)=>{const u=USERS.find(x=>x.id===l.userId);return s+(u?hScore(l,u):0);},0)/(LOGS.length||1);
-  const sc=s=>s>=80?'var(--lime)':s>=50?'var(--og)':'var(--red)';
-  return`${aBk()}<div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--lime);margin-bottom:12px">Dashboard</div>
+  const sc=s=>s>=80?\'var(--lime)\':s>=50?\'var(--og)\':\'var(--red)\';
+  return`${aBk()}<div style="font-family:\'Bebas Neue\',sans-serif;font-size:24px;letter-spacing:1px;color:var(--lime);margin-bottom:12px">Dashboard</div>
   <div class="admin-m"><div class="amc"><div class="amc-l">Users</div><div class="amc-v">${tu}</div></div><div class="amc"><div class="amc-l">Logs</div><div class="amc-v">${LOGS.length}</div></div><div class="amc"><div class="amc-l">High Risk</div><div class="amc-v" style="color:var(--red)">${hr}</div></div><div class="amc"><div class="amc-l">Avg Score</div><div class="amc-v" style="color:${sc(avg)}">${avg.toFixed(0)}</div></div></div>
-  <div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin-bottom:8px">กิจกรรมล่าสุด</div>
-  ${ACTS.slice(0,5).map(a=>acItem(a)).join('')}
+  ${renderAChallenges()}
+  <div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin:12px 0 8px">กิจกรรมล่าสุด</div>
+  ${ACTS.slice(0,5).map(a=>acItem(a)).join(\'\')}
   <div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--tx2);margin:12px 0 8px">สรุปรายผู้ใช้</div>
-  ${USERS.filter(u=>u.role==='user').map(u=>{const ul=LOGS.filter(l=>l.userId===u.id);const avgS=ul.reduce((s,l)=>s+hScore(l,u),0)/(ul.length||1);const lt=[...ul].sort((a,b)=>b.date.localeCompare(a.date))[0];const pb=u.photo?`background-image:url('${u.photo}')`:'';
-    return`<div class="card" style="margin-bottom:8px;padding:12px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--tl));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--bk);flex-shrink:0;background-size:cover;background-position:center;font-size:13px;${pb}">${!u.photo?u.name[0]:''}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">${u.name}</div><div style="font-size:9px;color:var(--bl);overflow:hidden;text-overflow:ellipsis">${u.email||''}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${sc(avgS)}">${avgS.toFixed(0)}</div><div style="font-size:9px;color:var(--tx3)">avg</div></div></div><div style="display:flex;gap:10px;font-size:9px;color:var(--tx2);flex-wrap:wrap"><span>Logs <b style="color:var(--tx)">${ul.length}</b></span><span>Last <b style="color:var(--tx)">${lt?lt.date:'-'}</b></span><span>${u.goalType}</span></div></div>`;
-  }).join('')}`;
+  ${USERS.filter(u=>u.role==='user').map(u=>{const ul=LOGS.filter(l=>l.userId===u.id);const avgS=ul.reduce((s,l)=>s+hScore(l,u),0)/(ul.length||1);const lt=[...ul].sort((a,b)=>b.date.localeCompare(a.date))[0];const pb=u.photo?`background-image:url(\'${u.photo}\')`:\'\';
+    return`<div class="card" style="margin-bottom:8px;padding:12px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--tl));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--bk);flex-shrink:0;background-size:cover;background-position:center;font-size:13px;${pb}">${!u.photo?u.name[0]:\'\'}</div><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">${u.name}</div><div style="font-size:9px;color:var(--bl);overflow:hidden;text-overflow:ellipsis">${u.email||\'\'}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:${sc(avgS)}">${avgS.toFixed(0)}</div><div style="font-size:9px;color:var(--tx3)">avg</div></div></div><div style="display:flex;gap:10px;font-size:9px;color:var(--tx2);flex-wrap:wrap"><span>Logs <b style="color:var(--tx)">${ul.length}</b></span><span>Last <b style="color:var(--tx)">${lt?lt.date:\'-\'}</b></span><span>${u.goalType}</span></div></div>`;
+  }).join(\'\')}`;
 }
 function renderAUsers(){
   return`${aBk()}<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--lime)">Users</div><button onclick="expAllUsers()" class="be">Export</button></div>

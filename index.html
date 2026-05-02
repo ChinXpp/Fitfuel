@@ -745,9 +745,34 @@ async function logout(){
   document.getElementById('global-loader').style.display='none';showScreen('splash');
 }
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');}
+function applyFitBotState(){
+  const wrap=document.getElementById('fitbot-wrap');
+  if(!wrap) return;
+  if(GCFG.fitbotEnabled===false){
+    wrap.style.display='none';
+    document.getElementById('fb-message')?.classList.remove('show');
+    document.getElementById('fb-badge')?.classList.remove('on');
+  } else {
+    wrap.style.display='';
+  }
+}
+function toggleFitBotPref(){
+  GCFG.fitbotEnabled=GCFG.fitbotEnabled===false;
+  saveGCFG();
+  applyFitBotState();
+  if(GCFG.fitbotEnabled){
+    showToast('FitBot เปิดแล้วครับ!');
+    setTimeout(()=>speakBot(`สวัสดีครับ ${dispName()}! FitBot กลับมาแล้ว ยินดีดูแลสุขภาพให้ครับ!`,5000,false,true),300);
+  } else {
+    showToast('FitBot ปิดแล้ว');
+  }
+  renderApp('profile');
+}
+
 function enterApp(){
   updAv();
   document.getElementById('fitbot-wrap').classList.add('active');
+  applyFitBotState();
   const rb = document.getElementById('topbar-role');
   if(rb) {
     rb.className = 'rb ' + CV;
@@ -755,9 +780,13 @@ function enterApp(){
   }
   initReminder();renderApp('home');showScreen('main');
   
-  // FitBot ทักทายเมื่อเข้าแอป
   setTimeout(() => {
-    speakBot(`สวัสดีครับ ${dispName()}! วันนี้เตรียมตัวสุขภาพดีหรือยังครับ?`, 6000);
+    const h=new Date().getHours();
+    const greet=h<12?'อรุณสวัสดิ์':h<17?'สวัสดีตอนบ่าย':'สวัสดีตอนเย็น';
+    const today=new Date().toISOString().split('T')[0];
+    const logged=LOGS.some(l=>l.userId===CU.id&&l.date===today);
+    const tail=logged?'วันนี้บันทึกข้อมูลแล้วครับ ทำได้ดีมาก!':'อย่าลืมบันทึกข้อมูลวันนี้ด้วยนะครับ!';
+    speakBot(`${greet}ครับ ${dispName()}! ${tail}`,6000,false,true);
   }, 1500);
 }
 function updAv(){
@@ -1046,11 +1075,13 @@ const IC={
   export:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>`,
   edit:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
   target:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,
+  bot:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg>`,
 };
 
 // ═══ RENDER ENGINE ═══
 let lastBotSpeak = 0;
 function speakBot(msg, dur=5000, thinking=false, force=false){
+  if(GCFG.fitbotEnabled===false) return;
   const now = Date.now();
   // Cooldown: ห้ามพูดบ่อยเกินไป (ยกเว้นโดนบังคับหรือถูกกดเรียก)
   if(!force && now - lastBotSpeak < 30000) return; 
@@ -1074,18 +1105,74 @@ function speakBot(msg, dur=5000, thinking=false, force=false){
   botTO=setTimeout(()=>{m.classList.remove('show');b.classList.remove('on');}, dur + (thinking ? 1200 : 0));
 }
 
-function botNavReact(page) {
-  if(CV !== 'user') return;
-  
-  const today = new Date().toISOString().split('T')[0];
-  const hasLogged = LOGS.some(l => l.userId === CU.id && l.date === today);
+function botNavReact(page){
+  const today=new Date().toISOString().split('T')[0];
 
-  if(page === 'home' && !hasLogged) {
-    speakBot('อย่าลืมบันทึกข้อมูลของวันนี้นะครับ เพื่อความต่อเนื่องของสถิติ!', 6000);
-  } else if(page === 'progress') {
-    speakBot('หน้าจอนี้จะบอกแนวโน้มสุขภาพของคุณในระยะยาวครับ ลองดูว่าเราพัฒนาขึ้นแค่ไหน!', 7000);
-  } else if(page === 'history') {
-    speakBot('คุณสามารถตรวจสอบและจัดการข้อมูลย้อนหลังได้ที่นี่ครับ', 6000);
+  if(CV==='admin'||CV==='master'){
+    const today=new Date().toISOString().split('T')[0];
+    const userOnly=USERS.filter(u=>u.role==='user');
+    // high-risk = latest log per user มีคะแนน < 50
+    const highRiskUsers=userOnly.filter(u=>{
+      const ul=LOGS.filter(l=>l.userId===u.id);
+      if(!ul.length) return false;
+      const lt=[...ul].sort((a,b)=>b.date.localeCompare(a.date))[0];
+      return hScore(lt,u)<50;
+    });
+    const inactive=userOnly.filter(u=>{
+      const ul=LOGS.filter(l=>l.userId===u.id);
+      if(!ul.length) return true;
+      const lt=[...ul].sort((a,b)=>b.date.localeCompare(a.date))[0];
+      return (new Date()-new Date(lt.date))/86400000>3;
+    });
+    const todayLogged=LOGS.filter(l=>l.date===today);
+    const todayActs=ACTS.filter(a=>a.timestamp&&new Date(a.timestamp).toDateString()===new Date().toDateString());
+
+    if(page==='dashboard'){
+      if(highRiskUsers.length>0) speakBot(`พบ ${highRiskUsers.length} User สุขภาพต่ำกว่าเกณฑ์ครับ! วันนี้มี ${todayLogged.length}/${userOnly.length} คนบันทึกแล้ว ดูหน้า Alerts ด้วยนะครับ`,7000);
+      else{const avg=LOGS.reduce((s,l)=>{const u=USERS.find(x=>x.id===l.userId);return s+(u?hScore(l,u):0);},0)/(LOGS.length||1);speakBot(`สถานะระบบดีครับ! Health avg ${avg.toFixed(0)}/100 วันนี้ ${todayLogged.length}/${userOnly.length} คนบันทึกแล้วครับ`,7000);}
+    } else if(page==='users'){
+      if(inactive.length>0) speakBot(`มี ${inactive.length} User ไม่ได้บันทึกนานกว่า 3 วันแล้วครับ ลองส่ง reminder หรือตรวจสอบด้วยนะครับ`,6000);
+      else speakBot(`User ทุกคน active ดีครับ! ไม่มีใครหยุดบันทึกเกิน 3 วัน มี ${todayLogged.length} คนบันทึกวันนี้แล้วครับ`,6000);
+    } else if(page==='logs'){
+      const recentLogs=LOGS.filter(l=>{return(new Date()-new Date(l.date))/86400000<7;});
+      speakBot(`บันทึกวันนี้ ${todayLogged.length} รายการ | 7 วันที่ผ่านมา ${recentLogs.length} รายการ | ทั้งหมด ${LOGS.length} รายการครับ`,6000);
+    } else if(page==='alerts'){
+      if(highRiskUsers.length>0){
+        const worst=[...highRiskUsers].sort((a,b)=>{const la=LOGS.filter(l=>l.userId===a.id).sort((x,y)=>y.date.localeCompare(x.date))[0];const lb=LOGS.filter(l=>l.userId===b.id).sort((x,y)=>y.date.localeCompare(x.date))[0];return(la?hScore(la,a):100)-(lb?hScore(lb,b):100);})[0];
+        const ws=LOGS.filter(l=>l.userId===worst.id).sort((a,b)=>b.date.localeCompare(a.date))[0];
+        speakBot(`User ที่น่าเป็นห่วงที่สุดคือ ${worst.name} (Score ${ws?hScore(ws,worst):'?'}) ควรติดต่อหรือให้คำแนะนำด้วยครับ!`,8000);
+      } else speakBot(`ยอดเยี่ยมครับ! ไม่มี Alert ตอนนี้ ผู้ใช้ทุกคนอยู่ในเกณฑ์ดีหมดเลยครับ`,6000);
+    } else if(page==='activity'){
+      const deletes=todayActs.filter(a=>a.type==='delete').length;
+      if(deletes>0) speakBot(`วันนี้มีการลบข้อมูล ${deletes} รายการครับ ลองตรวจสอบว่าถูกต้องหรือเปล่านะครับ`,6000);
+      else speakBot(`Activity วันนี้ ${todayActs.length} รายการ ไม่มีการลบข้อมูล ระบบปลอดภัยดีครับ`,5000);
+    } else if(page==='control'){
+      const avg=LOGS.reduce((s,l)=>{const u=USERS.find(x=>x.id===l.userId);return s+(u?hScore(l,u):0);},0)/(LOGS.length||1);
+      speakBot(`ระบบ: Users ${userOnly.length} คน | Admins ${USERS.filter(u=>u.role==='admin').length} คน | Health avg ${avg.toFixed(0)}/100 | Activities ${ACTS.length} รายการครับ`,7000);
+    } else if(page==='roles'){
+      speakBot(`Admin ${USERS.filter(u=>u.role==='admin').length} คน · User ${userOnly.length} คน · Master ${USERS.filter(u=>u.role==='master').length} คนในระบบครับ`,5000);
+    } else if(page==='backup'){
+      speakBot(`ควร export ข้อมูลสม่ำเสมอนะครับ ปัจจุบันมีข้อมูล ${LOGS.length} logs และ ${ACTS.length} activities ที่ควรสำรองไว้ครับ`,6000);
+    }
+    return;
+  }
+
+  const uLogs=LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>b.date.localeCompare(a.date));
+  const todayLog=uLogs.find(l=>l.date===today);
+  const yestDate=new Date(); yestDate.setDate(yestDate.getDate()-1);
+  const yestLog=uLogs.find(l=>l.date===yestDate.toISOString().split('T')[0]);
+
+  if(page==='home'){
+    if(!todayLog) speakBot(`อย่าลืมบันทึกข้อมูลวันนี้นะครับ ${dispName()}!`,6000);
+  } else if(page==='log'){
+    if(yestLog) speakBot(`เมื่อวาน: น้ำหนัก ${yestLog.weight}kg · นอน ${yestLog.sleep}ชม. · น้ำ ${yestLog.water}L · ออกกำลัง ${yestLog.exercise}นาที`,7000);
+    else speakBot('บันทึกทุกวันจะช่วยให้วิเคราะห์แนวโน้มได้แม่นยำขึ้นครับ!',5000);
+  } else if(page==='progress'){
+    speakBot('กดเปลี่ยน 7D/30D/90D เพื่อดูแนวโน้มในช่วงเวลาต่างๆ ได้เลยนะครับ',7000);
+  } else if(page==='history'){
+    speakBot('กดที่ log แต่ละรายการเพื่อดูรายละเอียดหรือลบข้อมูลได้ครับ',5000);
+  } else if(page==='profile'){
+    speakBot(`อัพเดทเป้าหมายหรือรูปโปรไฟล์ได้ที่นี่เลยนะครับ ${dispName()}!`,5000);
   }
 }
 
@@ -1545,76 +1632,171 @@ let botTO=null;
 
 function toggleFitBot(){
   const m=document.getElementById('fb-message');
-  if(m.classList.contains('show') && !m.classList.contains('thinking')) {
+  if(m.classList.contains('show')&&!m.classList.contains('thinking')){
     m.classList.remove('show');
-    return;
-  }
-  
-  // Smart Insight Engine: วิเคราะห์ข้อมูลย้อนหลัง
-  const uLogs = LOGS.filter(l => l.userId === CU.id).sort((a,b) => b.date.localeCompare(a.date));
-  const weekLogs = uLogs.slice(0, 7);
-  
-  if(weekLogs.length < 3) {
-    const tips=['ดื่มน้ำให้ครบ 2-3 ลิตรต่อวันนะครับ','เริ่มออกกำลังกายวันละนิด จิตแจ่มใสครับ','ลองจดบันทึกให้ครบ 3 วัน เพื่อให้ผมเริ่มวิเคราะห์แนวโน้มได้แม่นยำขึ้นนะครับ'];
-    speakBot(tips[Math.floor(Math.random()*tips.length)], 5000, true);
+    document.getElementById('fb-badge').classList.remove('on');
     return;
   }
 
-  // 1. วิเคราะห์น้ำหนัก
-  const avgW = weekLogs.reduce((s,l) => s + l.weight, 0) / weekLogs.length;
-  const currentW = weekLogs[0].weight;
-  const wDiff = currentW - avgW;
-  
-  // 2. วิเคราะห์ความขยัน
-  const totalEx = weekLogs.reduce((s,l) => s + l.exercise, 0);
-  const avgEx = totalEx / weekLogs.length;
+  if(CV==='admin'||CV==='master'){
+    const today=new Date().toISOString().split('T')[0];
+    const userOnly=USERS.filter(u=>u.role==='user');
+    const todayLogged=LOGS.filter(l=>l.date===today);
+    const todayActs=ACTS.filter(a=>a.timestamp&&new Date(a.timestamp).toDateString()===new Date().toDateString());
+    const allScores=LOGS.map(l=>{const u=USERS.find(x=>x.id===l.userId);return u?hScore(l,u):null;}).filter(s=>s!==null);
+    const avgScore=allScores.length?allScores.reduce((a,b)=>a+b,0)/allScores.length:0;
+    // high-risk = users ที่ latest log มีคะแนน < 50
+    const highRiskUsers=userOnly.filter(u=>{const ul=LOGS.filter(l=>l.userId===u.id);if(!ul.length)return false;const lt=[...ul].sort((a,b)=>b.date.localeCompare(a.date))[0];return hScore(lt,u)<50;});
+    // inactive = ไม่ได้บันทึกนานกว่า 3 วัน
+    const inactive=userOnly.filter(u=>{const ul=LOGS.filter(l=>l.userId===u.id);if(!ul.length)return true;const lt=[...ul].sort((a,b)=>b.date.localeCompare(a.date))[0];return(new Date()-new Date(lt.date))/86400000>3;});
+    // issues ใน 7 วันที่ผ่านมา
+    const recentLogs=LOGS.filter(l=>(new Date()-new Date(l.date))/86400000<7);
+    const lowSleep=recentLogs.filter(l=>l.sleep<6).length;
+    const lowWater=recentLogs.filter(l=>l.water<(GCFG.waterTarget||2.5)*0.6).length;
+    const noEx=recentLogs.filter(l=>l.exercise===0).length;
+    const logRate=userOnly.length?Math.round(todayLogged.length/userOnly.length*100):0;
 
-  let insight = '';
-  if (Math.abs(wDiff) > 0.1) {
-    insight = wDiff < 0 ? `น้ำหนักคุณลดลงจากค่าเฉลี่ยสัปดาห์นี้ ${Math.abs(wDiff).toFixed(1)}kg เลยนะ! ยอดเยี่ยมมากครับ ` : `ช่วงนี้น้ำหนักขึ้นเล็กน้อยนะครับ (${wDiff.toFixed(1)}kg) ลองคุมอาหารเพิ่มอีกนิดนะครับ `;
-  } else {
-    insight = `น้ำหนักคุณค่อนข้างคงที่ครับ รักษาวินัยต่อไปนะ! `;
+    const pool=[];
+    // 1. ภาพรวมระบบ
+    pool.push(`Health avg ${avgScore.toFixed(0)}/100 | Users ${userOnly.length} คน | Logs รวม ${LOGS.length} รายการ | Activities ${ACTS.length} ครับ`);
+    // 2. วันนี้
+    pool.push(`วันนี้ ${todayLogged.length}/${userOnly.length} คนบันทึกแล้ว (${logRate}%) | กิจกรรม ${todayActs.length} รายการครับ`);
+    // 3. กลุ่มเสี่ยง
+    if(highRiskUsers.length>0){
+      const names=highRiskUsers.slice(0,2).map(u=>u.name).join(', ');
+      pool.push(`กลุ่มเสี่ยง ${highRiskUsers.length} User: ${names}${highRiskUsers.length>2?` +${highRiskUsers.length-2} คน`:''} ควรดูหน้า Alerts ครับ!`);
+    } else {
+      pool.push(`ไม่มี User กลุ่มเสี่ยงตอนนี้ครับ ผู้ใช้ทุกคนสุขภาพอยู่ในเกณฑ์ดีหมดเลย!`);
+    }
+    // 4. Inactive users
+    if(inactive.length>0){
+      const names=inactive.slice(0,2).map(u=>u.name).join(', ');
+      pool.push(`${inactive.length} User ไม่ได้บันทึกนาน > 3 วัน: ${names}${inactive.length>2?` +${inactive.length-2} คน`:''} ลองส่ง reminder ครับ`);
+    }
+    // 5. แนวโน้มปัญหา 7 วัน
+    if(lowSleep>0||lowWater>0||noEx>0){
+      const issues=[];
+      if(lowSleep>0) issues.push(`นอนน้อย ${lowSleep}ครั้ง`);
+      if(lowWater>0) issues.push(`น้ำไม่พอ ${lowWater}ครั้ง`);
+      if(noEx>0) issues.push(`ไม่ออกกำลัง ${noEx}ครั้ง`);
+      pool.push(`แนวโน้ม 7 วันที่ผ่านมา: ${issues.join(' · ')} ควรแจ้งเตือน User ด้วยนะครับ`);
+    }
+    speakBot(pool[Math.floor(Math.random()*pool.length)],8000,true,true);
+    return;
   }
 
-  if (avgEx > 30) insight += `คุณออกกำลังกายเฉลี่ยวันละ ${Math.round(avgEx)} นาที ถือว่าแอคทีฟมากครับ!`;
-  else insight += `ลองเพิ่มเวลาออกกำลังกายอีกนิดนะครับ สัปดาห์นี้เฉลี่ยแค่ ${Math.round(avgEx)} นาทีเอง`;
+  const uLogs=LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>b.date.localeCompare(a.date));
+  const today=new Date().toISOString().split('T')[0];
 
-  speakBot(insight, 8000, true);
+  if(uLogs.length<3){
+    const tips=[
+      'ดื่มน้ำให้ครบตามเป้าทุกวันนะครับ ช่วยระบบเผาผลาญและผิวพรรณดีมากครับ!',
+      'เริ่มออกกำลังกายเบาๆ 20 นาทีก็โอเคครับ สะสมทีละนิดสุขภาพดีแน่นอน',
+      'บันทึกให้ครบ 3 วันก่อนนะครับ แล้วผมจะวิเคราะห์สุขภาพให้ได้เลย!'
+    ];
+    speakBot(tips[Math.floor(Math.random()*tips.length)],5000,true,true);
+    return;
+  }
+
+  const weekLogs=uLogs.slice(0,7);
+  const h=new Date().getHours();
+  const pool=[];
+
+  // น้ำหนัก
+  const avgW=weekLogs.reduce((s,l)=>s+l.weight,0)/weekLogs.length;
+  const wDiff=weekLogs[0].weight-avgW;
+  pool.push(Math.abs(wDiff)>0.2
+    ?(wDiff<0?`น้ำหนักลดจากค่าเฉลี่ยสัปดาห์ ${Math.abs(wDiff).toFixed(1)}kg ยอดเยี่ยมมากครับ ทำต่อไปเลย!`:`น้ำหนักขึ้น ${wDiff.toFixed(1)}kg จากค่าเฉลี่ย ลองเพิ่มน้ำและลดแป้งช่วงเย็นนะครับ`)
+    :`น้ำหนักสัปดาห์นี้ค่อนข้างคงที่ (${weekLogs[0].weight}kg) รักษาวินัยนี้ไว้นะครับ!`);
+
+  // การนอน
+  const avgSleep=weekLogs.reduce((s,l)=>s+l.sleep,0)/weekLogs.length;
+  const sleepT=CU.sleepTarget||7.5;
+  pool.push(avgSleep<sleepT-0.5
+    ?`นอนเฉลี่ยแค่ ${avgSleep.toFixed(1)} ชม./วัน น้อยกว่าเป้า ${sleepT} ชม. นะครับ ลองเข้านอนให้ตรงเวลาและวางมือถือก่อนนอน 30 นาทีครับ`
+    :`นอนหลับได้คุณภาพดีครับ! สัปดาห์นี้เฉลี่ย ${avgSleep.toFixed(1)} ชม. ร่างกายฟื้นฟูได้เต็มที่แน่นอนครับ`);
+
+  // น้ำ
+  const avgWater=weekLogs.reduce((s,l)=>s+l.water,0)/weekLogs.length;
+  const waterT=GCFG.waterTarget||2.5;
+  pool.push(avgWater<waterT*0.75
+    ?`ดื่มน้ำน้อยไปนะครับ สัปดาห์นี้เฉลี่ย ${avgWater.toFixed(1)}L ควรให้ถึง ${waterT}L/วัน ลองพกขวดน้ำติดตัวตลอดครับ`
+    :`ดื่มน้ำครบเป้าทุกวันเลยครับ! เฉลี่ย ${avgWater.toFixed(1)}L/วัน ผิวพรรณสดใสแน่นอนครับ`);
+
+  // ออกกำลังกาย
+  const totalEx=weekLogs.reduce((s,l)=>s+l.exercise,0);
+  const weekExT=CU.weeklyExerciseTarget||150;
+  const exPct=Math.round(totalEx/weekExT*100);
+  pool.push(exPct>=100
+    ?`ออกกำลังกายครบ ${weekExT} นาทีแล้วครับ! (${totalEx} นาทีสัปดาห์นี้) ร่างกายและหัวใจแข็งแรงแน่นอนครับ`
+    :`ออกกำลังกายไปแล้ว ${totalEx}/${weekExT} นาทีสัปดาห์นี้ (${exPct}%) เหลืออีก ${weekExT-totalEx} นาทีถึงเป้านะครับ!`);
+
+  // พลังงาน
+  const eLogs=weekLogs.filter(l=>l.energyLevel!=null);
+  if(eLogs.length>=3){
+    const avgE=eLogs.reduce((s,l)=>s+l.energyLevel,0)/eLogs.length;
+    pool.push(avgE<5
+      ?`พลังงานสัปดาห์นี้เฉลี่ย ${avgE.toFixed(1)}/10 นะครับ ลองดูว่านอนพอ ดื่มน้ำครบ และอาหารสมดุลหรือยังครับ`
+      :`พลังงานดีมากเลยครับ! สัปดาห์นี้เฉลี่ย ${avgE.toFixed(1)}/10 แสดงว่าร่างกายอยู่ในสภาพดีครับ`);
+  }
+
+  // เวลา
+  if(h>=5&&h<9) pool.push('อรุณสวัสดิ์ครับ! ดื่มน้ำอุ่นสักแก้วก่อนอาหารเช้าช่วยกระตุ้นระบบย่อยได้ดีมากเลยนะครับ');
+  else if(h>=12&&h<14) pool.push('หลังมื้อกลางวัน ลองเดินเบาๆ 10 นาทีนะครับ ช่วยย่อยอาหารและไม่ง่วงช่วงบ่ายด้วยครับ');
+  else if(h>=17&&h<20) pool.push('ช่วงเย็นเหมาะออกกำลังกายมากครับ กล้ามเนื้อยืดหยุ่นดี ลองวิ่งหรือเดิน 30 นาทีดูนะครับ');
+  else if(h>=21) pool.push('ใกล้เวลานอนแล้วนะครับ วางมือถือก่อนนอน 30 นาทีและเปิดห้องให้เย็นนิดหน่อย เพื่อหลับได้ลึกขึ้นครับ');
+
+  // ยังไม่ได้บันทึกวันนี้
+  if(uLogs[0]?.date!==today) pool.push(`อย่าลืมบันทึกข้อมูลวันนี้นะครับ ${dispName()}! เพื่อความต่อเนื่องของสถิติสุขภาพ`);
+
+  speakBot(pool[Math.floor(Math.random()*pool.length)],8000,true,true);
 }
 
 async function botReact(log){
-  // สำหรับ Admin/Master: ให้บอทสรุปสถานะระบบเบื้องต้น
-  if(CV === 'admin' || CV === 'master') {
-    const highRisk = LOGS.filter(l => {
-      const u = USERS.find(x => x.id === l.userId);
-      return u && hScore(l, u) < 50;
-    }).length;
-    
-    if(highRisk > 0) speakBot(`ตรวจพบ User กลุ่มเสี่ยง ${highRisk} รายในระบบครับ Admin ควรตรวจสอบหน้า Alerts นะครับ!`, 8000);
-    else speakBot(`สถานะระบบปกติครับ! ผู้ใช้ทุกคนมีสุขภาพเกณฑ์ดี ขอบคุณที่ช่วยดูแลระบบนะครับ`, 7000);
+  if(CV==='admin'||CV==='master'){
+    const userOnly=USERS.filter(u=>u.role==='user');
+    const highRiskUsers=userOnly.filter(u=>{const ul=LOGS.filter(l=>l.userId===u.id);if(!ul.length)return false;const lt=[...ul].sort((a,b)=>b.date.localeCompare(a.date))[0];return hScore(lt,u)<50;});
+    const today=new Date().toISOString().split('T')[0];
+    const todayLogged=LOGS.filter(l=>l.date===today);
+    const logRate=userOnly.length?Math.round(todayLogged.length/userOnly.length*100):0;
+    if(highRiskUsers.length>0){
+      speakBot(`บันทึกข้อมูลสำเร็จครับ! ตอนนี้มี ${highRiskUsers.length} User กลุ่มเสี่ยงในระบบ วันนี้ ${logRate}% ของ User บันทึกแล้วครับ`,7000,false,true);
+    } else {
+      speakBot(`บันทึกเรียบร้อยครับ! ระบบปกติดี ไม่มี User กลุ่มเสี่ยง วันนี้ ${logRate}% ของ User บันทึกข้อมูลแล้วครับ`,6000,false,true);
+    }
     return;
   }
 
-  // สำหรับ User ทั่วไป: วิเคราะห์เจาะลึกขึ้น
-  const u = CU;
-  const bmiVal = bmi(log.weight, u.height);
-  
-  if(log.water < GCFG.waterTarget * 0.4) {
-    speakBot(`คุณดื่มน้ำน้อยมากเลยครับ (เพิ่งได้ ${Math.round((log.water/GCFG.waterTarget)*100)}% ของเป้าหมาย) ระวังผิวแห้งและอ่อนเพลียนะครับ!`, 8000);
-  } else if(log.sleep < 5) {
-    speakBot(`นอนน้อยกว่า 5 ชม. อันตรายต่อหัวใจนะครับ คืนนี้รีบเข้านอนและงดคาเฟอีนช่วงเย็นนะครับ`, 8000);
-  } else if(log.exercise > 90) {
-    speakBot(`โห! ออกกำลังกายหนักมากครับ (${log.exercise} นาที) อย่าลืมยืดเหยียดและเติมโปรตีนหลังซ้อมด้วยนะ!`, 7000);
-  } else if(bmiVal > 30 && log.exercise === 0) {
-    speakBot(`BMI คุณอยู่ในเกณฑ์สูงนะครับ ลองเริ่มขยับตัววันละ 15 นาที เพื่อหัวใจที่แข็งแรงขึ้นครับ`, 8000);
-  } else {
-    const positiveMsgs = [
-      'บันทึกข้อมูลเรียบร้อย! ทำดีมากครับที่รักษาวินัย',
-      'รักษาระดับนี้ไว้เรื่อยๆ สุขภาพดีแน่นอนครับ!',
-      'ความสำเร็จเกิดจากสิ่งที่ทำทุกวัน ยินดีด้วยที่วันนี้ทำสำเร็จครับ!',
-      'วันนี้คุณ Chin ดูแลตัวเองได้ยอดเยี่ยมมากครับ'
+  const bmiVal=bmi(log.weight,CU.height);
+  const waterT=GCFG.waterTarget||2.5;
+  const score=hScore(log,CU);
+
+  if(log.water<waterT*0.4){
+    speakBot(`ดื่มน้ำน้อยมากเลยครับ (${Math.round(log.water/waterT*100)}% ของเป้า ${waterT}L) เติมน้ำด่วนเลยนะครับ ระวังเพลียและปวดหัว!`,8000,false,true);
+  } else if(log.sleep<5){
+    speakBot(`นอนน้อยกว่า 5 ชม. อันตรายต่อหัวใจนะครับ คืนนี้ปิดมือถือแล้วเข้านอนเร็วๆ เลยครับ!`,8000,false,true);
+  } else if(log.exercise>90){
+    speakBot(`ออกกำลังกายหนักมากครับ (${log.exercise} นาที!) อย่าลืมยืดเหยียดและกินโปรตีนหลังซ้อมด้วยนะ!`,7000,false,true);
+  } else if(bmiVal>30&&log.exercise===0){
+    speakBot(`BMI อยู่ที่ ${bmiVal.toFixed(1)} ครับ ลองเริ่มขยับตัววันละ 15 นาทีเพื่อหัวใจที่แข็งแรงขึ้นนะครับ!`,8000,false,true);
+  } else if(score>=80){
+    const great=[
+      `${score} คะแนน! วันนี้ดูแลตัวเองได้ยอดเยี่ยมมากเลยครับ ${dispName()}!`,
+      `คะแนนวันนี้ ${score}/100 ยอดมากครับ ทำต่อไปเรื่อยๆ แล้วสุขภาพดีแน่นอน!`,
+      `ทุกการบันทึกคือก้าวสู่สุขภาพที่ดีขึ้น วันนี้ ${score} คะแนน ยอดเยี่ยมครับ!`
     ];
-    speakBot(positiveMsgs[Math.floor(Math.random()*positiveMsgs.length)], 6000);
+    speakBot(great[Math.floor(Math.random()*great.length)],6000,false,true);
+  } else if(log.energyLevel!=null&&log.energyLevel<=3){
+    speakBot(`พลังงานวันนี้ต่ำนะครับ (${log.energyLevel}/10) ลองดูว่าพักผ่อนพอ ดื่มน้ำครบ และอาหารสมดุลหรือยังครับ`,7000,false,true);
+  } else if(log.water>=waterT){
+    speakBot(`ดื่มน้ำครบ ${log.water}L วันนี้ด้วยครับ ยอดเยี่ยมมาก! รักษาวินัยนี้ไว้นะครับ`,6000,false,true);
+  } else {
+    const positive=[
+      `บันทึกเรียบร้อยครับ! รักษาวินัยนี้ไว้นะ ความสม่ำเสมอคือกุญแจสำคัญครับ`,
+      `วันนี้ทำได้ดีมากครับ สุขภาพดีแน่นอนถ้าทำแบบนี้ทุกวัน!`,
+      `ยอดเยี่ยมครับ ${dispName()}! ทุกวันที่บันทึกคือการลงทุนเพื่อสุขภาพระยะยาวครับ`
+    ];
+    speakBot(positive[Math.floor(Math.random()*positive.length)],6000,false,true);
   }
 }
 
@@ -1902,6 +2084,7 @@ function renderProfile(){
   <div class="ps-lbl">PREFERENCES · การตั้งค่า</div>
   <div class="ps-items">
     <div class="pi"><div class="pi-ic">${IC.bell}</div><div class="pi-main"><div class="pi-t">Notifications <span style="font-size:9px;color:var(--tx3);font-weight:400">การแจ้งเตือน</span></div><div class="pi-s">${remS.enabled?'เปิดอยู่ · '+remS.time:'ปิดอยู่'}</div></div><label class="tog"><input type="checkbox" ${remS.enabled?'checked':''} onchange="toggleReminder()"><span class="tog-sl"></span></label></div>
+    <div class="pi"><div class="pi-ic" style="color:var(--lime);background:rgba(200,240,0,.08)">${IC.bot}</div><div class="pi-main"><div class="pi-t">FitBot <span style="font-size:9px;color:var(--tx3);font-weight:400">ผู้ช่วย AI</span></div><div class="pi-s">${GCFG.fitbotEnabled!==false?'เปิดอยู่ · วิเคราะห์สุขภาพให้คุณ':'ปิดอยู่'}</div></div><label class="tog"><input type="checkbox" ${GCFG.fitbotEnabled!==false?'checked':''} onchange="toggleFitBotPref()"><span class="tog-sl"></span></label></div>
     <div class="pi" onclick="navTo('settings')"><div class="pi-ic">${IC.bell}</div><div class="pi-main"><div class="pi-t">Reminders <span style="font-size:9px;color:var(--tx3);font-weight:400">ตัวเตือน</span></div><div class="pi-s">เวลา ${remS.time}</div></div><div class="pi-r">${IC.arrow}</div></div>
   </div>
   <div class="ps-lbl">DATA · ข้อมูล</div>

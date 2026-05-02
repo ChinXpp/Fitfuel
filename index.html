@@ -363,6 +363,17 @@ select.fi option{background:var(--card2)}
 @keyframes sp{to{transform:rotate(360deg)}}
 .toast{position:fixed;bottom:94px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--lime);color:var(--bk);padding:10px 18px;border-radius:26px;font-weight:700;font-size:11px;opacity:0;transition:all .26s ease;z-index:9999;white-space:nowrap;max-width:86vw;text-align:center;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* FitBot */
+.fb-wrap{position:fixed;right:18px;bottom:96px;z-index:9500;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
+.fb-msg{background:var(--dark);border:1px solid var(--lime);padding:12px 15px;border-radius:18px 18px 2px 18px;max-width:240px;box-shadow:0 10px 25px rgba(0,0,0,.5);opacity:0;transform:translateY(10px) scale(.9);transition:all .3s cubic-bezier(.18,.89,.32,1.28);pointer-events:auto}
+.fb-msg.show{opacity:1;transform:none}
+.fb-txt{font-size:11px;line-height:1.5;color:var(--tx)}
+.fb-bot{width:46px;height:46px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;color:var(--bk);box-shadow:0 4px 15px rgba(200,240,0,.3);cursor:pointer;pointer-events:auto;transition:all .2s;position:relative}
+.fb-bot:active{transform:scale(.9)}
+.fb-bot svg{width:24px;height:24px}
+.fb-badge{position:absolute;top:-2px;right:-2px;width:12px;height:12px;background:var(--red);border:2px solid var(--dark);border-radius:50%;display:none}
+.fb-badge.on{display:block}
 .ph-in{display:none}
 .es-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--br)}
 .es-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
@@ -554,6 +565,17 @@ select.fi option{background:var(--card2)}
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- FitBot -->
+<div class="fb-wrap" id="fitbot-wrap">
+  <div class="fb-msg" id="fb-message">
+    <div class="fb-txt" id="fb-text">สวัสดีครับ! ผมคือ FitBot พร้อมช่วยดูแลสุขภาพคุณแล้วครับ</div>
+  </div>
+  <div class="fb-bot" onclick="toggleFitBot()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+    <div class="fb-badge" id="fb-badge"></div>
+  </div>
+</div>
 
 <script>
 // ═══ SUPABASE INIT ═══
@@ -1468,6 +1490,36 @@ function openQuickLog(){
 // ------------------------------------------
 
 // ลบ Draft ทิ้งหลังจาก Save สำเร็จ
+let botTO=null;
+function speakBot(msg, dur=5000){
+  const m=document.getElementById('fb-message'), t=document.getElementById('fb-text'), b=document.getElementById('fb-badge');
+  t.innerHTML=msg; m.classList.add('show'); b.classList.add('on');
+  if(botTO)clearTimeout(botTO);
+  botTO=setTimeout(()=>{m.classList.remove('show');b.classList.remove('on');}, dur);
+}
+function toggleFitBot(){
+  const m=document.getElementById('fb-message');
+  if(m.classList.contains('show')) m.classList.remove('show');
+  else {
+    const tips=[
+      'อย่าลืมดื่มน้ำให้ครบตามเป้าหมายนะครับ!',
+      'การนอนที่มีคุณภาพช่วยให้กล้ามเนื้อฟื้นฟูได้ดีที่สุด',
+      'ลองเดินยืดเส้นยืดสายทุกๆ 1 ชั่วโมงดูสิครับ',
+      'สู้ๆ นะครับ เป้าหมายสุขภาพอยู่ไม่ไกลแล้ว!',
+      'วันนี้คุณ Chin ดูแลตัวเองดีหรือยังครับ?'
+    ];
+    speakBot(tips[Math.floor(Math.random()*tips.length)]);
+  }
+}
+
+async function botReact(log){
+  // วิเคราะห์ข้อมูลเพื่อตอบสนอง
+  if(log.water < GCFG.waterTarget * 0.5) speakBot(`คุณดื่มน้ำน้อยไปนิดนะครับ (เพิ่งได้ ${log.water}L) ลองจิบน้ำเพิ่มดูนะครับ!`);
+  else if(log.sleep < 6) speakBot(`เมื่อคืนนอนน้อยจังครับ (${log.sleep} ชม.) วันนี้หาเวลาพักผ่อนบ้างนะครับ`);
+  else if(log.exercise >= 60) speakBot(`สุดยอดไปเลย! ออกกำลังกายไปถึง ${log.exercise} นาที แข็งแรงแน่นอนครับ`);
+  else speakBot(`บันทึกข้อมูลเรียบร้อย! ขอบคุณที่รักษาวินัยนะครับ`);
+}
+
 async function submitLog(){
   if(!supa){alert("ไม่สามารถเชื่อมต่อได้");return;}
   const date=document.getElementById('log-date').value;
@@ -1521,6 +1573,7 @@ async function submitLog(){
   localStorage.removeItem('fitfuel_draft_' + CU.id);
   
   showToast(existing ? 'อัปเดตข้อมูลสำเร็จ!' : 'บันทึกข้อมูลสำเร็จ!');
+  botReact(ml); // FitBot ทักทายหลังบันทึก
   setTimeout(()=>navTo('home',document.querySelectorAll('.bnav .ni')[0]),600);
 }
 
@@ -1590,6 +1643,7 @@ async function submitQuickLog(){
   localStorage.removeItem('fitfuel_draft_' + CU.id);
   
   closeQuickLog();showToast(existing ? 'อัปเดตข้อมูลสำเร็จ!' : 'บันทึกสำเร็จ!');
+  botReact(ml); // FitBot ทักทายหลังบันทึก
   renderApp('home');
 }
 function updLogProg(f){

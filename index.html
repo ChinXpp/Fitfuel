@@ -369,6 +369,8 @@ select.fi option{background:var(--card2)}
 .fb-wrap.active{display:flex}
 .fb-msg{background:var(--dark);border:1px solid var(--lime);padding:12px 15px;border-radius:18px 18px 2px 18px;max-width:240px;box-shadow:0 10px 25px rgba(0,0,0,.5);opacity:0;transform:translateY(10px) scale(.9);transition:all .3s cubic-bezier(.18,.89,.32,1.28);pointer-events:auto}
 .fb-msg.show{opacity:1;transform:none}
+.fb-msg.thinking::after{content:'...';position:absolute;bottom:5px;right:15px;font-size:12px;color:var(--lime);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .fb-txt{font-size:11px;line-height:1.5;color:var(--tx)}
 .fb-bot{width:46px;height:46px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;color:var(--bk);box-shadow:0 4px 15px rgba(200,240,0,.3);cursor:pointer;pointer-events:auto;transition:all .2s;position:relative}
 .fb-bot:active{transform:scale(.9)}
@@ -1047,6 +1049,46 @@ const IC={
 };
 
 // ═══ RENDER ENGINE ═══
+let lastBotSpeak = 0;
+function speakBot(msg, dur=5000, thinking=false, force=false){
+  const now = Date.now();
+  // Cooldown: ห้ามพูดบ่อยเกินไป (ยกเว้นโดนบังคับหรือถูกกดเรียก)
+  if(!force && now - lastBotSpeak < 30000) return; 
+
+  const m=document.getElementById('fb-message'), t=document.getElementById('fb-text'), b=document.getElementById('fb-badge');
+  lastBotSpeak = now;
+  
+  if(thinking) {
+    t.innerHTML='กำลังวิเคราะห์ข้อมูล...';
+    m.classList.add('show', 'thinking');
+    setTimeout(() => {
+      m.classList.remove('thinking');
+      t.innerHTML = msg;
+      b.classList.add('on');
+    }, 1200);
+  } else {
+    t.innerHTML=msg; m.classList.add('show'); b.classList.add('on');
+  }
+
+  if(botTO)clearTimeout(botTO);
+  botTO=setTimeout(()=>{m.classList.remove('show');b.classList.remove('on');}, dur + (thinking ? 1200 : 0));
+}
+
+function botNavReact(page) {
+  if(CV !== 'user') return;
+  
+  const today = new Date().toISOString().split('T')[0];
+  const hasLogged = LOGS.some(l => l.userId === CU.id && l.date === today);
+
+  if(page === 'home' && !hasLogged) {
+    speakBot('อย่าลืมบันทึกข้อมูลของวันนี้นะครับ เพื่อความต่อเนื่องของสถิติ!', 6000);
+  } else if(page === 'progress') {
+    speakBot('หน้าจอนี้จะบอกแนวโน้มสุขภาพของคุณในระยะยาวครับ ลองดูว่าเราพัฒนาขึ้นแค่ไหน!', 7000);
+  } else if(page === 'history') {
+    speakBot('คุณสามารถตรวจสอบและจัดการข้อมูลย้อนหลังได้ที่นี่ครับ', 6000);
+  }
+}
+
 function renderApp(page){
   CP=page;renderNav();
   const el=document.getElementById('main-content');
@@ -1058,21 +1100,15 @@ function renderApp(page){
     else if(page==='profile')el.innerHTML=renderProfile();
     else if(page==='settings')el.innerHTML=renderSettings();
   }else if(CV==='admin'){
-    if(page==='dashboard')el.innerHTML=renderADash();
-    else if(page==='users')el.innerHTML=renderAUsers();
-    else if(page==='logs')el.innerHTML=renderALogs();
-    else if(page==='activity')el.innerHTML=renderActivity();
-    else if(page==='alerts')el.innerHTML=renderAlerts();
-  }else{
-    if(page==='control')el.innerHTML=renderMCtrl();
-    else if(page==='roles')el.innerHTML=renderMRoles();
+...
     else if(page==='activity')el.innerHTML=renderActivity();
     else if(page==='backup')el.innerHTML=renderMBackup();
   }
+  
+  botNavReact(page); // ให้บอททักทายตามหน้าจอที่ไป
+
   if(document.getElementById('wc')){
-    requestAnimationFrame(()=>drawChart('wc',LOGS.filter(l=>l.userId===CU.id),CU,30));
-  }
-}
+...
 
 const _NAV={
   user:[{p:'home',i:IC.home,l:'Home'},{p:'log',i:IC.plus,l:'Log'},{p:'progress',i:IC.trend,l:'Progress'},{p:'history',i:IC.grid,l:'History'},{p:'profile',i:IC.user,l:'Profile'}],
@@ -1499,25 +1535,62 @@ function openQuickLog(){
 
 // ลบ Draft ทิ้งหลังจาก Save สำเร็จ
 let botTO=null;
-function speakBot(msg, dur=5000){
+function speakBot(msg, dur=5000, thinking=false){
   const m=document.getElementById('fb-message'), t=document.getElementById('fb-text'), b=document.getElementById('fb-badge');
-  t.innerHTML=msg; m.classList.add('show'); b.classList.add('on');
+  
+  if(thinking) {
+    t.innerHTML='กำลังวิเคราะห์ข้อมูล...';
+    m.classList.add('show', 'thinking');
+    setTimeout(() => {
+      m.classList.remove('thinking');
+      t.innerHTML = msg;
+      b.classList.add('on');
+    }, 1200);
+  } else {
+    t.innerHTML=msg; m.classList.add('show'); b.classList.add('on');
+  }
+
   if(botTO)clearTimeout(botTO);
-  botTO=setTimeout(()=>{m.classList.remove('show');b.classList.remove('on');}, dur);
+  botTO=setTimeout(()=>{m.classList.remove('show');b.classList.remove('on');}, dur + (thinking ? 1200 : 0));
 }
+
 function toggleFitBot(){
   const m=document.getElementById('fb-message');
-  if(m.classList.contains('show')) m.classList.remove('show');
-  else {
-    const tips=[
-      'อย่าลืมดื่มน้ำให้ครบตามเป้าหมายนะครับ!',
-      'การนอนที่มีคุณภาพช่วยให้กล้ามเนื้อฟื้นฟูได้ดีที่สุด',
-      'ลองเดินยืดเส้นยืดสายทุกๆ 1 ชั่วโมงดูสิครับ',
-      'สู้ๆ นะครับ เป้าหมายสุขภาพอยู่ไม่ไกลแล้ว!',
-      'วันนี้คุณ Chin ดูแลตัวเองดีหรือยังครับ?'
-    ];
-    speakBot(tips[Math.floor(Math.random()*tips.length)]);
+  if(m.classList.contains('show') && !m.classList.contains('thinking')) {
+    m.classList.remove('show');
+    return;
   }
+  
+  // Smart Insight Engine: วิเคราะห์ข้อมูลย้อนหลัง
+  const uLogs = LOGS.filter(l => l.userId === CU.id).sort((a,b) => b.date.localeCompare(a.date));
+  const weekLogs = uLogs.slice(0, 7);
+  
+  if(weekLogs.length < 3) {
+    const tips=['ดื่มน้ำให้ครบ 2-3 ลิตรต่อวันนะครับ','เริ่มออกกำลังกายวันละนิด จิตแจ่มใสครับ','ลองจดบันทึกให้ครบ 3 วัน เพื่อให้ผมเริ่มวิเคราะห์แนวโน้มได้แม่นยำขึ้นนะครับ'];
+    speakBot(tips[Math.floor(Math.random()*tips.length)], 5000, true);
+    return;
+  }
+
+  // 1. วิเคราะห์น้ำหนัก
+  const avgW = weekLogs.reduce((s,l) => s + l.weight, 0) / weekLogs.length;
+  const currentW = weekLogs[0].weight;
+  const wDiff = currentW - avgW;
+  
+  // 2. วิเคราะห์ความขยัน
+  const totalEx = weekLogs.reduce((s,l) => s + l.exercise, 0);
+  const avgEx = totalEx / weekLogs.length;
+
+  let insight = '';
+  if (Math.abs(wDiff) > 0.1) {
+    insight = wDiff < 0 ? `น้ำหนักคุณลดลงจากค่าเฉลี่ยสัปดาห์นี้ ${Math.abs(wDiff).toFixed(1)}kg เลยนะ! ยอดเยี่ยมมากครับ ` : `ช่วงนี้น้ำหนักขึ้นเล็กน้อยนะครับ (${wDiff.toFixed(1)}kg) ลองคุมอาหารเพิ่มอีกนิดนะครับ `;
+  } else {
+    insight = `น้ำหนักคุณค่อนข้างคงที่ครับ รักษาวินัยต่อไปนะ! `;
+  }
+
+  if (avgEx > 30) insight += `คุณออกกำลังกายเฉลี่ยวันละ ${Math.round(avgEx)} นาที ถือว่าแอคทีฟมากครับ!`;
+  else insight += `ลองเพิ่มเวลาออกกำลังกายอีกนิดนะครับ สัปดาห์นี้เฉลี่ยแค่ ${Math.round(avgEx)} นาทีเอง`;
+
+  speakBot(insight, 8000, true);
 }
 
 async function botReact(log){

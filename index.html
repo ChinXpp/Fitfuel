@@ -1100,7 +1100,14 @@ function renderApp(page){
     else if(page==='profile')el.innerHTML=renderProfile();
     else if(page==='settings')el.innerHTML=renderSettings();
   }else if(CV==='admin'){
-...
+    if(page==='dashboard')el.innerHTML=renderADash();
+    else if(page==='users')el.innerHTML=renderAUsers();
+    else if(page==='logs')el.innerHTML=renderALogs();
+    else if(page==='alerts')el.innerHTML=renderAlerts();
+    else if(page==='activity')el.innerHTML=renderActivity();
+  }else if(CV==='master'){
+    if(page==='control')el.innerHTML=renderMCtrl();
+    else if(page==='roles')el.innerHTML=renderMRoles();
     else if(page==='activity')el.innerHTML=renderActivity();
     else if(page==='backup')el.innerHTML=renderMBackup();
   }
@@ -1108,7 +1115,10 @@ function renderApp(page){
   botNavReact(page); // ให้บอททักทายตามหน้าจอที่ไป
 
   if(document.getElementById('wc')){
-...
+    const uLogs=LOGS.filter(l=>l.userId===CU.id).sort((a,b)=>a.date.localeCompare(b.date));
+    setTimeout(()=>drawChart('wc',uLogs,CU,progDays),0);
+  }
+}
 
 const _NAV={
   user:[{p:'home',i:IC.home,l:'Home'},{p:'log',i:IC.plus,l:'Log'},{p:'progress',i:IC.trend,l:'Progress'},{p:'history',i:IC.grid,l:'History'},{p:'profile',i:IC.user,l:'Profile'}],
@@ -1531,28 +1541,7 @@ function openQuickLog(){
   }, 50);
 }
 
-// ------------------------------------------
-
-// ลบ Draft ทิ้งหลังจาก Save สำเร็จ
 let botTO=null;
-function speakBot(msg, dur=5000, thinking=false){
-  const m=document.getElementById('fb-message'), t=document.getElementById('fb-text'), b=document.getElementById('fb-badge');
-  
-  if(thinking) {
-    t.innerHTML='กำลังวิเคราะห์ข้อมูล...';
-    m.classList.add('show', 'thinking');
-    setTimeout(() => {
-      m.classList.remove('thinking');
-      t.innerHTML = msg;
-      b.classList.add('on');
-    }, 1200);
-  } else {
-    t.innerHTML=msg; m.classList.add('show'); b.classList.add('on');
-  }
-
-  if(botTO)clearTimeout(botTO);
-  botTO=setTimeout(()=>{m.classList.remove('show');b.classList.remove('on');}, dur + (thinking ? 1200 : 0));
-}
 
 function toggleFitBot(){
   const m=document.getElementById('fb-message');
